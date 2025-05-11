@@ -1,0 +1,1121 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Financial System Component Builder</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent-color: #4f8df5;
+            --accent-hover: #3a7ade;
+            --error-color: #f44336;
+            --success-color: #4caf50;
+            --border-color: #333333;
+            --card-bg: #242424;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding: 16px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        header p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+            gap: 4px;
+        }
+        
+        .tab {
+            padding: 10px 16px;
+            background-color: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        
+        .tab.active {
+            background-color: var(--card-bg);
+            color: var(--accent-color);
+            font-weight: 500;
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .components-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .component {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: grab;
+            transition: transform 0.2s, box-shadow 0.2s;
+            user-select: none;
+            border: 2px solid transparent;
+        }
+        
+        .component:active {
+            cursor: grabbing;
+        }
+        
+        .component:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .component img, .component i {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 8px;
+            font-size: 32px;
+            color: var(--accent-color);
+        }
+        
+        .component h3 {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+        
+        .component p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .workspace {
+            background-color: var(--bg-secondary);
+            border-radius: 12px;
+            min-height: 400px;
+            padding: 24px;
+            position: relative;
+            margin-bottom: 20px;
+            border: 1px dashed var(--border-color);
+        }
+        
+        .workspace-dropzone {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        
+        .workspace-component {
+            position: absolute;
+            z-index: 2;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 12px;
+            width: 100px;
+            text-align: center;
+            cursor: move;
+            user-select: none;
+            box-shadow: var(--shadow);
+        }
+        
+        .workspace-component h3 {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        
+        .connection-point {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            z-index: 3;
+        }
+        
+        .connection {
+            position: absolute;
+            height: 2px;
+            background-color: var(--accent-color);
+            z-index: 1;
+            pointer-events: none;
+            transform-origin: left center;
+        }
+        
+        .feedback {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .feedback.success {
+            background-color: var(--success-color);
+        }
+        
+        .feedback.error {
+            background-color: var(--error-color);
+        }
+        
+        .feedback.show {
+            opacity: 1;
+        }
+        
+        .completion-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .completion-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 90%;
+            width: 500px;
+            text-align: center;
+        }
+        
+        .modal-content h2 {
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+        
+        .modal-content p {
+            margin-bottom: 24px;
+            color: var(--text-secondary);
+        }
+        
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .btn:hover {
+            background-color: var(--accent-hover);
+        }
+        
+        .reset-btn {
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .reset-btn:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        @media (max-width: 768px) {
+            .workspace {
+                min-height: 300px;
+            }
+            
+            header h1 {
+                font-size: 20px;
+            }
+            
+            header p {
+                font-size: 14px;
+            }
+            
+            .components-container {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .components-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .workspace {
+                min-height: 250px;
+                padding: 16px;
+            }
+            
+            .tab {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>Financial System Component Builder</h1>
+            <p>Assemble a complete financial ecosystem by dragging and connecting core components</p>
+        </header>
+        
+        <div class=&quot;tabs&quot;>
+            <button class=&quot;tab active&quot; data-tab=&quot;build&quot;>Build System</button>
+            <button class=&quot;tab&quot; data-tab=&quot;learn&quot;>Learn Components</button>
+            <button class=&quot;tab&quot; data-tab=&quot;examples&quot;>Example Setups</button>
+        </div>
+        
+        <div id=&quot;build&quot; class=&quot;tab-content active&quot;>
+            <h2 style=&quot;margin-bottom: 16px; font-size: 18px;&quot;>Available Components</h2>
+            
+            <div class=&quot;components-container&quot;>
+                <div class=&quot;component&quot; data-component=&quot;pos&quot;>
+                    <i>💻</i>
+                    <h3>POS System</h3>
+                    <p>Sales tracking</p>
+                </div>
+                <div class=&quot;component&quot; data-component=&quot;inventory&quot;>
+                    <i>📦</i>
+                    <h3>Inventory</h3>
+                    <p>Stock management</p>
+                </div>
+                <div class=&quot;component&quot; data-component=&quot;accounting&quot;>
+                    <i>📊</i>
+                    <h3>Accounting</h3>
+                    <p>Financial records</p>
+                </div>
+                <div class=&quot;component&quot; data-component=&quot;procurement&quot;>
+                    <i>🛒</i>
+                    <h3>Procurement</h3>
+                    <p>Purchasing system</p>
+                </div>
+                <div class=&quot;component&quot; data-component=&quot;dashboard&quot;>
+                    <i>📱</i>
+                    <h3>Dashboard</h3>
+                    <p>Analytics view</p>
+                </div>
+                <div class=&quot;component&quot; data-component=&quot;ai&quot;>
+                    <i>🤖</i>
+                    <h3>AI Module</h3>
+                    <p>Smart analytics</p>
+                </div>
+            </div>
+            
+            <h2 style=&quot;margin-bottom: 16px; font-size: 18px;&quot;>Workspace</h2>
+            <p style=&quot;margin-bottom: 16px; color: var(--text-secondary); font-size: 14px;&quot;>Drag components to the workspace and connect them to build your financial system</p>
+            
+            <div class=&quot;workspace&quot;>
+                <div class=&quot;workspace-dropzone&quot;></div>
+            </div>
+            
+            <div class=&quot;actions&quot;>
+                <button class=&quot;reset-btn&quot;>Reset Workspace</button>
+                <button class=&quot;btn check-system-btn&quot;>Check System</button>
+            </div>
+        </div>
+        
+        <div id=&quot;learn&quot; class=&quot;tab-content&quot;>
+            <h2 style=&quot;margin-bottom: 16px; font-size: 18px;&quot;>Core Components of a Smart Financial Ecosystem</h2>
+            
+            <div style=&quot;background-color: var(--card-bg); border-radius: 8px; padding: 16px; margin-bottom: 16px;&quot;>
+                <h3 style=&quot;font-size: 16px; margin-bottom: 8px;&quot;>Integrated POS System</h3>
+                <p style=&quot;color: var(--text-secondary); margin-bottom: 8px;&quot;>- Seamless sync from point-of-sale to your general ledger</p>
+                <p style=&quot;color: var(--text-secondary);&quot;>- Real-time P&amp;L and margin reporting by dish or location</p>
+            </div>
+            
+            <div style=&quot;background-color: var(--card-bg); border-radius: 8px; padding: 16px; margin-bottom: 16px;&quot;>
+                <h3 style=&quot;font-size: 16px; margin-bottom: 8px;&quot;>Digital Inventory &amp; Procurement</h3>
+                <p style=&quot;color: var(--text-secondary); margin-bottom: 8px;&quot;>- Automatic reorder triggers and supplier portals</p>
+                <p style=&quot;color: var(--text-secondary);&quot;>- Cost roll-up from purchase order to plate cost</p>
+            </div>
+            
+            <div style=&quot;background-color: var(--card-bg); border-radius: 8px; padding: 16px; margin-bottom: 16px;&quot;>
+                <h3 style=&quot;font-size: 16px; margin-bottom: 8px;&quot;>Accounting Automation</h3>
+                <p style=&quot;color: var(--text-secondary); margin-bottom: 8px;&quot;>- AI parses invoices, categorizes expenses and reconciles bank feeds</p>
+                <p style=&quot;color: var(--text-secondary);&quot;>- Automated batching of vendor payments and payroll</p>
+            </div>
+            
+            <div style=&quot;background-color: var(--card-bg); border-radius: 8px; padding: 16px; margin-bottom: 16px;&quot;>
+                <h3 style=&quot;font-size: 16px; margin-bottom: 8px;&quot;>Real-Time Dashboards &amp; Alerts</h3>
+                <p style=&quot;color: var(--text-secondary); margin-bottom: 8px;&quot;>- Custom KPIs: cash-flow runway, daily sales vs. forecast, outstanding payables</p>
+                <p style=&quot;color: var(--text-secondary);&quot;>- Instant notifications for anomalies (spike in cost, dip in revenue)</p>
+            </div>
+            
+            <div style=&quot;background-color: var(--card-bg); border-radius: 8px; padding: 16px; margin-bottom: 16px;&quot;>
+                <h3 style=&quot;font-size: 16px; margin-bottom: 8px;&quot;>AI-Powered Enhancements</h3>
+                <p style=&quot;color: var(--text-secondary); margin-bottom: 8px;&quot;>- Predictive forecasting and anomaly detection</p>
+                <p style=&quot;color: var(--text-secondary);&quot;>- Automated purchase orders and insight generation</p>
+            </div>
+        </div>
+        
+        <div id=&quot;examples&quot; class=&quot;tab-content&quot;>
+            <h2 style=&quot;margin-bottom: 16px; font-size: 18px;&quot;>Sample Financial System Setups</h2>
+            
+            <div style=&quot;background-color: var(--card-bg); border-radius: 8px; padding: 16px; margin-bottom: 16px;&quot;>
+                <h3 style=&quot;font-size: 16px; margin-bottom: 8px;&quot;>Food Truck Setup</h3>
+                <p style=&quot;color: var(--text-secondary); margin-bottom: 12px;&quot;>A simple system for mobile food businesses</p>
+                <img src=&quot;https://cdn.minicoursegenerator.com/production/images/giyora638782629175372100/2ac20e71-58e8-4be0-a426-8a1a3cc9d5a3.png&quot; alt=&quot;System Diagram&quot; style=&quot;width: 100%; max-width: 400px; border-radius: 6px;&quot;>
+                <button class=&quot;btn&quot; style=&quot;margin-top: 12px; font-size: 12px;&quot; data-example=&quot;food-truck&quot;>Load Example</button>
+            </div>
+            
+            <div style=&quot;background-color: var(--card-bg); border-radius: 8px; padding: 16px; margin-bottom: 16px;&quot;>
+                <h3 style=&quot;font-size: 16px; margin-bottom: 8px;&quot;>Restaurant Management System</h3>
+                <p style=&quot;color: var(--text-secondary); margin-bottom: 12px;&quot;>Complete setup for single-location restaurants</p>
+                <img src=&quot;https://cdn.minicoursegenerator.com/production/images/giyora638782629175372100/2ac20e71-58e8-4be0-a426-8a1a3cc9d5a3.png&quot; alt=&quot;System Diagram&quot; style=&quot;width: 100%; max-width: 400px; border-radius: 6px;&quot;>
+                <button class=&quot;btn&quot; style=&quot;margin-top: 12px; font-size: 12px;&quot; data-example=&quot;restaurant&quot;>Load Example</button>
+            </div>
+            
+            <div style=&quot;background-color: var(--card-bg); border-radius: 8px; padding: 16px; margin-bottom: 16px;&quot;>
+                <h3 style=&quot;font-size: 16px; margin-bottom: 8px;&quot;>Multi-Location Enterprise</h3>
+                <p style=&quot;color: var(--text-secondary); margin-bottom: 12px;&quot;>Advanced system for chain restaurants</p>
+                <img src=&quot;https://cdn.minicoursegenerator.com/production/images/giyora638782629175372100/2ac20e71-58e8-4be0-a426-8a1a3cc9d5a3.png&quot; alt=&quot;System Diagram&quot; style=&quot;width: 100%; max-width: 400px; border-radius: 6px;&quot;>
+                <button class=&quot;btn&quot; style=&quot;margin-top: 12px; font-size: 12px;&quot; data-example=&quot;enterprise&quot;>Load Example</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class=&quot;feedback&quot;>Component connected successfully!</div>
+    
+    <div class=&quot;completion-modal&quot;>
+        <div class=&quot;modal-content&quot;>
+            <h2>System Complete! 🎉</h2>
+            <p>You've successfully built a complete financial ecosystem. This integrated system will provide real-time visibility, accuracy, and forward-looking insights for your business.</p>
+            <button class=&quot;btn close-modal-btn&quot;>Awesome!</button>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Drag and drop functionality
+            const components = document.querySelectorAll('.component');
+            const workspace = document.querySelector('.workspace');
+            const workspaceDropzone = document.querySelector('.workspace-dropzone');
+            const feedback = document.querySelector('.feedback');
+            const resetBtn = document.querySelector('.reset-btn');
+            const checkSystemBtn = document.querySelector('.check-system-btn');
+            const completionModal = document.querySelector('.completion-modal');
+            const closeModalBtn = document.querySelector('.close-modal-btn');
+            
+            let connections = [];
+            let placedComponents = [];
+            let isDragging = false;
+            let currentDragComponent = null;
+            let isConnecting = false;
+            let connectionStartComponent = null;
+            let mouseX = 0;
+            let mouseY = 0;
+            let tempConnection = null;
+            
+            // Required connections for a complete system
+            const requiredConnections = [
+                ['pos', 'inventory'],
+                ['pos', 'accounting'],
+                ['inventory', 'procurement'],
+                ['accounting', 'dashboard'],
+                ['procurement', 'accounting']
+            ];
+            
+            // Example configurations
+            const examples = {
+                'food-truck': [
+                    { component: 'pos', x: 50, y: 50 },
+                    { component: 'inventory', x: 200, y: 50 },
+                    { component: 'accounting', x: 120, y: 150 }
+                ],
+                'restaurant': [
+                    { component: 'pos', x: 50, y: 50 },
+                    { component: 'inventory', x: 200, y: 50 },
+                    { component: 'accounting', x: 50, y: 150 },
+                    { component: 'procurement', x: 200, y: 150 },
+                    { component: 'dashboard', x: 125, y: 250 }
+                ],
+                'enterprise': [
+                    { component: 'pos', x: 50, y: 50 },
+                    { component: 'inventory', x: 200, y: 50 },
+                    { component: 'accounting', x: 50, y: 150 },
+                    { component: 'procurement', x: 200, y: 150 },
+                    { component: 'dashboard', x: 50, y: 250 },
+                    { component: 'ai', x: 200, y: 250 }
+                ]
+            };
+            
+            // Handle component drag start
+            components.forEach(component => {
+                component.addEventListener('mousedown', startDrag);
+                component.addEventListener('touchstart', startDrag, { passive: false });
+                
+                function startDrag(e) {
+                    if (e.type === 'touchstart') {
+                        e.preventDefault();
+                    }
+                    
+                    isDragging = true;
+                    const componentType = component.getAttribute('data-component');
+                    
+                    // Create a clone to drag
+                    currentDragComponent = document.createElement('div');
+                    currentDragComponent.classList.add('workspace-component');
+                    currentDragComponent.setAttribute('data-component', componentType);
+                    
+                    const icon = document.createElement('i');
+                    icon.textContent = component.querySelector('i').textContent;
+                    
+                    const title = document.createElement('h3');
+                    title.textContent = component.querySelector('h3').textContent;
+                    
+                    currentDragComponent.appendChild(icon);
+                    currentDragComponent.appendChild(title);
+                    
+                    document.body.appendChild(currentDragComponent);
+                    
+                    // Position the drag element at cursor position
+                    updateDragPosition(e);
+                    
+                    document.addEventListener('mousemove', drag);
+                    document.addEventListener('touchmove', drag, { passive: false });
+                    document.addEventListener('mouseup', endDrag);
+                    document.addEventListener('touchend', endDrag);
+                }
+                
+                function drag(e) {
+                    if (!isDragging) return;
+                    if (e.type === 'touchmove') {
+                        e.preventDefault();
+                    }
+                    
+                    updateDragPosition(e);
+                }
+                
+                function endDrag(e) {
+                    if (!isDragging) return;
+                    
+                    document.removeEventListener('mousemove', drag);
+                    document.removeEventListener('touchmove', drag);
+                    document.removeEventListener('mouseup', endDrag);
+                    document.removeEventListener('touchend', endDrag);
+                    
+                    const componentType = currentDragComponent.getAttribute('data-component');
+                    
+                    // Check if component is dropped in workspace
+                    const workspaceRect = workspace.getBoundingClientRect();
+                    const dragRect = currentDragComponent.getBoundingClientRect();
+                    
+                    if (
+                        dragRect.left >= workspaceRect.left &amp;&amp;
+                        dragRect.right <= workspaceRect.right &amp;&amp;
+                        dragRect.top >= workspaceRect.top &amp;&amp;
+                        dragRect.bottom <= workspaceRect.bottom
+                    ) {
+                        // Calculate position relative to workspace
+                        const x = dragRect.left - workspaceRect.left;
+                        const y = dragRect.top - workspaceRect.top;
+                        
+                        // Check if component type already exists in workspace
+                        const existingComponent = placedComponents.find(pc => pc.type === componentType);
+                        if (existingComponent) {
+                            showFeedback('This component is already placed', 'error');
+                        } else {
+                            placeComponent(componentType, x, y);
+                            showFeedback('Component added to workspace');
+                        }
+                    }
+                    
+                    // Remove drag element
+                    currentDragComponent.remove();
+                    currentDragComponent = null;
+                    isDragging = false;
+                }
+                
+                function updateDragPosition(e) {
+                    const clientX = e.clientX || (e.touches &amp;&amp; e.touches[0].clientX);
+                    const clientY = e.clientY || (e.touches &amp;&amp; e.touches[0].clientY);
+                    
+                    if (clientX &amp;&amp; clientY) {
+                        currentDragComponent.style.left = clientX - (currentDragComponent.offsetWidth / 2) + 'px';
+                        currentDragComponent.style.top = clientY - (currentDragComponent.offsetHeight / 2) + 'px';
+                    }
+                }
+            });
+            
+            // Place component in workspace
+            function placeComponent(type, x, y) {
+                const component = document.createElement('div');
+                component.classList.add('workspace-component');
+                component.setAttribute('data-component', type);
+                component.style.left = x + 'px';
+                component.style.top = y + 'px';
+                
+                const icon = document.createElement('i');
+                const originalComponent = document.querySelector(`.component[data-component=&quot;${type}&quot;]`);
+                icon.textContent = originalComponent.querySelector('i').textContent;
+                
+                const title = document.createElement('h3');
+                title.textContent = originalComponent.querySelector('h3').textContent;
+                
+                component.appendChild(icon);
+                component.appendChild(title);
+                
+                // Add connection point
+                const connectionPoint = document.createElement('div');
+                connectionPoint.classList.add('connection-point');
+                connectionPoint.style.top = '50%';
+                connectionPoint.style.right = '-6px';
+                component.appendChild(connectionPoint);
+                
+                workspace.appendChild(component);
+                
+                // Make placed component draggable
+                makeComponentDraggable(component);
+                
+                // Make component connectable
+                makeComponentConnectable(component);
+                
+                // Add to placed components array
+                placedComponents.push({
+                    element: component,
+                    type: type,
+                    x: x,
+                    y: y
+                });
+            }
+            
+            // Make placed component draggable within workspace
+            function makeComponentDraggable(component) {
+                let isDragging = false;
+                let offsetX, offsetY;
+                
+                component.addEventListener('mousedown', startDrag);
+                component.addEventListener('touchstart', startDrag, { passive: false });
+                
+                function startDrag(e) {
+                    // Don't start drag if clicking on connection point
+                    if (e.target.classList.contains('connection-point')) return;
+                    
+                    if (e.type === 'touchstart') {
+                        e.preventDefault();
+                    }
+                    
+                    isDragging = true;
+                    
+                    const clientX = e.clientX || (e.touches &amp;&amp; e.touches[0].clientX);
+                    const clientY = e.clientY || (e.touches &amp;&amp; e.touches[0].clientY);
+                    
+                    const rect = component.getBoundingClientRect();
+                    offsetX = clientX - rect.left;
+                    offsetY = clientY - rect.top;
+                    
+                    document.addEventListener('mousemove', drag);
+                    document.addEventListener('touchmove', drag, { passive: false });
+                    document.addEventListener('mouseup', endDrag);
+                    document.addEventListener('touchend', endDrag);
+                    
+                    // Bring to front
+                    component.style.zIndex = '10';
+                }
+                
+                function drag(e) {
+                    if (!isDragging) return;
+                    
+                    if (e.type === 'touchmove') {
+                        e.preventDefault();
+                    }
+                    
+                    const clientX = e.clientX || (e.touches &amp;&amp; e.touches[0].clientX);
+                    const clientY = e.clientY || (e.touches &amp;&amp; e.touches[0].clientY);
+                    
+                    const workspaceRect = workspace.getBoundingClientRect();
+                    
+                    // Calculate new position (constraints within workspace)
+                    let newX = clientX - workspaceRect.left - offsetX;
+                    let newY = clientY - workspaceRect.top - offsetY;
+                    
+                    // Enforce boundaries
+                    newX = Math.max(0, Math.min(newX, workspaceRect.width - component.offsetWidth));
+                    newY = Math.max(0, Math.min(newY, workspaceRect.height - component.offsetHeight));
+                    
+                    component.style.left = newX + 'px';
+                    component.style.top = newY + 'px';
+                    
+                    // Update position in placedComponents array
+                    const componentData = placedComponents.find(pc => pc.element === component);
+                    if (componentData) {
+                        componentData.x = newX;
+                        componentData.y = newY;
+                    }
+                    
+                    // Update connections
+                    updateConnections();
+                }
+                
+                function endDrag() {
+                    if (!isDragging) return;
+                    
+                    document.removeEventListener('mousemove', drag);
+                    document.removeEventListener('touchmove', drag);
+                    document.removeEventListener('mouseup', endDrag);
+                    document.removeEventListener('touchend', endDrag);
+                    
+                    isDragging = false;
+                    component.style.zIndex = '2';
+                }
+            }
+            
+            // Make component connectable
+            function makeComponentConnectable(component) {
+                const connectionPoint = component.querySelector('.connection-point');
+                
+                connectionPoint.addEventListener('mousedown', startConnection);
+                connectionPoint.addEventListener('touchstart', startConnection, { passive: false });
+                
+                function startConnection(e) {
+                    if (e.type === 'touchstart') {
+                        e.preventDefault();
+                    }
+                    
+                    isConnecting = true;
+                    connectionStartComponent = component;
+                    
+                    // Create temporary connection line
+                    tempConnection = document.createElement('div');
+                    tempConnection.classList.add('connection');
+                    workspace.appendChild(tempConnection);
+                    
+                    // Initial position
+                    const startPoint = connectionPoint.getBoundingClientRect();
+                    const workspaceRect = workspace.getBoundingClientRect();
+                    
+                    const startX = startPoint.left + startPoint.width / 2 - workspaceRect.left;
+                    const startY = startPoint.top + startPoint.height / 2 - workspaceRect.top;
+                    
+                    tempConnection.style.left = startX + 'px';
+                    tempConnection.style.top = startY + 'px';
+                    
+                    document.addEventListener('mousemove', dragConnection);
+                    document.addEventListener('touchmove', dragConnection, { passive: false });
+                    document.addEventListener('mouseup', endConnection);
+                    document.addEventListener('touchend', endConnection);
+                }
+                
+                function dragConnection(e) {
+                    if (!isConnecting) return;
+                    
+                    if (e.type === 'touchmove') {
+                        e.preventDefault();
+                    }
+                    
+                    const clientX = e.clientX || (e.touches &amp;&amp; e.touches[0].clientX);
+                    const clientY = e.clientY || (e.touches &amp;&amp; e.touches[0].clientY);
+                    
+                    mouseX = clientX;
+                    mouseY = clientY;
+                    
+                    updateTempConnection();
+                }
+                
+                function endConnection(e) {
+                    if (!isConnecting) return;
+                    
+                    document.removeEventListener('mousemove', dragConnection);
+                    document.removeEventListener('touchmove', dragConnection);
+                    document.removeEventListener('mouseup', endConnection);
+                    document.removeEventListener('touchend', endConnection);
+                    
+                    // Check if ending on another component's connection point
+                    const endElement = document.elementFromPoint(mouseX, mouseY);
+                    
+                    if (endElement &amp;&amp; endElement.classList.contains('connection-point')) {
+                        const endComponent = endElement.closest('.workspace-component');
+                        
+                        // Don't connect to self
+                        if (endComponent !== connectionStartComponent) {
+                            createConnection(connectionStartComponent, endComponent);
+                        }
+                    }
+                    
+                    // Remove temp connection
+                    if (tempConnection) {
+                        tempConnection.remove();
+                        tempConnection = null;
+                    }
+                    
+                    isConnecting = false;
+                    connectionStartComponent = null;
+                }
+            }
+            
+            // Update temporary connection line
+            function updateTempConnection() {
+                if (!tempConnection || !connectionStartComponent) return;
+                
+                const workspaceRect = workspace.getBoundingClientRect();
+                const startRect = connectionStartComponent.getBoundingClientRect();
+                const startPointRect = connectionStartComponent.querySelector('.connection-point').getBoundingClientRect();
+                
+                const startX = startPointRect.left + startPointRect.width / 2 - workspaceRect.left;
+                const startY = startPointRect.top + startPointRect.height / 2 - workspaceRect.top;
+                
+                const endX = mouseX - workspaceRect.left;
+                const endY = mouseY - workspaceRect.top;
+                
+                // Calculate distance and angle
+                const dx = endX - startX;
+                const dy = endY - startY;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                
+                // Position and rotate line
+                tempConnection.style.left = startX + 'px';
+                tempConnection.style.top = startY + 'px';
+                tempConnection.style.width = length + 'px';
+                tempConnection.style.transform = `rotate(${angle}deg)`;
+            }
+            
+            // Create permanent connection between components
+            function createConnection(startComponent, endComponent) {
+                const startType = startComponent.getAttribute('data-component');
+                const endType = endComponent.getAttribute('data-component');
+                
+                // Check if connection already exists
+                const existingConnection = connections.find(conn => 
+                    (conn.start === startComponent &amp;&amp; conn.end === endComponent) ||
+                    (conn.start === endComponent &amp;&amp; conn.end === startComponent)
+                );
+                
+                if (existingConnection) {
+                    showFeedback('These components are already connected', 'error');
+                    return;
+                }
+                
+                // Create connection line
+                const connection = document.createElement('div');
+                connection.classList.add('connection');
+                workspace.appendChild(connection);
+                
+                // Store connection
+                connections.push({
+                    element: connection,
+                    start: startComponent,
+                    end: endComponent,
+                    startType: startType,
+                    endType: endType
+                });
+                
+                // Update connection position
+                updateConnectionPosition(connection, startComponent, endComponent);
+                
+                showFeedback(`Connected ${startType} to ${endType}`);
+            }
+            
+            // Update all connections
+            function updateConnections() {
+                connections.forEach(conn => {
+                    updateConnectionPosition(conn.element, conn.start, conn.end);
+                });
+            }
+            
+            // Update single connection position
+            function updateConnectionPosition(connectionEl, startComponent, endComponent) {
+                const workspaceRect = workspace.getBoundingClientRect();
+                
+                const startPointRect = startComponent.querySelector('.connection-point').getBoundingClientRect();
+                const endPointRect = endComponent.querySelector('.connection-point').getBoundingClientRect();
+                
+                const startX = startPointRect.left + startPointRect.width / 2 - workspaceRect.left;
+                const startY = startPointRect.top + startPointRect.height / 2 - workspaceRect.top;
+                
+                const endX = endPointRect.left + endPointRect.width / 2 - workspaceRect.left;
+                const endY = endPointRect.top + endPointRect.height / 2 - workspaceRect.top;
+                
+                // Calculate distance and angle
+                const dx = endX - startX;
+                const dy = endY - startY;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                
+                // Position and rotate line
+                connectionEl.style.left = startX + 'px';
+                connectionEl.style.top = startY + 'px';
+                connectionEl.style.width = length + 'px';
+                connectionEl.style.transform = `rotate(${angle}deg)`;
+            }
+            
+            // Reset workspace
+            resetBtn.addEventListener('click', () => {
+                clearWorkspace();
+                showFeedback('Workspace cleared');
+            });
+            
+            // Clear workspace
+            function clearWorkspace() {
+                // Remove all placed components
+                placedComponents.forEach(pc => {
+                    pc.element.remove();
+                });
+                placedComponents = [];
+                
+                // Remove all connections
+                connections.forEach(conn => {
+                    conn.element.remove();
+                });
+                connections = [];
+            }
+            
+            // Show feedback message
+            function showFeedback(message, type = 'success') {
+                feedback.textContent = message;
+                feedback.className = 'feedback';
+                
+                if (type === 'error') {
+                    feedback.classList.add('error');
+                } else {
+                    feedback.classList.add('success');
+                }
+                
+                feedback.classList.add('show');
+                
+                setTimeout(() => {
+                    feedback.classList.remove('show');
+                }, 3000);
+            }
+            
+            // Check if system is complete
+            checkSystemBtn.addEventListener('click', () => {
+                const systemComplete = isSystemComplete();
+                
+                if (systemComplete) {
+                    completionModal.classList.add('show');
+                } else {
+                    showFeedback('System incomplete. Add more components or connections.', 'error');
+                }
+            });
+            
+            // Check if system has all required components and connections
+            function isSystemComplete() {
+                // Check if we have minimum required components
+                const minComponents = ['pos', 'inventory', 'accounting', 'dashboard'];
+                
+                for (const component of minComponents) {
+                    const hasComponent = placedComponents.some(pc => pc.type === component);
+                    if (!hasComponent) {
+                        return false;
+                    }
+                }
+                
+                // Check for minimum connections
+                let requiredConnectionCount = 0;
+                
+                for (const [startType, endType] of requiredConnections) {
+                    const hasConnection = connections.some(conn => 
+                        (conn.startType === startType &amp;&amp; conn.endType === endType) ||
+                        (conn.startType === endType &amp;&amp; conn.endType === startType)
+                    );
+                    
+                    if (hasConnection) {
+                        requiredConnectionCount++;
+                    }
+                }
+                
+                // Need at least 3 connections for a basic system
+                return requiredConnectionCount >= 3;
+            }
+            
+            // Close modal
+            closeModalBtn.addEventListener('click', () => {
+                completionModal.classList.remove('show');
+            });
+            
+            // Handle example loading
+            document.querySelectorAll('[data-example]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const exampleType = btn.getAttribute('data-example');
+                    loadExample(exampleType);
+                });
+            });
+            
+            // Load example configuration
+            function loadExample(exampleType) {
+                clearWorkspace();
+                
+                const example = examples[exampleType];
+                if (!example) return;
+                
+                // Place components
+                example.forEach(comp => {
+                    placeComponent(comp.component, comp.x, comp.y);
+                });
+                
+                // Create some connections based on required connections
+                setTimeout(() => {
+                    const components = placedComponents;
+                    
+                    // Create connections based on the example type
+                    if (exampleType === 'food-truck') {
+                        createConnectionByType('pos', 'inventory');
+                        createConnectionByType('pos', 'accounting');
+                    } else if (exampleType === 'restaurant') {
+                        createConnectionByType('pos', 'inventory');
+                        createConnectionByType('pos', 'accounting');
+                        createConnectionByType('inventory', 'procurement');
+                        createConnectionByType('accounting', 'dashboard');
+                    } else if (exampleType === 'enterprise') {
+                        createConnectionByType('pos', 'inventory');
+                        createConnectionByType('pos', 'accounting');
+                        createConnectionByType('inventory', 'procurement');
+                        createConnectionByType('accounting', 'dashboard');
+                        createConnectionByType('dashboard', 'ai');
+                        createConnectionByType('procurement', 'accounting');
+                    }
+                    
+                    showFeedback(`Loaded ${exampleType} example`);
+                }, 100);
+            }
+            
+            // Helper to create connection by component types
+            function createConnectionByType(startType, endType) {
+                const startComponent = placedComponents.find(pc => pc.type === startType)?.element;
+                const endComponent = placedComponents.find(pc => pc.type === endType)?.element;
+                
+                if (startComponent &amp;&amp; endComponent) {
+                    createConnection(startComponent, endComponent);
+                }
+            }
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_yuejhb7p';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_yuejhb7p" style="width: 100%; height: 1123px; border: none;"></iframe>

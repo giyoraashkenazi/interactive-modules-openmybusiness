@@ -1,0 +1,624 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Permit &amp; License Checklist Builder</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --background: #121212;
+            --card-bg: #1e1e1e;
+            --text: #f3f4f6;
+            --text-secondary: #a1a1aa;
+            --border: #2e2e2e;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        header {
+            padding: 1.5rem 0;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        header p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .logo {
+            margin-bottom: 1rem;
+            max-width: 120px;
+        }
+        
+        .progress-container {
+            margin: 2rem 0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .tab-container {
+            margin-bottom: 2rem;
+            overflow: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+        }
+        
+        .tab-container::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .tab {
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            user-select: none;
+            flex-shrink: 0;
+        }
+        
+        .tab.active {
+            color: var(--text);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+        
+        .toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-container:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+        
+        .toggle-label {
+            flex: 1;
+        }
+        
+        .toggle-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+        
+        .toggle-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        
+        .toggle {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+        
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: &quot;&quot;;
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text);
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            border: none;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        
+        .btn-outline:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+        
+        .results-item {
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .results-item h3 {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .results-item h3 span {
+            margin-right: 0.5rem;
+        }
+        
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tag-required {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .tag-recommended {
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .category-title {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 1.1rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                padding: 1.5rem;
+            }
+            
+            header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .tab {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+            
+            header h1 {
+                font-size: 1.25rem;
+            }
+            
+            .btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <img src=&quot;https://cdn.minicoursegenerator.com/production/images/giyora638782629175372100/bf03d73a-0517-423d-95d4-a92c903f4945.png&quot; alt=&quot;Logo&quot; class=&quot;logo&quot;>
+            <h1>Permit &amp; License Checklist Builder</h1>
+            <p>Generate a personalized checklist of required permits and licenses for your food business</p>
+        </header>
+        
+        <div class=&quot;progress-container&quot;>
+            <div class=&quot;progress-bar&quot;>
+                <div class=&quot;progress-fill&quot; id=&quot;progress-fill&quot;></div>
+            </div>
+            <div class=&quot;progress-text&quot;>
+                <span id=&quot;progress-step&quot;>Step 1 of 5</span>
+                <span id=&quot;progress-percentage&quot;>20%</span>
+            </div>
+        </div>
+        
+        <div class=&quot;card&quot;>
+            <div class=&quot;tab-container&quot;>
+                <div class=&quot;tabs&quot;>
+                    <div class=&quot;tab active&quot; data-tab=&quot;business-info&quot;>Business Info</div>
+                    <div class=&quot;tab&quot; data-tab=&quot;legal-structure&quot;>Legal Structure</div>
+                    <div class=&quot;tab&quot; data-tab=&quot;operations&quot;>Operations</div>
+                    <div class=&quot;tab&quot; data-tab=&quot;location&quot;>Location</div>
+                    <div class=&quot;tab&quot; data-tab=&quot;results&quot;>Your Checklist</div>
+                </div>
+            </div>
+            
+            <div class=&quot;tab-content active&quot; id=&quot;business-info&quot;>
+                <h2 class=&quot;category-title&quot;>Tell us about your food business</h2>
+                
+                <div class=&quot;form-group&quot;>
+                    <label for=&quot;business-name&quot;>Business Name</label>
+                    <input type=&quot;text&quot; id=&quot;business-name&quot; placeholder=&quot;Enter your business name&quot;>
+                </div>
+                
+                <div class=&quot;form-group&quot;>
+                    <label for=&quot;business-type&quot;>Business Type</label>
+                    <select id=&quot;business-type&quot;>
+                        <option value=&quot;&quot;>Select your business type</option>
+                        <option value=&quot;restaurant&quot;>Restaurant</option>
+                        <option value=&quot;food-truck&quot;>Food Truck/Mobile Vendor</option>
+                        <option value=&quot;catering&quot;>Catering Business</option>
+                        <option value=&quot;bakery&quot;>Bakery</option>
+                        <option value=&quot;coffee-shop&quot;>Coffee Shop</option>
+                        <option value=&quot;pop-up&quot;>Pop-up/Food Stand</option>
+                        <option value=&quot;delivery&quot;>Delivery-Only Kitchen</option>
+                        <option value=&quot;other&quot;>Other Food Business</option>
+                    </select>
+                </div>
+                
+                <div class=&quot;form-group&quot;>
+                    <label>Is this an existing business or a new venture?</label>
+                    <div class=&quot;toggle-container&quot;>
+                        <div class=&quot;toggle-label&quot;>
+                            <div class=&quot;toggle-title&quot;>New Business</div>
+                            <div class=&quot;toggle-description&quot;>I'm starting a new food business</div>
+                        </div>
+                        <label class=&quot;toggle&quot;>
+                            <input type=&quot;checkbox&quot; id=&quot;existing-business&quot;>
+                            <span class=&quot;slider&quot;></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class=&quot;nav-buttons&quot;>
+                    <span></span>
+                    <button class=&quot;btn btn-primary&quot; id=&quot;btn-to-legal&quot;>Continue</button>
+                </div>
+            </div>
+            
+            <div class=&quot;tab-content&quot; id=&quot;legal-structure&quot;>
+                <h2 class=&quot;category-title&quot;>Legal Structure &amp; Registration</h2>
+                
+                <div class=&quot;form-group&quot;>
+                    <label>Select your preferred business structure:</label>
+                    <div class=&quot;toggle-container&quot;>
+                        <div class=&quot;toggle-label&quot;>
+                            <div class=&quot;toggle-title&quot;>Sole Proprietorship</div>
+                            <div class=&quot;toggle-description&quot;>Easiest to launch, but no personal-liability shield</div>
+                        </div>
+                        <label class=&quot;toggle&quot;>
+                            <input type=&quot;checkbox&quot; name=&quot;business-structure&quot; data-structure=&quot;sole-proprietorship&quot;>
+                            <span class=&quot;slider&quot;></span>
+                        </label>
+                    </div>
+                    
+                    <div class=&quot;toggle-container&quot;>
+                        <div class=&quot;toggle-label&quot;>
+                            <div class=&quot;toggle-title&quot;>Partnership</div>
+                            <div class=&quot;toggle-description&quot;>Shared ownership and risk — great for co-founders</div>
+                        </div>
+                        <label class=&quot;toggle&quot;>
+                            <input type=&quot;checkbox&quot; name=&quot;business-structure&quot; data-structure=&quot;partnership&quot;>
+                            <span class=&quot;slider&quot;></span>
+                        </label>
+                    </div>
+                    
+                    <div class=&quot;toggle-container&quot;>
+                        <div class=&quot;toggle-label&quot;>
+                            <div class=&quot;toggle-title&quot;>LLC (Limited Liability Company)</div>
+                            <div class=&quot;toggle-description&quot;>Blends liability protection with tax flexibility</div>
+                        </div>
+                        <label class=&quot;toggle&quot;>
+                            <input type=&quot;checkbox&quot; name=&quot;business-structure&quot; data-structure=&quot;llc&quot;>
+                            <span class=&quot;slider&quot;></span>
+                        </label>
+                    </div>
+                    
+                    <div class=&quot;toggle-container&quot;>
+                        <div class=&quot;toggle-label&quot;>
+                            <div class=&quot;toggle-title&quot;>Corporation</div>
+                            <div class=&quot;toggle-description&quot;>Strongest asset protection; requires more paperwork</div>
+                        </div>
+                        <label class=&quot;toggle&quot;>
+                            <input type=&quot;checkbox&quot; name=&quot;business-structure&quot; data-structure=&quot;corporation&quot;>
+                            <span class=&quot;slider&quot;></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class=&quot;nav-buttons&quot;>
+                    <button class=&quot;btn btn-outline&quot; id=&quot;btn-to-business&quot;>Back</button>
+                    <button class=&quot;btn btn-primary&quot; id=&quot;btn-to-operations&quot;>Continue</button>
+                </div>
+            </div>
+            
+            <div class=&quot;tab-content&quot; id=&quot;operations&quot;>
+                <h2 class=&quot;category-title&quot;>Business Operations</h2>
+                
+                <div class=&quot;form-group&quot;>
+                    <label>Which of the following will your business involve?</label>
+                    
+                    <div class=&quot;toggle-container&quot;>
+                        <div class=&quot;toggle-label&quot;>
+                            <div class=&quot;toggle-title&quot;>Food Preparation</div>
+                            <div class=&quot;toggle-description&quot;>Cooking, assembling, or otherwise preparing food</div>
+                        </div>
+                        <label class=&quot;toggle&quot;>
+                            <input type=&quot;checkbox&quot; name=&quot;operation-type&quot; data-operation=&quot;food-prep&quot;>
+                            <span class=&quot;slider&quot;></span>
+                        </label>
+                    </div>
+                    
+                    <div class=&quot;toggle-container&quot;>
+                        <div class=&quot;toggle-label&quot;>
+                            <div class=&quot;toggle-title&quot;>Alcoholic Beverages</div>
+                            <div class=&quot;toggle-description&quot;>Serving or selling alcoholic beverages</div>
+                        </div>
+                        <label class=&quot;toggle&quot;>
+                            <input type=&quot;checkbox&quot; name=&quot;operation-type&quot; data-operation=&quot;alcohol&quot;>
+                            <span class=&quot;slider&quot;></span>
+                        </label>
+                    </div>
+                    
+                    <div class=&quot;toggle-container&quot;>
+                        <div class=&quot;toggle-label&quot;>
+                            <div class=&quot;toggle-title&quot;>Outdoor Seating/Dining</div>
+                            <div class=&quot;toggle-description&quot;>Providing outdoor space for customers</div>
+                        </div>
+                        <label class=&quot;toggle&quot;>
+                            <input type=&quot;checkbox&quot; name=&quot;operation-type&quot; data-operation=&quot;outdoor&quot;>
+                            <span class=&quot;slider&quot;></span>
+                        </label>
+                    </div>
+                    
+                    <div class=&quot;toggle-container&quot;>
+                        <div class=&quot;toggle-label&quot;>
+                            <div class=&quot;toggle-title&quot;>Employees</div>
+                            <div class=&quot;toggle-description&quot;>Hiring staff beyond the owner(s)</div>
+                        </div>
+                        <label class=&quot;toggle&quot;>
+                            <input type=&quot;checkbox&quot; name=&quot;operation-type&quot; data-operation=&quot;employees&quot;>
+                            <span class=&quot;slider&quot;></span>
+                        </label>
+                    </div>
+                    
+                    <div class=&quot;toggle-container&quot;>
+                        <div class=&quot;toggle-label&quot;>
+                            <div class=&quot;toggle-title&quot;>Online Sales</div>
+                            <div class=&quot;toggle-description&quot;>Selling food products online or for delivery</div>
+                        </div>
+                        <label class=&quot;toggle&quot;>
+                            <input type=&quot;checkbox&quot; name=&quot;operation-type&quot; data-operation=&quot;online&quot;>
+                            <span class=&quot;slider&quot;></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class=&quot;nav-buttons&quot;>
+                    <button class=&quot;btn btn-outline&quot; id=&quot;btn-to-legal-back&quot;>Back</button>
+                    <button class=&quot;btn btn-primary&quot; id=&quot;btn-to-location&quot;>Continue</button>
+                </div>
+            </div>
+            
+            <div class=&quot;tab-content&quot; id=&quot;location&quot;>
+                <h2 class=&quot;category-title&quot;>Business Location</h2>
+                
+                <div class=&quot;form-group&quot;>
+                    <label for=&quot;state&quot;>State</label>
+                    <select id=&quot;state&quot;>
+                        <option value=&quot;&quot;>Select your state</option>
+                        <option value=&quot;AL&quot;>Alabama</option>
+                        <option value=&quot;AK&quot;>Alaska</option>
+                        <option value=&quot;AZ&quot;>Arizona</option>
+                        <option value=&quot;AR&quot;>Arkansas</option>
+                        <option value=&quot;CA&quot;>California</option>
+                        <option value=&quot;CO&quot;>Colorado</option>
+                        <option value=&quot;CT&quot;>Connecticut</option>
+                        <option value=&quot;DE&quot;>Delaware</option>
+                        <option value=&quot;FL&quot;>Florida</option>
+                        <option value=&quot;GA&quot;>Georgia</option>
+                        <option value=&quot;HI&quot;>Hawaii</option>
+                        <option value=&quot;ID&quot;>Idaho</option>
+                        <option value=&quot;IL&quot;>Illinois</option>
+                        <option value=&quot;IN&quot;>Indiana</option>
+                        <option value=&quot;IA&quot;>Iowa</option>
+                        <option value=&quot;KS&quot;>Kansas</option>
+                        <option value=&quot;KY&quot;>Kentucky</option>
+                        <option value=&quot;LA&quot;>Louisiana</option>
+                        <option value=&quot;ME&quot;>Maine</option>
+                        <option value=&quot;MD&quot;>Maryland</option>
+                        <option value=&quot;MA&quot;>Massachusetts</option>
+                        <option value=&quot;MI&quot;>Michigan</option>
+                        <option value=&quot;MN&quot;>Minnesota</option>
+                        <option value=&quot;MS&quot;>Mississippi</option>
+                        <option value=&quot;MO&quot;>Missouri</option>
+                        <option value=&quot;MT&quot;>Montana</option>
+                        <option value=&quot;NE&quot;>Nebraska</option>
+                        <option value=&quot;NV&quot;>Nevada</option>
+                        <option value=&quot;NH&quot;>New Hampshire</option>
+                        <option value=&quot;NJ&quot;>New Jersey</option>
+                        <option value=&quot;NM&quot;>New Mexico</option>
+                        <option value=&quot;NY&quot;>New York</option>
+                        <option value=&quot;NC&quot;>North Carolina</option>
+                        <option value=&quot;ND&quot;>North Dakota</option>
+                        <option value=&quot;OH&quot;>Ohio</option>
+                        <option value=&quot;OK&quot;>Oklahoma</option>
+                        <option value=&quot;OR&quot;>Oregon</option>
+                        <option value=&quot;PA&quot;>Pennsylvania</option>
+                        <option value=&quot;RI&quot;>Rhode Island</option>
+                        <option value=&quot;SC&quot;>South Carolina</option>
+                        <option value=&quot;SD&quot;>South Dakota</option>
+                        <option value=&quot;TN&quot;>Tennessee</option>
+                        <option value=&quot;TX&quot;>Texas</option>
+                        <option value=&quot;UT&quot;>Utah</option>
+                        <option value=&quot;VT&quot;>Vermont</option>
+                        <option value=&quot;VA&quot;>Virginia</option>
+                        <option value=&quot;WA&quot;>Washington</option>
+Error during streaming: {'type': 'error', 'error': {'details': None, 'type': 'invalid_request_error', 'message': 'Output blocked by content filtering policy'}}" data-interaction-code="math_eq_veormsqg" style="width: 100%; height: 1149px; border: none;"></iframe>

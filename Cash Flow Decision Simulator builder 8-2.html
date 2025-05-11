@@ -1,0 +1,918 @@
+<iframe srcdoc="```html
+<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Cash Flow Decision Simulator</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #4f46e5;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --text: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        h2 {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        
+        .card {
+            background-color: var(--surface);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .tab-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.25rem;
+            background-color: var(--surface-light);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            flex: 1 1 auto;
+            text-align: center;
+            transition: background-color 0.2s;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: var(--text);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            text-align: center;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+        }
+        
+        .decision-options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+        }
+        
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .metric {
+            background-color: var(--surface-light);
+            padding: 1rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .outcome {
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        .outcome.positive {
+            border-left-color: var(--success);
+        }
+        
+        .outcome.negative {
+            border-left-color: var(--danger);
+        }
+        
+        .outcome.warning {
+            border-left-color: var(--warning);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .badge.success {
+            background-color: var(--success);
+        }
+        
+        .badge.danger {
+            background-color: var(--danger);
+        }
+        
+        .badge.warning {
+            background-color: var(--warning);
+        }
+        
+        .scenario-content {
+            margin-bottom: 1.5rem;
+        }
+        
+        .option-btn {
+            width: 100%;
+            text-align: left;
+            padding: 1rem;
+            border: 1px solid var(--surface-light);
+            background-color: var(--surface);
+            color: var(--text);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .option-btn:hover {
+            background-color: var(--surface-light);
+            transform: translateY(-2px);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .reset-container {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        
+        .info-box {
+            background-color: rgba(99, 102, 241, 0.1);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin: 1.5rem 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        
+        @media (max-width: 768px) {
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            h2 {
+                font-size: 1.3rem;
+            }
+            
+            .btn {
+                width: 100%;
+                margin-right: 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .tab {
+                flex: 0 0 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>Cash Flow Decision Simulator</h1>
+            <p>Navigate the challenges of managing cash flow in your food business</p>
+        </header>
+        
+        <div class=&quot;tab-container&quot;>
+            <div class=&quot;tab active&quot; data-tab=&quot;scenario&quot;>Scenario</div>
+            <div class=&quot;tab&quot; data-tab=&quot;metrics&quot;>Metrics</div>
+            <div class=&quot;tab&quot; data-tab=&quot;help&quot;>Help</div>
+        </div>
+        
+        <div class=&quot;tab-content active&quot; id=&quot;scenario&quot;>
+            <div id=&quot;intro-screen&quot;>
+                <div class=&quot;card&quot;>
+                    <h2>🍽️ Welcome to Flavor Junction!</h2>
+                    <p>You've just taken over as the manager of a popular local restaurant. While the business is generating good revenue, previous management has left the financial systems in disarray.</p>
+                    <p>Your mission: Navigate critical cash flow decisions to keep the business profitable and avoid the &quot;Illusion of Cash&quot; trap that sinks many food businesses.</p>
+                    
+                    <div class=&quot;info-box&quot;>
+                        <h3>The Cash Flow Challenge</h3>
+                        <p>Food businesses often experience a <strong>timing mismatch</strong> - customers pay immediately, but suppliers offer 30-60 day payment terms. This creates a false sense of surplus cash when in reality, large bills are just around the corner.</p>
+                    </div>
+                    
+                    <div class=&quot;metrics&quot;>
+                        <div class=&quot;metric&quot;>
+                            <div class=&quot;metric-value&quot;>$24,000</div>
+                            <div class=&quot;metric-label&quot;>Current Cash</div>
+                        </div>
+                        <div class=&quot;metric&quot;>
+                            <div class=&quot;metric-value&quot;>$18,500</div>
+                            <div class=&quot;metric-label&quot;>Upcoming Bills</div>
+                        </div>
+                        <div class=&quot;metric&quot;>
+                            <div class=&quot;metric-value&quot;>$9,200</div>
+                            <div class=&quot;metric-label&quot;>Weekly Revenue</div>
+                        </div>
+                    </div>
+                    
+                    <button class=&quot;btn&quot; id=&quot;start-btn&quot;>Start Simulation</button>
+                </div>
+            </div>
+            
+            <div id=&quot;scenario-container&quot; class=&quot;hidden&quot;>
+                <!-- Scenarios will be dynamically generated here -->
+            </div>
+            
+            <div id=&quot;results-screen&quot; class=&quot;hidden&quot;>
+                <div class=&quot;card&quot;>
+                    <h2>Simulation Results</h2>
+                    <div class=&quot;outcome&quot; id=&quot;final-outcome&quot;></div>
+                    
+                    <h3>Final Business Metrics</h3>
+                    <div class=&quot;metrics&quot; id=&quot;final-metrics&quot;>
+                        <div class=&quot;metric&quot;>
+                            <div class=&quot;metric-value&quot; id=&quot;final-cash&quot;>$0</div>
+                            <div class=&quot;metric-label&quot;>Cash Balance</div>
+                        </div>
+                        <div class=&quot;metric&quot;>
+                            <div class=&quot;metric-value&quot; id=&quot;final-reputation&quot;>0</div>
+                            <div class=&quot;metric-label&quot;>Reputation</div>
+                        </div>
+                        <div class=&quot;metric&quot;>
+                            <div class=&quot;metric-value&quot; id=&quot;final-profitability&quot;>0%</div>
+                            <div class=&quot;metric-label&quot;>Profitability</div>
+                        </div>
+                    </div>
+                    
+                    <h3>Key Lessons</h3>
+                    <ul id=&quot;key-lessons&quot;>
+                        <!-- Lessons will be populated based on choices -->
+                    </ul>
+                    
+                    <div class=&quot;reset-container&quot;>
+                        <button class=&quot;btn&quot; id=&quot;reset-btn&quot;>Reset Simulation</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class=&quot;tab-content&quot; id=&quot;metrics&quot;>
+            <div class=&quot;card&quot;>
+                <h2>Business Performance</h2>
+                <div class=&quot;metrics&quot;>
+                    <div class=&quot;metric&quot;>
+                        <div class=&quot;metric-value&quot; id=&quot;cash-balance&quot;>$24,000</div>
+                        <div class=&quot;metric-label&quot;>Cash Balance</div>
+                    </div>
+                    <div class=&quot;metric&quot;>
+                        <div class=&quot;metric-value&quot; id=&quot;cash-runway&quot;>14 days</div>
+                        <div class=&quot;metric-label&quot;>Cash Runway</div>
+                    </div>
+                    <div class=&quot;metric&quot;>
+                        <div class=&quot;metric-value&quot; id=&quot;reputation-score&quot;>70</div>
+                        <div class=&quot;metric-label&quot;>Reputation</div>
+                    </div>
+                    <div class=&quot;metric&quot;>
+                        <div class=&quot;metric-value&quot; id=&quot;profitability&quot;>8%</div>
+                        <div class=&quot;metric-label&quot;>Profitability</div>
+                    </div>
+                </div>
+                
+                <h3>Upcoming Payables</h3>
+                <div id=&quot;payables-list&quot;>
+                    <p>Supplier Payment: $8,200 (Due in 7 days)</p>
+                    <p>Rent: $6,500 (Due in 14 days)</p>
+                    <p>Payroll: $3,800 (Due in 3 days)</p>
+                </div>
+                
+                <h3>Cash Flow Trends</h3>
+                <p>Your daily operations are generating a net positive cash flow of approximately $750 per day after all expenses.</p>
+                
+                <div class=&quot;outcome&quot; id=&quot;cashflow-insight&quot;>
+                    <div class=&quot;badge warning&quot;>AI INSIGHT</div>
+                    <p>Based on current trends, you may face a cash shortfall during the third week unless supplier terms are renegotiated or expenses reduced.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class=&quot;tab-content&quot; id=&quot;help&quot;>
+            <div class=&quot;card&quot;>
+                <h2>Understanding Cash Flow Management</h2>
+                <p>This simulator helps you understand the crucial components of effective cash flow management in a food business:</p>
+                
+                <h3>🧠 Key Concepts</h3>
+                <ul>
+                    <li><strong>Timing Mismatch:</strong> Cash sales hit your account instantly, but supplier invoices often settle 30–60 days later.</li>
+                    <li><strong>False Surplus Risk:</strong> Without real-time visibility, you may overspend on labor or inventory before payables fall due.</li>
+                    <li><strong>Cash Runway:</strong> How many days you can operate before running out of cash at current burn rates.</li>
+                    <li><strong>Break-Even Point:</strong> The sales volume required to cover all your fixed and variable costs.</li>
+                </ul>
+                
+                <h3>📊 Metrics Explained</h3>
+                <ul>
+                    <li><strong>Cash Balance:</strong> Current cash available in your accounts.</li>
+                    <li><strong>Reputation:</strong> Reflects customer satisfaction and supplier relationships.</li>
+                    <li><strong>Profitability:</strong> Net profit margin after all expenses.</li>
+                    <li><strong>Cash Runway:</strong> How long your business can operate with current cash reserves.</li>
+                </ul>
+                
+                <div class=&quot;info-box&quot;>
+                    <h3>Simulator Tips</h3>
+                    <p>Each decision affects multiple aspects of your business. Consider both short-term cash needs and long-term business health. Sometimes the cheapest option now may cost more later!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Simulation data
+        const gameState = {
+            cash: 24000,
+            reputation: 70,
+            profitability: 8,
+            cashRunway: 14,
+            currentScenario: 0,
+            decisions: [],
+            scenarios: [
+                {
+                    id: 1,
+                    title: &quot;Supplier Payment Terms&quot;,
+                    description: &quot;Your main food supplier offers a 5% discount if you pay immediately instead of using their standard net-30 terms. This would require $12,000 cash right now, but save you $600.&quot;,
+                    options: [
+                        {
+                            id: &quot;1a&quot;,
+                            text: &quot;Pay now and take the discount&quot;,
+                            cashImpact: -12000,
+                            profitabilityImpact: 1.5,
+                            reputationImpact: 0,
+                            outcome: &quot;You paid $12,000 immediately and saved $600. Your profitability improved due to lower costs, but your cash reserves dropped significantly.&quot;,
+                            outcomeType: &quot;mixed&quot;
+                        },
+                        {
+                            id: &quot;1b&quot;,
+                            text: &quot;Keep the net-30 terms to preserve cash&quot;,
+                            cashImpact: 0,
+                            profitabilityImpact: -0.5,
+                            reputationImpact: 0,
+                            outcome: &quot;You preserved your cash position but missed out on savings. This impacts your overall profitability slightly.&quot;,
+                            outcomeType: &quot;neutral&quot;
+                        },
+                        {
+                            id: &quot;1c&quot;,
+                            text: &quot;Negotiate for a 2.5% discount with net-15 terms&quot;,
+                            cashImpact: 0,
+                            profitabilityImpact: 0.5,
+                            reputationImpact: 5,
+                            outcome: &quot;The supplier agrees to your proposal. You'll save $300 when payment is due in 15 days, and your relationship with the supplier improves.&quot;,
+                            outcomeType: &quot;positive&quot;
+                        }
+                    ]
+                },
+                {
+                    id: 2,
+                    title: &quot;Unexpected Equipment Failure&quot;,
+                    description: &quot;Your main refrigerator has failed! You need to address this immediately. Your options are:&quot;,
+                    options: [
+                        {
+                            id: &quot;2a&quot;,
+                            text: &quot;Emergency repair ($2,400 immediately)&quot;,
+                            cashImpact: -2400,
+                            profitabilityImpact: -0.2,
+                            reputationImpact: 0,
+                            outcome: &quot;The repair is completed quickly, minimizing business disruption. However, the repair may not last long-term.&quot;,
+                            outcomeType: &quot;neutral&quot;
+                        },
+                        {
+                            id: &quot;2b&quot;,
+                            text: &quot;Buy new equipment ($8,500 immediately)&quot;,
+                            cashImpact: -8500,
+                            profitabilityImpact: 0.5,
+                            reputationImpact: 5,
+                            outcome: &quot;The new equipment is more energy-efficient, reducing utility costs. Your kitchen staff is happy with the reliable new equipment.&quot;,
+                            outcomeType: &quot;positive&quot;
+                        },
+                        {
+                            id: &quot;2c&quot;,
+                            text: &quot;Lease new equipment ($800/month for 12 months)&quot;,
+                            cashImpact: -800,
+                            profitabilityImpact: -0.3,
+                            reputationImpact: 3,
+                            outcome: &quot;You preserve cash now, but will pay $9,600 total over the next year. This impacts your long-term profitability.&quot;,
+                            outcomeType: &quot;mixed&quot;
+                        }
+                    ]
+                },
+                {
+                    id: 3,
+                    title: &quot;Staff Scheduling Challenge&quot;,
+                    description: &quot;You've noticed inconsistent customer traffic. Some days are overstaffed while others are understaffed. How will you address this?&quot;,
+                    options: [
+                        {
+                            id: &quot;3a&quot;,
+                            text: &quot;Invest in scheduling software with AI forecasting ($1,500)&quot;,
+                            cashImpact: -1500,
+                            profitabilityImpact: 2,
+                            reputationImpact: 10,
+                            outcome: &quot;The AI-powered system optimizes staffing levels based on historical patterns. Labor costs decrease by 12% and customer satisfaction improves due to consistent service.&quot;,
+                            outcomeType: &quot;positive&quot;
+                        },
+                        {
+                            id: &quot;3b&quot;,
+                            text: &quot;Maintain current fixed scheduling approach (no change)&quot;,
+                            cashImpact: 0,
+                            profitabilityImpact: -1,
+                            reputationImpact: -5,
+                            outcome: &quot;Continuing with inflexible schedules results in ongoing labor inefficiency and occasional poor customer experiences during busy periods.&quot;,
+                            outcomeType: &quot;negative&quot;
+                        },
+                        {
+                            id: &quot;3c&quot;,
+                            text: &quot;Implement on-call shifts (workers available but not guaranteed hours)&quot;,
+                            cashImpact: 0,
+                            profitabilityImpact: 1,
+                            reputationImpact: -10,
+                            outcome: &quot;While this improves labor cost efficiency, staff morale plummets due to income uncertainty. Several experienced employees begin looking for other jobs.&quot;,
+                            outcomeType: &quot;mixed&quot;
+                        }
+                    ]
+                },
+                {
+                    id: 4,
+                    title: &quot;Upcoming Rent Payment&quot;,
+                    description: &quot;Your quarterly rent payment of $19,500 is due in 7 days. Your current cash balance may not be sufficient depending on your previous choices.&quot;,
+                    options: [
+                        {
+                            id: &quot;4a&quot;,
+                            text: &quot;Pay rent in full using available cash&quot;,
+                            cashImpact: -19500,
+                            profitabilityImpact: 0,
+                            reputationImpact: 0,
+                            outcome: &quot;You make the payment on time, maintaining your relationship with your landlord. This significantly reduces your cash reserves.&quot;,
+                            outcomeType: &quot;neutral&quot;,
+                            requiredCash: 19500
+                        },
+                        {
+                            id: &quot;4b&quot;,
+                            text: &quot;Negotiate a payment plan (pay $6,500 now, remainder over 60 days with 5% fee)&quot;,
+                            cashImpact: -6500,
+                            profitabilityImpact: -0.5,
+                            reputationImpact: -5,
+                            outcome: &quot;The landlord accepts your proposal but is less flexible with future requests. The additional fee adds $650 to your total payment.&quot;,
+                            outcomeType: &quot;mixed&quot;
+                        },
+                        {
+                            id: &quot;4c&quot;,
+                            text: &quot;Take a short-term loan to cover the payment ($19,500 at 12% interest for 90 days)&quot;,
+                            cashImpact: 19500,
+                            profitabilityImpact: -1.5,
+                            reputationImpact: 0,
+                            outcome: &quot;You secure the loan and pay the rent on time, but will need to repay $21,060 in 90 days, affecting your future cash flow and profitability.&quot;,
+                            outcomeType: &quot;mixed&quot;
+                        }
+                    ]
+                },
+                {
+                    id: 5,
+                    title: &quot;Menu Pricing Strategy&quot;,
+                    description: &quot;Food costs have increased by 8% over the last quarter. How will you respond to maintain profitability?&quot;,
+                    options: [
+                        {
+                            id: &quot;5a&quot;,
+                            text: &quot;Raise all menu prices by 8% to maintain margins&quot;,
+                            cashImpact: 0,
+                            profitabilityImpact: 1,
+                            reputationImpact: -7,
+                            outcome: &quot;You preserve your profit margins, but some regular customers complain about the sudden increase. You notice a slight decrease in customer frequency.&quot;,
+                            outcomeType: &quot;mixed&quot;
+                        },
+                        {
+                            id: &quot;5b&quot;,
+                            text: &quot;Selectively raise prices only on high-margin items&quot;,
+                            cashImpact: 0,
+                            profitabilityImpact: 0.5,
+                            reputationImpact: -2,
+                            outcome: &quot;This balanced approach minimizes customer pushback while partially offsetting increased costs. Overall profitability is slightly affected.&quot;,
+                            outcomeType: &quot;neutral&quot;
+                        },
+                        {
+                            id: &quot;5c&quot;,
+                            text: &quot;Redesign menu with more cost-effective ingredients ($2,000 for consulting chef)&quot;,
+                            cashImpact: -2000,
+                            profitabilityImpact: 2,
+                            reputationImpact: 5,
+                            outcome: &quot;The menu redesign is a hit! Food costs decrease by 12% while maintaining quality. Customer satisfaction increases with the fresh new offerings.&quot;,
+                            outcomeType: &quot;positive&quot;
+                        }
+                    ]
+                }
+            ]
+        };
+        
+        // DOM elements
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const introScreen = document.getElementById('intro-screen');
+        const scenarioContainer = document.getElementById('scenario-container');
+        const resultsScreen = document.getElementById('results-screen');
+        
+        // Metrics elements
+        const cashBalanceEl = document.getElementById('cash-balance');
+        const cashRunwayEl = document.getElementById('cash-runway');
+        const reputationScoreEl = document.getElementById('reputation-score');
+        const profitabilityEl = document.getElementById('profitability');
+        
+        // Final metrics elements
+        const finalCashEl = document.getElementById('final-cash');
+        const finalReputationEl = document.getElementById('final-reputation');
+        const finalProfitabilityEl = document.getElementById('final-profitability');
+        const finalOutcomeEl = document.getElementById('final-outcome');
+        const keyLessonsEl = document.getElementById('key-lessons');
+        
+        // Tab switching functionality
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show corresponding content
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === tabId) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+        
+        // Start simulation
+        startBtn.addEventListener('click', () => {
+            introScreen.classList.add('hidden');
+            scenarioContainer.classList.remove('hidden');
+            loadScenario(0);
+        });
+        
+        // Reset simulation
+        resetBtn.addEventListener('click', () => {
+            // Reset game state
+            gameState.cash = 24000;
+            gameState.reputation = 70;
+            gameState.profitability = 8;
+            gameState.cashRunway = 14;
+            gameState.currentScenario = 0;
+            gameState.decisions = [];
+            
+            // Update UI
+            updateMetrics();
+            resultsScreen.classList.add('hidden');
+            introScreen.classList.remove('hidden');
+            
+            // Switch to scenario tab
+            tabs[0].click();
+        });
+        
+        // Load scenario
+        function loadScenario(index) {
+            if (index >= gameState.scenarios.length) {
+                showResults();
+                return;
+            }
+            
+            const scenario = gameState.scenarios[index];
+            gameState.currentScenario = index;
+            
+            // Create scenario HTML
+            let scenarioHTML = `
+                <div class=&quot;card&quot;>
+                    <h2>${scenario.title}</h2>
+                    <div class=&quot;scenario-content&quot;>
+                        <p>${scenario.description}</p>
+                    </div>
+                    <div class=&quot;metrics&quot;>
+                        <div class=&quot;metric&quot;>
+                            <div class=&quot;metric-value&quot;>$${gameState.cash.toLocaleString()}</div>
+                            <div class=&quot;metric-label&quot;>Current Cash</div>
+                        </div>
+                        <div class=&quot;metric&quot;>
+                            <div class=&quot;metric-value&quot;>${gameState.profitability}%</div>
+                            <div class=&quot;metric-label&quot;>Profitability</div>
+                        </div>
+                        <div class=&quot;metric&quot;>
+                            <div class=&quot;metric-value&quot;>${gameState.reputation}</div>
+                            <div class=&quot;metric-label&quot;>Reputation</div>
+                        </div>
+                    </div>
+                    <div class=&quot;decision-options&quot;>
+            `;
+            
+            // Add options
+            scenario.options.forEach(option => {
+                const isDisabled = option.requiredCash &amp;&amp; gameState.cash < option.requiredCash;
+                scenarioHTML += `
+                    <button class=&quot;option-btn&quot; data-option=&quot;${option.id}&quot; ${isDisabled ? 'disabled' : ''}>
+                        ${option.text}
+                        ${isDisabled ? '<br><small style=&quot;color: var(--danger);&quot;>(Insufficient cash available)</small>' : ''}
+                    </button>
+                `;
+            });
+            
+            scenarioHTML += `
+                    </div>
+                </div>
+            `;
+            
+            scenarioContainer.innerHTML = scenarioHTML;
+            
+            // Add event listeners to options
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                if (!btn.disabled) {
+                    btn.addEventListener('click', () => {
+                        const optionId = btn.getAttribute('data-option');
+                        makeDecision(optionId);
+                    });
+                }
+            });
+        }
+        
+        // Make decision
+        function makeDecision(optionId) {
+            const scenario = gameState.scenarios[gameState.currentScenario];
+            const option = scenario.options.find(opt => opt.id === optionId);
+            
+            // Record decision
+            gameState.decisions.push({
+                scenarioId: scenario.id,
+                optionId: optionId
+            });
+            
+            // Apply impacts
+            gameState.cash += option.cashImpact;
+            gameState.profitability += option.profitabilityImpact;
+            gameState.reputation += option.reputationImpact;
+            
+            // Calculate new cash runway (simplified)
+            gameState.cashRunway = Math.max(0, Math.round(gameState.cash / 1700));
+            
+            // Update metrics display
+            updateMetrics();
+            
+            // Show outcome
+            let outcomeClass = 'neutral';
+            if (option.outcomeType === 'positive') outcomeClass = 'positive';
+            if (option.outcomeType === 'negative') outcomeClass = 'negative';
+            if (option.outcomeType === 'mixed') outcomeClass = 'warning';
+            
+            scenarioContainer.innerHTML = `
+                <div class=&quot;card&quot;>
+                    <h2>Decision Outcome</h2>
+                    <div class=&quot;outcome ${outcomeClass}&quot;>
+                        <p>${option.outcome}</p>
+                    </div>
+                    
+                    <div class=&quot;metrics&quot;>
+                        <div class=&quot;metric&quot;>
+                            <div class=&quot;metric-value&quot;>$${gameState.cash.toLocaleString()}</div>
+                            <div class=&quot;metric-label&quot;>Cash Balance</div>
+                        </div>
+                        <div class=&quot;metric&quot;>
+                            <div class=&quot;metric-value&quot;>${gameState.profitability}%</div>
+                            <div class=&quot;metric-label&quot;>Profitability</div>
+                        </div>
+                        <div class=&quot;metric&quot;>
+                            <div class=&quot;metric-value&quot;>${gameState.reputation}</div>
+                            <div class=&quot;metric-label&quot;>Reputation</div>
+                        </div>
+                    </div>
+                    
+                    <button class=&quot;btn&quot; id=&quot;next-btn&quot;>Continue</button>
+                </div>
+            `;
+            
+            document.getElementById('next-btn').addEventListener('click', () => {
+                loadScenario(gameState.currentScenario + 1);
+            });
+        }
+        
+        // Show results
+        function showResults() {
+            scenarioContainer.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+            
+            // Update final metrics
+            finalCashEl.textContent = `$${gameState.cash.toLocaleString()}`;
+            finalReputationEl.textContent = gameState.reputation;
+            finalProfitabilityEl.textContent = `${gameState.profitability}%`;
+            
+            // Determine overall outcome
+            let finalOutcomeText = '';
+            let finalOutcomeClass = '';
+            
+            if (gameState.cash <= 0) {
+                finalOutcomeText = `<h3>Business Failed - Cash Crisis!</h3>
+                    <p>You've run out of cash and cannot meet your obligations. Without immediate outside funding, the business will need to close.</p>`;
+                finalOutcomeClass = 'negative';
+            } else if (gameState.cash < 10000) {
+                finalOutcomeText = `<h3>Struggling Business</h3>
+                    <p>Your business is surviving but with dangerously low cash reserves. Any unexpected expense could lead to insolvency.</p>`;
+                finalOutcomeClass = 'warning';
+            } else if (gameState.profitability < 5) {
+                finalOutcomeText = `<h3>Breaking Even</h3>
+                    <p>Your business is operational but barely profitable. Long-term sustainability requires improving your margins.</p>`;
+                finalOutcomeClass = 'warning';
+            } else if (gameState.cash > 25000 &amp;&amp; gameState.profitability > 10 &amp;&amp; gameState.reputation > 75) {
+                finalOutcomeText = `<h3>Thriving Business!</h3>
+                    <p>Your restaurant is flourishing with strong cash reserves, excellent profitability, and a stellar reputation. You've mastered cash flow management!</p>`;
+                finalOutcomeClass = 'positive';
+            } else {
+                finalOutcomeText = `<h3>Stable Business</h3>
+                    <p>Your restaurant is operating stably with adequate cash reserves and reasonable profitability. There's room for growth but you've avoided the critical cash flow traps.</p>`;
+                finalOutcomeClass = 'positive';
+            }
+            
+            finalOutcomeEl.innerHTML = finalOutcomeText;
+            finalOutcomeEl.className = `outcome ${finalOutcomeClass}`;
+            
+            // Generate key lessons based on decisions
+            let lessonsHTML = '';
+            
+            if (gameState.decisions.some(d => d.optionId === '1a' || d.optionId === '2b')) {
+                lessonsHTML += `<li><strong>Large immediate payments</strong> can significantly reduce cash reserves, even when they save money long-term. Always consider their impact on your cash runway.</li>`;
+            }
+            
+            if (gameState.decisions.some(d => d.optionId === '3a')) {
+                lessonsHTML += `<li><strong>Technology investments</strong> that optimize operational efficiency often pay for themselves quickly through reduced costs and improved customer experience.</li>`;
+            }
+            
+            if (gameState.decisions.some(d => d.optionId === '4c')) {
+                lessonsHTML += `<li><strong>Debt financing</strong> can solve immediate cash problems but creates future obligations that impact profitability. Use it strategically.</li>`;
+            }
+            
+            if (gameState.decisions.some(d => d.optionId === '5c')) {
+                lessonsHTML += `<li><strong>Menu engineering</strong> is a powerful tool for improving profitability without alienating customers through direct price increases.</li>`;
+            }
+            
+            lessonsHTML += `<li><strong>Cash flow timing</strong> is critical in food service. The gap between immediate sales and delayed supplier payments creates both opportunities and risks.</li>`;
+            
+            keyLessonsEl.innerHTML = lessonsHTML;
+        }
+        
+        // Update metrics displays
+        function updateMetrics() {
+            cashBalanceEl.textContent = `$${gameState.cash.toLocaleString()}`;
+            cashRunwayEl.textContent = `${gameState.cashRunway} days`;
+            reputationScoreEl.textContent = gameState.reputation;
+            profitabilityEl.textContent = `${gameState.profitability}%`;
+        }
+        
+        // Initialize
+        updateMetrics();
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_r8lec742';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>
+```" data-interaction-code="math_eq_r8lec742" style="width: 100%; height: 1039px; border: none;"></iframe>

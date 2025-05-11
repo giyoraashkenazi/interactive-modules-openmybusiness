@@ -1,0 +1,1002 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Pre-Marketing Strategy Builder</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg-dark: #121212;
+            --bg-card: #1e1e1e;
+            --text-light: #f3f4f6;
+            --text-gray: #9ca3af;
+            --border: #2e2e2e;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        header {
+            text-align: center;
+            padding: 2rem 1rem;
+            background: linear-gradient(to right, #4338ca, #6366f1);
+            margin-bottom: 2rem;
+            border-radius: 0 0 1rem 1rem;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        p.subtitle {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        h3 {
+            font-size: 1.25rem;
+            margin: 1.5rem 0 1rem;
+            color: var(--text-light);
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.25rem;
+            background-color: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .option-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .option-group h4 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-gray);
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .option {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .option:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .option.selected {
+            border-color: var(--primary);
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+        
+        .option.selected::after {
+            content: &quot;✓&quot;;
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: var(--primary);
+            color: white;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+        
+        .option h5 {
+            font-size: 0.925rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .option p {
+            font-size: 0.8rem;
+            color: var(--text-gray);
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        button.secondary {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-light);
+        }
+        
+        button.secondary:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        
+        #results {
+            display: none;
+        }
+        
+        .result-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .result-card h4 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .progress-container {
+            margin: 1.5rem 0;
+        }
+        
+        .progress-bar {
+            height: 0.5rem;
+            background-color: var(--border);
+            border-radius: 1rem;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-gray);
+            font-size: 0.8rem;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.75rem;
+            }
+            
+            .tab {
+                padding: 0.625rem 1rem;
+                font-size: 0.75rem;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class=&quot;container&quot;>
+            <h1>Pre-Marketing Strategy Builder</h1>
+            <p class=&quot;subtitle&quot;>Build a customized pre-marketing strategy to validate your business concept before investing major resources</p>
+        </div>
+    </header>
+
+    <div class=&quot;container&quot;>
+        <div class=&quot;card&quot; id=&quot;intro-card&quot;>
+            <h2>🧠 Pre-Marketing: Evaluating Your Business Potential</h2>
+            <p>In today's digital world, smart entrepreneurs don't start a business before answering a crucial question: <strong>Is there real demand for my concept?</strong></p>
+            <p>This builder will help you create a customized pre-marketing plan to validate your business idea using powerful digital tools for fast, affordable insights.</p>
+            
+            <div class=&quot;progress-container&quot;>
+                <div class=&quot;progress-label&quot;>
+                    <span>Your progress</span>
+                    <span id=&quot;progress-percent&quot;>0%</span>
+                </div>
+                <div class=&quot;progress-bar&quot;>
+                    <div class=&quot;progress&quot; id=&quot;progress-bar&quot; style=&quot;width: 0%&quot;></div>
+                </div>
+            </div>
+            
+            <button id=&quot;start-builder&quot;>Start Building Your Strategy</button>
+        </div>
+
+        <div class=&quot;card&quot; id=&quot;builder&quot; style=&quot;display: none;&quot;>
+            <div class=&quot;tabs&quot; id=&quot;strategy-tabs&quot;>
+                <div class=&quot;tab active&quot; data-tab=&quot;digital-tools&quot;>Digital Tools</div>
+                <div class=&quot;tab&quot; data-tab=&quot;audience-testing&quot;>Audience Testing</div>
+                <div class=&quot;tab&quot; data-tab=&quot;data-collection&quot;>Data Collection</div>
+                <div class=&quot;tab&quot; data-tab=&quot;ethics&quot;>Ethics &amp; Sustainability</div>
+                <div class=&quot;tab&quot; data-tab=&quot;global-local&quot;>Global &amp; Local</div>
+                <div class=&quot;tab&quot; data-tab=&quot;summary&quot;>Summary</div>
+            </div>
+
+            <div class=&quot;tab-content active&quot; data-tab=&quot;digital-tools&quot;>
+                <h3>📈 Digital Marketing Tools to Validate Demand</h3>
+                <p>Select which digital validation methods you want to include in your pre-marketing strategy:</p>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Landing Page Testing</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;digital-tools&quot; data-option=&quot;landing-page&quot;>
+                            <h5>Simple Landing Page</h5>
+                            <p>Create a basic landing page to test interest before your product exists</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;digital-tools&quot; data-option=&quot;waitlist&quot;>
+                            <h5>Email Waitlist</h5>
+                            <p>Collect email addresses from interested customers to gauge demand</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Social Media Testing</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;digital-tools&quot; data-option=&quot;social-ads&quot;>
+                            <h5>Micro Ad Campaigns</h5>
+                            <p>Run small-scale ads on Facebook or Instagram to measure engagement</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;digital-tools&quot; data-option=&quot;content-posts&quot;>
+                            <h5>Content Testing</h5>
+                            <p>Post different content ideas to see which generates the most engagement</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Market Research Tools</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;digital-tools&quot; data-option=&quot;google-trends&quot;>
+                            <h5>Google Trends</h5>
+                            <p>Research keyword popularity and seasonal trends for your business concept</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;digital-tools&quot; data-option=&quot;answer-public&quot;>
+                            <h5>Answer the Public</h5>
+                            <p>Discover what questions people are asking about your market or product</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;navigation&quot;>
+                    <button class=&quot;tab-nav secondary&quot; data-direction=&quot;prev&quot;>Back</button>
+                    <button class=&quot;tab-nav&quot; data-direction=&quot;next&quot;>Continue</button>
+                </div>
+            </div>
+
+            <div class=&quot;tab-content&quot; data-tab=&quot;audience-testing&quot;>
+                <h3>🍽 Testing Concepts with a Real Audience</h3>
+                <p>Select which audience testing methods you want to include in your pre-marketing strategy:</p>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Feedback Collection</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;audience-testing&quot; data-option=&quot;survey&quot;>
+                            <h5>Short Survey</h5>
+                            <p>Publish a short survey asking what products/services customers would want</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;audience-testing&quot; data-option=&quot;focus-group&quot;>
+                            <h5>Focus Group</h5>
+                            <p>Gather a small group for in-depth discussion about your concept</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Visual Testing</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;audience-testing&quot; data-option=&quot;product-images&quot;>
+                            <h5>Sample Product Images</h5>
+                            <p>Post sample product images (even AI-generated) to observe reactions</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;audience-testing&quot; data-option=&quot;concept-video&quot;>
+                            <h5>Concept Video</h5>
+                            <p>Create a simple video explaining your concept to gauge interest</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Live Testing</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;audience-testing&quot; data-option=&quot;tasting-event&quot;>
+                            <h5>Mini Tasting/Sampling Event</h5>
+                            <p>Host a mini event for a selected group and gather feedback</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;audience-testing&quot; data-option=&quot;pop-up&quot;>
+                            <h5>Pop-up Experience</h5>
+                            <p>Create a temporary physical presence to test your concept</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;navigation&quot;>
+                    <button class=&quot;tab-nav secondary&quot; data-direction=&quot;prev&quot;>Back</button>
+                    <button class=&quot;tab-nav&quot; data-direction=&quot;next&quot;>Continue</button>
+                </div>
+            </div>
+
+            <div class=&quot;tab-content&quot; data-tab=&quot;data-collection&quot;>
+                <h3>📊 Data Collection and Insights</h3>
+                <p>Select which data collection methods you want to include in your pre-marketing strategy:</p>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Quantitative Data</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;data-collection&quot; data-option=&quot;engagement-metrics&quot;>
+                            <h5>Engagement Metrics</h5>
+                            <p>Track likes, shares, comments, and click-through rates</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;data-collection&quot; data-option=&quot;conversion-tracking&quot;>
+                            <h5>Conversion Tracking</h5>
+                            <p>Monitor how many people take desired actions (sign-ups, etc.)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Qualitative Data</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;data-collection&quot; data-option=&quot;sentiment-analysis&quot;>
+                            <h5>Sentiment Analysis</h5>
+                            <p>Analyze comments and feedback for emotional responses</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;data-collection&quot; data-option=&quot;interviews&quot;>
+                            <h5>Customer Interviews</h5>
+                            <p>Conduct in-depth interviews with potential customers</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Competitive Analysis</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;data-collection&quot; data-option=&quot;competitor-audit&quot;>
+                            <h5>Competitor Audit</h5>
+                            <p>Analyze offerings and positioning of direct competitors</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;data-collection&quot; data-option=&quot;gap-analysis&quot;>
+                            <h5>Market Gap Analysis</h5>
+                            <p>Identify unmet needs and opportunities in the market</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;navigation&quot;>
+                    <button class=&quot;tab-nav secondary&quot; data-direction=&quot;prev&quot;>Back</button>
+                    <button class=&quot;tab-nav&quot; data-direction=&quot;next&quot;>Continue</button>
+                </div>
+            </div>
+
+            <div class=&quot;tab-content&quot; data-tab=&quot;ethics&quot;>
+                <h3>🌱 Sustainability and Ethics</h3>
+                <p>Select which ethical elements you want to highlight in your pre-marketing strategy:</p>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Sustainability Focus</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;ethics&quot; data-option=&quot;sourcing&quot;>
+                            <h5>Sustainable Sourcing</h5>
+                            <p>Highlight commitment to eco-friendly or sustainable materials/ingredients</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;ethics&quot; data-option=&quot;packaging&quot;>
+                            <h5>Eco-Friendly Packaging</h5>
+                            <p>Emphasize minimal or sustainable packaging approaches</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Social Responsibility</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;ethics&quot; data-option=&quot;labor-practices&quot;>
+                            <h5>Ethical Labor Practices</h5>
+                            <p>Showcase fair treatment of workers throughout your supply chain</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;ethics&quot; data-option=&quot;community-impact&quot;>
+                            <h5>Community Impact</h5>
+                            <p>Highlight how your business benefits local communities</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Transparency</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;ethics&quot; data-option=&quot;behind-scenes&quot;>
+                            <h5>Behind-the-Scenes Content</h5>
+                            <p>Share development process and authentic business journey</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;ethics&quot; data-option=&quot;ingredient-disclosure&quot;>
+                            <h5>Full Disclosure</h5>
+                            <p>Be transparent about ingredients, materials, or business practices</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;navigation&quot;>
+                    <button class=&quot;tab-nav secondary&quot; data-direction=&quot;prev&quot;>Back</button>
+                    <button class=&quot;tab-nav&quot; data-direction=&quot;next&quot;>Continue</button>
+                </div>
+            </div>
+
+            <div class=&quot;tab-content&quot; data-tab=&quot;global-local&quot;>
+                <h3>🌎 Think Globally, Act Locally</h3>
+                <p>Select which global-local strategies you want to include in your pre-marketing plan:</p>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Global Trends</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;global-local&quot; data-option=&quot;trend-research&quot;>
+                            <h5>Global Trend Research</h5>
+                            <p>Research international trends that could be adapted to your local market</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;global-local&quot; data-option=&quot;international-brands&quot;>
+                            <h5>Study International Brands</h5>
+                            <p>Analyze successful foreign businesses in your industry</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Local Adaptation</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;global-local&quot; data-option=&quot;local-customs&quot;>
+                            <h5>Local Culture Integration</h5>
+                            <p>Adapt global concepts to fit local customs and preferences</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;global-local&quot; data-option=&quot;regional-suppliers&quot;>
+                            <h5>Local Supply Chain</h5>
+                            <p>Highlight use of regional suppliers or ingredients</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;option-group&quot;>
+                    <h4>Positioning</h4>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option&quot; data-category=&quot;global-local&quot; data-option=&quot;global-quality&quot;>
+                            <h5>Global Quality, Local Touch</h5>
+                            <p>Position as offering international standards with local understanding</p>
+                        </div>
+                        <div class=&quot;option&quot; data-category=&quot;global-local&quot; data-option=&quot;fusion-approach&quot;>
+                            <h5>Fusion Approach</h5>
+                            <p>Create unique offerings that blend global and local elements</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class=&quot;navigation&quot;>
+                    <button class=&quot;tab-nav secondary&quot; data-direction=&quot;prev&quot;>Back</button>
+                    <button class=&quot;tab-nav&quot; data-direction=&quot;next&quot;>See Your Strategy</button>
+                </div>
+            </div>
+
+            <div class=&quot;tab-content&quot; data-tab=&quot;summary&quot;>
+                <h3>🎯 Your Pre-Marketing Strategy</h3>
+                <p>Based on your selections, here's your customized pre-marketing plan:</p>
+
+                <div id=&quot;strategy-summary&quot;>
+                    <!-- Will be filled dynamically -->
+                </div>
+
+                <div class=&quot;result-card&quot;>
+                    <h4>📌 Key Takeaways</h4>
+                    <ul>
+                        <li>Great concepts must be tested, not just dreamed.</li>
+                        <li>Digital tools make real-world validation fast and affordable.</li>
+                        <li>Small experiments now can prevent major losses later.</li>
+                        <li>Pre-Marketing is not optional — it's a core part of modern business development.</li>
+                    </ul>
+                </div>
+
+                <div class=&quot;navigation&quot;>
+                    <button class=&quot;tab-nav secondary&quot; data-direction=&quot;prev&quot;>Back</button>
+                    <button id=&quot;download-pdf&quot;>Download Your Strategy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class=&quot;footer&quot;>
+        <p>Pre-Marketing Strategy Builder © 2023 | Helping entrepreneurs validate business concepts</p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Store selected options
+            const selectedOptions = {
+                'digital-tools': [],
+                'audience-testing': [],
+                'data-collection': [],
+                'ethics': [],
+                'global-local': []
+            };
+            
+            // Tab navigation
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const tabOrder = ['digital-tools', 'audience-testing', 'data-collection', 'ethics', 'global-local', 'summary'];
+            let currentTabIndex = 0;
+            
+            // Start button
+            document.getElementById('start-builder').addEventListener('click', function() {
+                document.getElementById('intro-card').style.display = 'none';
+                document.getElementById('builder').style.display = 'block';
+                updateProgress();
+            });
+            
+            // Tab click handler
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    currentTabIndex = tabOrder.indexOf(tabId);
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.getAttribute('data-tab') === tabId) {
+                            content.classList.add('active');
+                        }
+                    });
+                    
+                    updateProgress();
+                });
+            });
+            
+            // Tab navigation buttons
+            const navButtons = document.querySelectorAll('.tab-nav');
+            navButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const direction = this.getAttribute('data-direction');
+                    
+                    if (direction === 'next') {
+                        if (currentTabIndex < tabOrder.length - 1) {
+                            currentTabIndex++;
+                        }
+                    } else if (direction === 'prev') {
+                        if (currentTabIndex > 0) {
+                            currentTabIndex--;
+                        } else {
+                            // Go back to intro if at first tab
+                            document.getElementById('intro-card').style.display = 'block';
+                            document.getElementById('builder').style.display = 'none';
+                            return;
+                        }
+                    }
+                    
+                    // If moving to summary tab, generate summary first
+                    if (tabOrder[currentTabIndex] === 'summary') {
+                        generateSummary();
+                    }
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    document.querySelector(`.tab[data-tab=&quot;${tabOrder[currentTabIndex]}&quot;]`).classList.add('active');
+                    
+                    // Show corresponding content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.getAttribute('data-tab') === tabOrder[currentTabIndex]) {
+                            content.classList.add('active');
+                        }
+                    });
+                    
+                    updateProgress();
+                });
+            });
+            
+            // Option selection
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    const category = this.getAttribute('data-category');
+                    const optionValue = this.getAttribute('data-option');
+                    
+                    if (this.classList.contains('selected')) {
+                        // Deselect
+                        this.classList.remove('selected');
+                        const index = selectedOptions[category].indexOf(optionValue);
+                        if (index > -1) {
+                            selectedOptions[category].splice(index, 1);
+                        }
+                    } else {
+                        // Select
+                        this.classList.add('selected');
+                        selectedOptions[category].push(optionValue);
+                    }
+                });
+            });
+            
+            // Generate summary based on selected options
+            function generateSummary() {
+                const summaryElement = document.getElementById('strategy-summary');
+                summaryElement.innerHTML = '';
+                
+                // Check if any options were selected
+                let hasSelections = false;
+                for (const category in selectedOptions) {
+                    if (selectedOptions[category].length > 0) {
+                        hasSelections = true;
+                        break;
+                    }
+                }
+                
+                if (!hasSelections) {
+                    summaryElement.innerHTML = `
+                        <div class=&quot;result-card&quot;>
+                            <h4>⚠️ No Methods Selected</h4>
+                            <p>You haven't selected any pre-marketing methods. Go back to previous tabs and select at least one validation method to build your strategy.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Digital Tools section
+                if (selectedOptions['digital-tools'].length > 0) {
+                    const toolsCard = document.createElement('div');
+                    toolsCard.className = 'result-card';
+                    
+                    let toolsHTML = `<h4>📈 Digital Tools Strategy</h4><ul>`;
+                    
+                    selectedOptions['digital-tools'].forEach(tool => {
+                        switch(tool) {
+                            case 'landing-page':
+                                toolsHTML += `<li><strong>Landing Page:</strong> Create a simple, one-page website that explains your concept and captures potential customer information.</li>`;
+                                break;
+                            case 'waitlist':
+                                toolsHTML += `<li><strong>Email Waitlist:</strong> Set up a waitlist form to gauge interest level and build an initial customer base.</li>`;
+                                break;
+                            case 'social-ads':
+                                toolsHTML += `<li><strong>Micro Ad Campaigns:</strong> Run small targeted ads ($50-100) to test different messaging and visual approaches.</li>`;
+                                break;
+                            case 'content-posts':
+                                toolsHTML += `<li><strong>Content Testing:</strong> Create 3-5 different posts about your concept to see which generates the most engagement.</li>`;
+                                break;
+                            case 'google-trends':
+                                toolsHTML += `<li><strong>Google Trends Research:</strong> Analyze search trends related to your business concept to identify seasonal patterns and growing interest.</li>`;
+                                break;
+                            case 'answer-public':
+                                toolsHTML += `<li><strong>Answer the Public:</strong> Research common questions people ask about your industry or product type to identify knowledge gaps.</li>`;
+                                break;
+                        }
+                    });
+                    
+                    toolsHTML += `</ul>`;
+                    toolsCard.innerHTML = toolsHTML;
+                    summaryElement.appendChild(toolsCard);
+                }
+                
+                // Audience Testing section
+                if (selectedOptions['audience-testing'].length > 0) {
+                    const audienceCard = document.createElement('div');
+                    audienceCard.className = 'result-card';
+                    
+                    let audienceHTML = `<h4>🍽 Audience Testing Strategy</h4><ul>`;
+                    
+                    selectedOptions['audience-testing'].forEach(method => {
+                        switch(method) {
+                            case 'survey':
+                                audienceHTML += `<li><strong>Short Survey:</strong> Create a 5-7 question survey about preferences and needs related to your concept.</li>`;
+                                break;
+                            case 'focus-group':
+                                audienceHTML += `<li><strong>Focus Group:</strong> Gather 5-8 potential customers for a moderated discussion about your concept.</li>`;
+                                break;
+                            case 'product-images':
+                                audienceHTML += `<li><strong>Sample Product Images:</strong> Create realistic mockups of your product and share on social media to gauge reactions.</li>`;
+                                break;
+                            case 'concept-video':
+                                audienceHTML += `<li><strong>Concept Video:</strong> Develop a 60-90 second video explaining your concept and track engagement metrics.</li>`;
+                                break;
+                            case 'tasting-event':
+                                audienceHTML += `<li><strong>Mini Tasting/Sampling Event:</strong> Host a small event where people can try early versions of your offering.</li>`;
+                                break;
+                            case 'pop-up':
+                                audienceHTML += `<li><strong>Pop-up Experience:</strong> Create a temporary physical presence to test real-world reactions to your concept.</li>`;
+                                break;
+                        }
+                    });
+                    
+                    audienceHTML += `</ul>`;
+                    audienceCard.innerHTML = audienceHTML;
+                    summaryElement.appendChild(audienceCard);
+                }
+                
+                // Data Collection section
+                if (selectedOptions['data-collection'].length > 0) {
+                    const dataCard = document.createElement('div');
+                    dataCard.className = 'result-card';
+                    
+                    let dataHTML = `<h4>📊 Data Collection Strategy</h4><ul>`;
+                    
+                    selectedOptions['data-collection'].forEach(method => {
+                        switch(method) {
+                            case 'engagement-metrics':
+                                dataHTML += `<li><strong>Engagement Metrics:</strong> Track likes, shares, comments, and click-through rates to understand which aspects of your concept resonate most.</li>`;
+                                break;
+                            case 'conversion-tracking':
+                                dataHTML += `<li><strong>Conversion Tracking:</strong> Set up tracking to monitor how many people take desired actions (sign-ups, form completions, etc.).</li>`;
+                                break;
+                            case 'sentiment-analysis':
+                                dataHTML += `<li><strong>Sentiment Analysis:</strong> Review comments and feedback to gauge emotional responses to your concept.</li>`;
+                                break;
+                            case 'interviews':
+                                dataHTML += `<li><strong>Customer Interviews:</strong> Conduct 5-10 in-depth interviews with potential customers to understand their needs and reactions.</li>`;
+                                break;
+                            case 'competitor-audit':
+                                dataHTML += `<li><strong>Competitor Audit:</strong> Analyze 3-5 competitors to understand their offerings, pricing, and positioning.</li>`;
+                                break;
+                            case 'gap-analysis':
+                                dataHTML += `<li><strong>Market Gap Analysis:</strong> Identify unmet needs in the market by examining customer complaints and shortcomings of existing options.</li>`;
+                                break;
+                        }
+                    });
+                    
+                    dataHTML += `</ul>`;
+                    dataCard.innerHTML = dataHTML;
+                    summaryElement.appendChild(dataCard);
+                }
+                
+                // Ethics section
+                if (selectedOptions['ethics'].length > 0) {
+                    const ethicsCard = document.createElement('div');
+                    ethicsCard.className = 'result-card';
+                    
+                    let ethicsHTML = `<h4>🌱 Ethics &amp; Sustainability Strategy</h4><ul>`;
+                    
+                    selectedOptions['ethics'].forEach(method => {
+                        switch(method) {
+                            case 'sourcing':
+                                ethicsHTML += `<li><strong>Sustainable Sourcing:</strong> Highlight your commitment to eco-friendly or sustainable materials/ingredients in pre-marketing materials.</li>`;
+                                break;
+                            case 'packaging':
+                                ethicsHTML += `<li><strong>Eco-Friendly Packaging:</strong> Showcase your minimal or sustainable packaging approach as a key differentiator.</li>`;
+                                break;
+                            case 'labor-practices':
+                                ethicsHTML += `<li><strong>Ethical Labor Practices:</strong> Emphasize fair treatment of workers throughout your supply chain in your messaging.</li>`;
+                                break;
+                            case 'community-impact':
+                                ethicsHTML += `<li><strong>Community Impact:</strong> Communicate how your business benefits local communities or supports social causes.</li>`;
+                                break;
+                            case 'behind-scenes':
+                                ethicsHTML += `<li><strong>Behind-the-Scenes Content:</strong> Share your development process and authentic business journey to build transparency.</li>`;
+                                break;
+                            case 'ingredient-disclosure':
+                                ethicsHTML += `<li><strong>Full Disclosure:</strong> Be transparent about ingredients, materials, or business practices to build trust.</li>`;
+                                break;
+                        }
+                    });
+                    
+                    ethicsHTML += `</ul>`;
+                    ethicsCard.innerHTML = ethicsHTML;
+                    summaryElement.appendChild(ethicsCard);
+                }
+                
+                // Global-Local section
+                if (selectedOptions['global-local'].length > 0) {
+                    const globalCard = document.createElement('div');
+                    globalCard.className = 'result-card';
+                    
+                    let globalHTML = `<h4>🌎 Global-Local Strategy</h4><ul>`;
+                    
+                    selectedOptions['global-local'].forEach(method => {
+                        switch(method) {
+                            case 'trend-research':
+                                globalHTML += `<li><strong>Global Trend Research:</strong> Research international trends that could be adapted to your local market to create a unique offering.</li>`;
+                                break;
+                            case 'international-brands':
+                                globalHTML += `<li><strong>Study International Brands:</strong> Analyze successful foreign businesses in your industry for insights and inspiration.</li>`;
+                                break;
+                            case 'local-customs':
+                                globalHTML += `<li><strong>Local Culture Integration:</strong> Adapt global concepts to fit local customs and preferences to increase relevance.</li>`;
+                                break;
+                            case 'regional-suppliers':
+                                globalHTML += `<li><strong>Local Supply Chain:</strong> Highlight your use of regional suppliers or ingredients to appeal to locally-minded customers.</li>`;
+                                break;
+                            case 'global-quality':
+                                globalHTML += `<li><strong>Global Quality, Local Touch:</strong> Position your offering as providing international standards with local understanding.</li>`;
+                                break;
+                            case 'fusion-approach':
+                                globalHTML += `<li><strong>Fusion Approach:</strong> Create unique offerings that blend global and local elements for a distinctive market position.</li>`;
+                                break;
+                        }
+                    });
+                    
+                    globalHTML += `</ul>`;
+                    globalCard.innerHTML = globalHTML;
+                    summaryElement.appendChild(globalCard);
+                }
+                
+                // Implementation Timeline
+                const timelineCard = document.createElement('div');
+                timelineCard.className = 'result-card';
+                
+                let timelineHTML = `
+                    <h4>⏱️ Implementation Timeline</h4>
+                    <p>Based on your selections, we recommend this implementation timeline:</p>
+                    <ul>
+                        <li><strong>Week 1-2:</strong> Set up digital tools and research platforms</li>
+                        <li><strong>Week 3-4:</strong> Create and launch initial testing content</li>
+                        <li><strong>Week 5-6:</strong> Collect and analyze initial data</li>
+                        <li><strong>Week 7-8:</strong> Refine concept based on feedback and conduct additional testing</li>
+                        <li><strong>Week 9-10:</strong> Make final adjustments and prepare for full launch</li>
+                    </ul>
+                `;
+                
+                timelineCard.innerHTML = timelineHTML;
+                summaryElement.appendChild(timelineCard);
+            }
+            
+            // Update progress indicator
+            function updateProgress() {
+                const totalTabs = tabOrder.length - 1; // Exclude summary tab
+                let progress = Math.round((currentTabIndex / totalTabs) * 100);
+                
+                // Cap at 100% when reaching summary
+                if (tabOrder[currentTabIndex] === 'summary') {
+                    progress = 100;
+                }
+                
+                document.getElementById('progress-bar').style.width = `${progress}%`;
+                document.getElementById('progress-percent').textContent = `${progress}%`;
+            }
+            
+            // Download PDF (mock functionality)
+            document.getElementById('download-pdf').addEventListener('click', function() {
+                alert('In a production environment, this would generate and download a PDF of your strategy. For this demo, please screenshot or copy your strategy summary.');
+            });
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_waw2qdp6';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_waw2qdp6" style="width: 100%; height: 883px; border: none;"></iframe>

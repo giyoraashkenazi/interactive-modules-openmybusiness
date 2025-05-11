@@ -1,0 +1,798 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Recipe Cost Builder</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary-color: #6200EA;
+            --primary-light: #9d46ff;
+            --accent-color: #00C853;
+            --text-color: #E0E0E0;
+            --background-dark: #121212;
+            --background-card: #1E1E1E;
+            --background-card-hover: #2D2D2D;
+            --error-color: #CF6679;
+            --border-color: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            height: 100vh;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        header {
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #BBB;
+            margin-bottom: 1rem;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--background-card);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .tab.active {
+            border-bottom: 2px solid var(--primary-light);
+            background-color: rgba(157, 70, 255, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--background-card);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.7rem;
+            color: white;
+        }
+
+        .ingredient-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.7rem;
+            margin-bottom: 1rem;
+        }
+
+        .ingredient-item {
+            background-color: var(--background-card-hover);
+            border-radius: 6px;
+            padding: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 0.85rem;
+        }
+
+        .ingredient-item:hover, .ingredient-item:active {
+            background-color: rgba(157, 70, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .recipe-area {
+            min-height: 200px;
+            margin-bottom: 1rem;
+        }
+
+        .recipe-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--background-card-hover);
+            margin-bottom: 0.5rem;
+            padding: 0.8rem;
+            border-radius: 6px;
+            border-left: 3px solid var(--primary-light);
+        }
+
+        .recipe-item-details {
+            flex: 1;
+        }
+
+        .recipe-item-name {
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+
+        .recipe-item-cost {
+            font-size: 0.8rem;
+            color: #BBB;
+        }
+
+        .recipe-item-actions {
+            display: flex;
+            align-items: center;
+        }
+
+        .quantity-input {
+            width: 60px;
+            padding: 0.4rem;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            background-color: var(--background-dark);
+            color: var(--text-color);
+            margin-right: 0.5rem;
+            text-align: center;
+        }
+
+        .remove-btn {
+            background-color: transparent;
+            border: none;
+            color: var(--error-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-recipe {
+            text-align: center;
+            padding: 2rem;
+            color: #999;
+            font-style: italic;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            border: 1px dashed var(--border-color);
+        }
+
+        .cost-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.7rem;
+        }
+
+        .summary-item {
+            background-color: var(--background-card-hover);
+            padding: 0.8rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .summary-label {
+            font-size: 0.8rem;
+            color: #BBB;
+            margin-bottom: 0.3rem;
+        }
+
+        .summary-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .action-btn {
+            display: block;
+            width: 100%;
+            padding: 0.8rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 1rem;
+        }
+
+        .action-btn:hover, .action-btn:active {
+            background-color: var(--primary-light);
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .breakdown-label {
+            font-weight: 500;
+        }
+        
+        .breakdown-value {
+            font-weight: 600;
+        }
+        
+        .pricing-form {
+            display: grid;
+            gap: 1rem;
+        }
+        
+        .form-group {
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 0.9rem;
+            color: #BBB;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background-color: var(--background-dark);
+            color: var(--text-color);
+        }
+        
+        .recommendation-card {
+            background-color: rgba(0, 200, 83, 0.1);
+            border-left: 3px solid var(--accent-color);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+        }
+        
+        .recommendation-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+
+        .dragging {
+            opacity: 0.5;
+        }
+
+        @media (min-width: 768px) {
+            .container {
+                max-width: 720px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .tab {
+                font-size: 1rem;
+            }
+            
+            .ingredient-list {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>Recipe Cost Builder</h1>
+            <p class=&quot;subtitle&quot;>Build your recipe and see real-time cost breakdown</p>
+        </header>
+        
+        <div class=&quot;tabs&quot;>
+            <div class=&quot;tab active&quot; data-tab=&quot;builder&quot;>Builder</div>
+            <div class=&quot;tab&quot; data-tab=&quot;breakdown&quot;>Cost Breakdown</div>
+            <div class=&quot;tab&quot; data-tab=&quot;pricing&quot;>Pricing</div>
+        </div>
+        
+        <div id=&quot;builder&quot; class=&quot;tab-content active&quot;>
+            <div class=&quot;card&quot;>
+                <div class=&quot;card-title&quot;>Ingredient Selection</div>
+                <div class=&quot;ingredient-list&quot; id=&quot;ingredientList&quot;>
+                    <!-- Ingredients will be generated via JavaScript -->
+                </div>
+            </div>
+            
+            <div class=&quot;card&quot;>
+                <div class=&quot;card-title&quot;>Your Recipe</div>
+                <div id=&quot;recipeArea&quot; class=&quot;recipe-area&quot;>
+                    <div class=&quot;empty-recipe&quot; id=&quot;emptyRecipe&quot;>
+                        Tap an ingredient to add it to your recipe
+                    </div>
+                    <div id=&quot;recipeItems&quot;></div>
+                </div>
+            </div>
+            
+            <div class=&quot;card&quot;>
+                <div class=&quot;card-title&quot;>Cost Summary</div>
+                <div class=&quot;cost-summary&quot;>
+                    <div class=&quot;summary-item&quot;>
+                        <div class=&quot;summary-label&quot;>Total Cost</div>
+                        <div class=&quot;summary-value&quot; id=&quot;totalCost&quot;>$0.00</div>
+                    </div>
+                    <div class=&quot;summary-item&quot;>
+                        <div class=&quot;summary-label&quot;>Food Cost %</div>
+                        <div class=&quot;summary-value&quot; id=&quot;foodCostPercent&quot;>0%</div>
+                    </div>
+                    <div class=&quot;summary-item&quot;>
+                        <div class=&quot;summary-label&quot;>Suggested Price</div>
+                        <div class=&quot;summary-value&quot; id=&quot;suggestedPrice&quot;>$0.00</div>
+                    </div>
+                    <div class=&quot;summary-item&quot;>
+                        <div class=&quot;summary-label&quot;>Gross Profit %</div>
+                        <div class=&quot;summary-value&quot; id=&quot;grossProfitPercent&quot;>0%</div>
+                    </div>
+                </div>
+                
+                <button class=&quot;action-btn&quot; id=&quot;calculateBtn&quot;>Calculate Menu Price</button>
+            </div>
+        </div>
+        
+        <div id=&quot;breakdown&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <div class=&quot;card-title&quot;>Recipe Cost Breakdown</div>
+                <div id=&quot;costBreakdown&quot;>
+                    <div class=&quot;empty-recipe&quot;>
+                        Add ingredients to see cost breakdown
+                    </div>
+                </div>
+            </div>
+            
+            <div class=&quot;card&quot;>
+                <div class=&quot;card-title&quot;>Pricing Analysis</div>
+                <div class=&quot;breakdown-item&quot;>
+                    <div class=&quot;breakdown-label&quot;>Target Food Cost %</div>
+                    <div class=&quot;breakdown-value&quot;>30%</div>
+                </div>
+                <div class=&quot;breakdown-item&quot;>
+                    <div class=&quot;breakdown-label&quot;>Current Food Cost %</div>
+                    <div class=&quot;breakdown-value&quot; id=&quot;currentFoodCost&quot;>0%</div>
+                </div>
+                <div class=&quot;breakdown-item&quot;>
+                    <div class=&quot;breakdown-label&quot;>Target Gross Profit %</div>
+                    <div class=&quot;breakdown-value&quot;>70%</div>
+                </div>
+                <div class=&quot;breakdown-item&quot;>
+                    <div class=&quot;breakdown-label&quot;>Current Gross Profit %</div>
+                    <div class=&quot;breakdown-value&quot; id=&quot;currentGrossProfit&quot;>0%</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;pricing&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <div class=&quot;card-title&quot;>Menu Pricing Strategy</div>
+                <div class=&quot;pricing-form&quot;>
+                    <div class=&quot;form-group&quot;>
+                        <label class=&quot;form-label&quot; for=&quot;targetFoodCost&quot;>Target Food Cost %</label>
+                        <input type=&quot;number&quot; id=&quot;targetFoodCost&quot; class=&quot;form-input&quot; value=&quot;30&quot; min=&quot;1&quot; max=&quot;99&quot;>
+                    </div>
+                    <div class=&quot;form-group&quot;>
+                        <label class=&quot;form-label&quot; for=&quot;pricingStrategy&quot;>Pricing Strategy</label>
+                        <select id=&quot;pricingStrategy&quot; class=&quot;form-input&quot;>
+                            <option value=&quot;costPlus&quot;>Cost-Plus Pricing</option>
+                            <option value=&quot;valueBased&quot;>Value-Based Pricing</option>
+                            <option value=&quot;competitive&quot;>Competitive Pricing</option>
+                            <option value=&quot;penetration&quot;>Penetration Pricing</option>
+                        </select>
+                    </div>
+                    <div class=&quot;form-group&quot;>
+                        <label class=&quot;form-label&quot; for=&quot;customPrice&quot;>Custom Menu Price ($)</label>
+                        <input type=&quot;number&quot; id=&quot;customPrice&quot; class=&quot;form-input&quot; value=&quot;0&quot; min=&quot;0&quot; step=&quot;0.01&quot;>
+                    </div>
+                    
+                    <button class=&quot;action-btn&quot; id=&quot;applyPricingBtn&quot;>Apply Pricing Strategy</button>
+                    
+                    <div class=&quot;recommendation-card&quot; id=&quot;recommendationCard&quot; style=&quot;display: none;&quot;>
+                        <div class=&quot;recommendation-title&quot;>Pricing Recommendation</div>
+                        <div id=&quot;recommendationText&quot;></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Ingredients data with costs
+        const ingredients = [
+            { id: 1, name: 'Chicken Breast', unit: 'lb', cost: 3.50, category: 'Protein' },
+            { id: 2, name: 'Ground Beef', unit: 'lb', cost: 4.75, category: 'Protein' },
+            { id: 3, name: 'Salmon Fillet', unit: 'lb', cost: 9.99, category: 'Protein' },
+            { id: 4, name: 'Tofu', unit: 'lb', cost: 2.50, category: 'Protein' },
+            { id: 5, name: 'Eggs', unit: 'dozen', cost: 3.25, category: 'Protein' },
+            { id: 6, name: 'Rice', unit: 'lb', cost: 1.50, category: 'Grains' },
+            { id: 7, name: 'Pasta', unit: 'lb', cost: 1.75, category: 'Grains' },
+            { id: 8, name: 'Bread', unit: 'loaf', cost: 2.99, category: 'Grains' },
+            { id: 9, name: 'Potatoes', unit: 'lb', cost: 0.99, category: 'Vegetables' },
+            { id: 10, name: 'Onions', unit: 'lb', cost: 0.89, category: 'Vegetables' },
+            { id: 11, name: 'Bell Peppers', unit: 'lb', cost: 1.99, category: 'Vegetables' },
+            { id: 12, name: 'Tomatoes', unit: 'lb', cost: 1.79, category: 'Vegetables' },
+            { id: 13, name: 'Spinach', unit: 'bunch', cost: 2.49, category: 'Vegetables' },
+            { id: 14, name: 'Mushrooms', unit: 'lb', cost: 3.99, category: 'Vegetables' },
+            { id: 15, name: 'Olive Oil', unit: 'bottle', cost: 8.99, category: 'Pantry' },
+            { id: 16, name: 'Salt', unit: 'box', cost: 1.25, category: 'Pantry' },
+            { id: 17, name: 'Black Pepper', unit: 'container', cost: 3.49, category: 'Pantry' },
+            { id: 18, name: 'Garlic', unit: 'head', cost: 0.79, category: 'Pantry' },
+            { id: 19, name: 'Butter', unit: 'lb', cost: 4.29, category: 'Dairy' },
+            { id: 20, name: 'Milk', unit: 'gallon', cost: 3.79, category: 'Dairy' },
+            { id: 21, name: 'Heavy Cream', unit: 'pint', cost: 3.29, category: 'Dairy' },
+            { id: 22, name: 'Cheddar Cheese', unit: 'lb', cost: 5.99, category: 'Dairy' },
+            { id: 23, name: 'Parmesan Cheese', unit: 'lb', cost: 8.99, category: 'Dairy' },
+            { id: 24, name: 'Packaging', unit: 'item', cost: 0.75, category: 'Other' }
+        ];
+
+        // Recipe state
+        let recipe = [];
+        let currentPrice = 0;
+        let targetFoodCost = 30; // Default 30%
+
+        // DOM elements
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const ingredientList = document.getElementById('ingredientList');
+        const recipeItems = document.getElementById('recipeItems');
+        const emptyRecipe = document.getElementById('emptyRecipe');
+        const totalCostEl = document.getElementById('totalCost');
+        const foodCostPercentEl = document.getElementById('foodCostPercent');
+        const suggestedPriceEl = document.getElementById('suggestedPrice');
+        const grossProfitPercentEl = document.getElementById('grossProfitPercent');
+        const costBreakdownEl = document.getElementById('costBreakdown');
+        const currentFoodCostEl = document.getElementById('currentFoodCost');
+        const currentGrossProfitEl = document.getElementById('currentGrossProfit');
+        const targetFoodCostInput = document.getElementById('targetFoodCost');
+        const customPriceInput = document.getElementById('customPrice');
+        const pricingStrategySelect = document.getElementById('pricingStrategy');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const applyPricingBtn = document.getElementById('applyPricingBtn');
+        const recommendationCard = document.getElementById('recommendationCard');
+        const recommendationText = document.getElementById('recommendationText');
+
+        // Initialize the app
+        function init() {
+            renderIngredients();
+            setupEventListeners();
+        }
+
+        // Render ingredients in the ingredient list
+        function renderIngredients() {
+            ingredientList.innerHTML = '';
+            
+            ingredients.forEach(ingredient => {
+                const div = document.createElement('div');
+                div.className = 'ingredient-item';
+                div.setAttribute('data-id', ingredient.id);
+                div.textContent = ingredient.name;
+                div.addEventListener('click', () => addIngredientToRecipe(ingredient));
+                
+                ingredientList.appendChild(div);
+            });
+        }
+
+        // Add an ingredient to the recipe
+        function addIngredientToRecipe(ingredient) {
+            // Check if ingredient already exists
+            const existingIngredient = recipe.find(item => item.id === ingredient.id);
+            
+            if (existingIngredient) {
+                existingIngredient.quantity += 1;
+            } else {
+                recipe.push({
+                    ...ingredient,
+                    quantity: 1
+                });
+            }
+            
+            renderRecipe();
+            updateCostSummary();
+        }
+
+        // Render the recipe items
+        function renderRecipe() {
+            if (recipe.length === 0) {
+                emptyRecipe.style.display = 'block';
+                recipeItems.innerHTML = '';
+                return;
+            }
+            
+            emptyRecipe.style.display = 'none';
+            recipeItems.innerHTML = '';
+            
+            recipe.forEach((item, index) => {
+                const itemCost = (item.cost * item.quantity).toFixed(2);
+                
+                const div = document.createElement('div');
+                div.className = 'recipe-item';
+                div.innerHTML = `
+                    <div class=&quot;recipe-item-details&quot;>
+                        <div class=&quot;recipe-item-name&quot;>${item.name}</div>
+                        <div class=&quot;recipe-item-cost&quot;>$${item.cost} per ${item.unit} × ${item.quantity} = $${itemCost}</div>
+                    </div>
+                    <div class=&quot;recipe-item-actions&quot;>
+                        <input type=&quot;number&quot; class=&quot;quantity-input&quot; value=&quot;${item.quantity}&quot; min=&quot;0.1&quot; step=&quot;0.1&quot; data-index=&quot;${index}&quot;>
+                        <button class=&quot;remove-btn&quot; data-index=&quot;${index}&quot;>×</button>
+                    </div>
+                `;
+                
+                recipeItems.appendChild(div);
+            });
+            
+            // Add event listeners to quantity inputs and remove buttons
+            document.querySelectorAll('.quantity-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    const newQuantity = parseFloat(e.target.value) || 0;
+                    
+                    if (newQuantity > 0) {
+                        recipe[index].quantity = newQuantity;
+                    } else {
+                        recipe.splice(index, 1);
+                    }
+                    
+                    renderRecipe();
+                    updateCostSummary();
+                });
+            });
+            
+            document.querySelectorAll('.remove-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const index = parseInt(e.target.dataset.index);
+                    recipe.splice(index, 1);
+                    renderRecipe();
+                    updateCostSummary();
+                });
+            });
+        }
+
+        // Update the cost summary
+        function updateCostSummary() {
+            const totalCost = calculateTotalCost();
+            const suggestedPrice = calculateSuggestedPrice(totalCost);
+            const foodCostPercent = totalCost > 0 &amp;&amp; currentPrice > 0 ? (totalCost / currentPrice) * 100 : 0;
+            const grossProfitPercent = 100 - foodCostPercent;
+            
+            totalCostEl.textContent = `$${totalCost.toFixed(2)}`;
+            suggestedPriceEl.textContent = `$${suggestedPrice.toFixed(2)}`;
+            foodCostPercentEl.textContent = `${foodCostPercent.toFixed(1)}%`;
+            grossProfitPercentEl.textContent = `${grossProfitPercent.toFixed(1)}%`;
+            
+            currentFoodCostEl.textContent = `${foodCostPercent.toFixed(1)}%`;
+            currentGrossProfitEl.textContent = `${grossProfitPercent.toFixed(1)}%`;
+            
+            customPriceInput.value = currentPrice.toFixed(2);
+            
+            updateCostBreakdown(totalCost);
+        }
+
+        // Calculate the total cost of the recipe
+        function calculateTotalCost() {
+            return recipe.reduce((total, item) => {
+                return total + (item.cost * item.quantity);
+            }, 0);
+        }
+
+        // Calculate the suggested price based on target food cost
+        function calculateSuggestedPrice(totalCost) {
+            return totalCost / (targetFoodCost / 100);
+        }
+
+        // Update the cost breakdown tab
+        function updateCostBreakdown(totalCost) {
+            if (recipe.length === 0) {
+                costBreakdownEl.innerHTML = `
+                    <div class=&quot;empty-recipe&quot;>
+                        Add ingredients to see cost breakdown
+                    </div>
+                `;
+                return;
+            }
+            
+            let breakdownHTML = '';
+            
+            recipe.forEach(item => {
+                const itemCost = item.cost * item.quantity;
+                const percentage = (itemCost / totalCost) * 100;
+                
+                breakdownHTML += `
+                    <div class=&quot;breakdown-item&quot;>
+                        <div class=&quot;breakdown-label&quot;>${item.name} (${item.quantity} ${item.unit})</div>
+                        <div class=&quot;breakdown-value&quot;>$${itemCost.toFixed(2)} (${percentage.toFixed(1)}%)</div>
+                    </div>
+                `;
+            });
+            
+            breakdownHTML += `
+                <div class=&quot;breakdown-item&quot; style=&quot;font-weight:700;border-top:2px solid var(--border-color);margin-top:0.5rem;padding-top:0.8rem;&quot;>
+                    <div class=&quot;breakdown-label&quot;>Total Recipe Cost</div>
+                    <div class=&quot;breakdown-value&quot;>$${totalCost.toFixed(2)}</div>
+                </div>
+            `;
+            
+            costBreakdownEl.innerHTML = breakdownHTML;
+        }
+
+        // Generate pricing recommendation
+        function generateRecommendation() {
+            const totalCost = calculateTotalCost();
+            const strategy = pricingStrategySelect.value;
+            let recommendation = '';
+            let suggestedPrice = 0;
+            
+            if (recipe.length === 0) {
+                recommendation = &quot;Add ingredients to your recipe to get pricing recommendations.&quot;;
+            } else {
+                targetFoodCost = parseInt(targetFoodCostInput.value) || 30;
+                
+                switch (strategy) {
+                    case 'costPlus':
+                        suggestedPrice = totalCost / (targetFoodCost / 100);
+                        recommendation = `Based on your total cost of <strong>$${totalCost.toFixed(2)}</strong> and target food cost of <strong>${targetFoodCost}%</strong>, we recommend a menu price of <strong>$${suggestedPrice.toFixed(2)}</strong>. This achieves a <strong>${(100 - targetFoodCost)}%</strong> gross profit margin.`;
+                        break;
+                    case 'valueBased':
+                        suggestedPrice = totalCost / (targetFoodCost / 100) * 1.2;
+                        recommendation = `For value-based pricing, we recommend a premium price of <strong>$${suggestedPrice.toFixed(2)}</strong>, which is 20% above the standard cost-plus price. This positions your dish as a premium offering while maintaining a <strong>${((suggestedPrice - totalCost) / suggestedPrice * 100).toFixed(1)}%</strong> gross profit margin.`;
+                        break;
+                    case 'competitive':
+                        suggestedPrice = totalCost / (targetFoodCost / 100) * 0.95;
+                        recommendation = `For competitive pricing, we recommend a price of <strong>$${suggestedPrice.toFixed(2)}</strong>, which is 5% below the standard market rate. This keeps you competitive while maintaining a <strong>${((suggestedPrice - totalCost) / suggestedPrice * 100).toFixed(1)}%</strong> gross profit margin.`;
+                        break;
+                    case 'penetration':
+                        suggestedPrice = totalCost / (targetFoodCost / 100) * 0.85;
+                        recommendation = `For penetration pricing, we recommend an introductory price of <strong>$${suggestedPrice.toFixed(2)}</strong>, which is 15% below standard pricing. This may help drive initial sales, but note that it reduces your gross profit margin to <strong>${((suggestedPrice - totalCost) / suggestedPrice * 100).toFixed(1)}%</strong>. Consider raising prices gradually as you build a customer base.`;
+                        break;
+                }
+            }
+            
+            recommendationText.innerHTML = recommendation;
+            recommendationCard.style.display = 'block';
+            
+            return suggestedPrice;
+        }
+
+        // Setup all event listeners
+        function setupEventListeners() {
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(tab.dataset.tab).classList.add('active');
+                });
+            });
+            
+            // Calculate menu price button
+            calculateBtn.addEventListener('click', () => {
+                if (recipe.length > 0) {
+                    targetFoodCost = parseInt(targetFoodCostInput.value) || 30;
+                    const totalCost = calculateTotalCost();
+                    currentPrice = calculateSuggestedPrice(totalCost);
+                    updateCostSummary();
+                    
+                    // Switch to pricing tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    document.querySelector('[data-tab=&quot;pricing&quot;]').classList.add('active');
+                    document.getElementById('pricing').classList.add('active');
+                    
+                    generateRecommendation();
+                }
+            });
+            
+            // Apply pricing strategy button
+            applyPricingBtn.addEventListener('click', () => {
+                targetFoodCost = parseInt(targetFoodCostInput.value) || 30;
+                const suggestedPrice = generateRecommendation();
+                
+                if (suggestedPrice > 0) {
+                    currentPrice = suggestedPrice;
+                    customPriceInput.value = currentPrice.toFixed(2);
+                    updateCostSummary();
+                }
+            });
+            
+            // Custom price input
+            customPriceInput.addEventListener('input', (e) => {
+                currentPrice = parseFloat(e.target.value) || 0;
+                updateCostSummary();
+            });
+            
+            // Target food cost input
+            targetFoodCostInput.addEventListener('input', (e) => {
+                targetFoodCost = parseInt(e.target.value) || 30;
+                updateCostSummary();
+            });
+            
+            // Pricing strategy changes
+            pricingStrategySelect.addEventListener('change', () => {
+                if (recipe.length > 0) {
+                    generateRecommendation();
+                }
+            });
+        }
+
+        // Initialize the app
+        init();
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_s0ks6jk7';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_s0ks6jk7" style="width: 100%; height: 1104px; border: none;"></iframe>

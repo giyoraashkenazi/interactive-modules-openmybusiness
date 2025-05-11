@@ -1,0 +1,1020 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>AI Branding Assistant Simulator</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --secondary: #4CAF50;
+            --dark: #121212;
+            --darker: #0A0A0A;
+            --light: #E0E0E0;
+            --mid: #555555;
+            --card-bg: #1E1E1E;
+            --highlight: #8B5CF6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark);
+            color: var(--light);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+        
+        header {
+            background-color: var(--darker);
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            color: white;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: var(--mid);
+            font-size: 0.9rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--mid);
+            padding-bottom: 0.5rem;
+        }
+        
+        .tab-btn {
+            background: var(--card-bg);
+            color: var(--light);
+            border: none;
+            padding: 0.7rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 120px;
+            font-size: 0.9rem;
+        }
+        
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 0.8rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-title i {
+            margin-right: 0.5rem;
+            color: var(--primary);
+        }
+        
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        textarea, input, select {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 0.4rem;
+            border: 1px solid var(--mid);
+            background-color: var(--darker);
+            color: var(--light);
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        button:hover {
+            background-color: #5A52CC;
+            transform: translateY(-2px);
+        }
+        
+        .output-container {
+            background-color: var(--darker);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1rem;
+            white-space: pre-wrap;
+            min-height: 100px;
+        }
+        
+        .comparison {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+        
+        @media (min-width: 768px) {
+            .comparison {
+                flex-direction: row;
+            }
+            
+            .comparison > div {
+                flex: 1;
+            }
+        }
+        
+        .before, .after {
+            background-color: var(--darker);
+            padding: 1rem;
+            border-radius: 0.5rem;
+        }
+        
+        .before h4, .after h4 {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .before h4 {
+            color: #FF6B6B;
+        }
+        
+        .after h4 {
+            color: #4CAF50;
+        }
+        
+        .tip {
+            background-color: rgba(108, 99, 255, 0.2);
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 0.4rem 0.4rem 0;
+        }
+        
+        .tip strong {
+            color: var(--primary);
+        }
+        
+        .icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            text-align: center;
+        }
+        
+        hr {
+            border: none;
+            border-top: 1px solid var(--mid);
+            margin: 1.5rem 0;
+        }
+        
+        .loader {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-left: 0.5rem;
+            display: none;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .branding-elements {
+            margin: 1.5rem 0;
+        }
+        
+        .branding-elements h3 {
+            margin-bottom: 1rem;
+        }
+        
+        ul, ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .content-section {
+            margin-bottom: 2rem;
+        }
+        
+        .content-section h2 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>AI Branding Assistant Simulator</h1>
+        <p class=&quot;subtitle&quot;>Explore how AI can transform your branding process</p>
+    </header>
+    
+    <div class=&quot;container&quot;>
+        <div class=&quot;tabs&quot;>
+            <button class=&quot;tab-btn active&quot; data-tab=&quot;overview&quot;>Overview</button>
+            <button class=&quot;tab-btn&quot; data-tab=&quot;story&quot;>Brand Story</button>
+            <button class=&quot;tab-btn&quot; data-tab=&quot;visual&quot;>Visual Concepts</button>
+            <button class=&quot;tab-btn&quot; data-tab=&quot;consistency&quot;>Consistency</button>
+            <button class=&quot;tab-btn&quot; data-tab=&quot;templates&quot;>Templates</button>
+        </div>
+        
+        <div id=&quot;overview&quot; class=&quot;tab-content active&quot;>
+            <div class=&quot;card&quot;>
+                <div class=&quot;card-title&quot;><i>🧠</i> The Process of Designing Your Business and Branding</div>
+                <p>From the very first second potential customers encounter you, your branding determines whether they choose to stay or move on. Branding is not just &quot;decoration&quot; – it's your emotional promise to the customer, the story you tell, and the value you represent.</p>
+                
+                <hr>
+                
+                <h3>🎯 Why Is Branding So Critical?</h3>
+                <ul>
+                    <li><strong>Instant Trust Building</strong><br>A strong brand conveys professionalism, stability, and seriousness. Customers tend to choose a brand that feels clear and reliable.</li>
+                    <li><strong>Standing Out in a Crowded Market</strong><br>In a world where anyone with an idea can open a Facebook page, a clear and original brand differentiates you from competitors and makes you stand out to customers.</li>
+                    <li><strong>Attracting Customers and Building a Fanbase</strong><br>A brand story that speaks the language of your target audience—its values, culture, and vision—builds an emotional connection that leads to referrals and loyalty.</li>
+                    <li><strong>Foundation for Marketing Decisions</strong><br>When you have a clear brand identity, every marketing choice—from messaging to campaigns—is backed by a unified and consistent concept.</li>
+                </ul>
+                
+                <hr>
+                
+                <h3>🔑 How to Build a Brand the Right Way</h3>
+                <ol>
+                    <li><strong>Define Core Values and Your Story</strong><br>– What problem does your business solve?<br>– Which guiding values (e.g., originality, sustainability, speedy service)?<br>– How would you tell your founding story as an emotional experience?</li>
+                    <li><strong>Identify Your Target Audience and Tone</strong><br>– Who are the people you want to attract?<br>– What &quot;language&quot; will you speak to them—formal, youthful, friendly, or professional?</li>
+                    <li><strong>Craft a Strong Core Message</strong><br>– A tagline that summarizes your promise to the customer.<br>– A memorable one-liner (e.g., &quot;The coffee that makes you smile again&quot;).</li>
+                    <li><strong>Test the Concept with Small Experiments</strong><br>– Quick presentations of a logo or slogan to key members of your target audience.<br>– A short online survey or micro focus group.<br>– Collect both quantitative and qualitative feedback for refinement and improvement.</li>
+                </ol>
+                
+                <hr>
+                
+                <h3>🤖 Using AI to Empower Your Branding Process</h3>
+                <ul>
+                    <li><strong>Brand Story Idea Generation</strong><br>Let ChatGPT draft multiple versions of your founding story based on your chosen values, refining until you find the perfect tone.</li>
+                    <li><strong>Visual Concept Development via Mood Boards</strong><br>Tools like Midjourney or DALL·E can generate inspiration boards with textures, atmospheres, and visual elements to guide your designer.</li>
+                    <li><strong>Recognition and Consistency Checks</strong><br>Use AI to analyze your social media pages and verify if your brand's messages and copy are landing correctly—are users recognizing your values?</li>
+                    <li><strong>Ready-to-Use Templates for Ongoing Communication</strong><br>Generate quick, on-brand templates in Canva with AI assistance for posts, stories, or newsletters to maintain a unified visual language without starting from scratch each time.</li>
+                </ul>
+                
+                <hr>
+                
+                <h3>📌 Important Points to Remember</h3>
+                <ul>
+                    <li>A brand is an emotional story, not just a pretty logo.</li>
+                    <li>Consistency in messaging and experience builds trust and loyalty.</li>
+                    <li>Testing with a small audience prevents major launch mistakes.</li>
+                    <li>AI is your &quot;ideation and digital partner&quot;: it accelerates processes, offers fresh perspectives, and helps define your unique voice.</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id=&quot;story&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <div class=&quot;card-title&quot;><i>📝</i> Brand Story Generation with AI</div>
+                <p>Create an engaging brand story by leveraging AI to articulate your values and mission in a compelling narrative.</p>
+                
+                <div class=&quot;input-group&quot;>
+                    <label for=&quot;business-type&quot;>Business Type</label>
+                    <select id=&quot;business-type&quot;>
+                        <option value=&quot;cafe&quot;>Coffee Shop / Cafe</option>
+                        <option value=&quot;tech&quot;>Tech Startup</option>
+                        <option value=&quot;retail&quot;>Retail Brand</option>
+                        <option value=&quot;wellbeing&quot;>Wellness / Health</option>
+                        <option value=&quot;service&quot;>Professional Service</option>
+                    </select>
+                </div>
+                
+                <div class=&quot;input-group&quot;>
+                    <label for=&quot;core-values&quot;>Core Values (select up to 3)</label>
+                    <div style=&quot;display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;&quot;>
+                        <button class=&quot;value-btn&quot; data-value=&quot;innovation&quot;>Innovation</button>
+                        <button class=&quot;value-btn&quot; data-value=&quot;sustainability&quot;>Sustainability</button>
+                        <button class=&quot;value-btn&quot; data-value=&quot;community&quot;>Community</button>
+                        <button class=&quot;value-btn&quot; data-value=&quot;quality&quot;>Quality</button>
+                        <button class=&quot;value-btn&quot; data-value=&quot;authenticity&quot;>Authenticity</button>
+                        <button class=&quot;value-btn&quot; data-value=&quot;accessibility&quot;>Accessibility</button>
+                    </div>
+                    <input type=&quot;hidden&quot; id=&quot;selected-values&quot; value=&quot;&quot;>
+                </div>
+                
+                <div class=&quot;input-group&quot;>
+                    <label for=&quot;audience&quot;>Target Audience</label>
+                    <select id=&quot;audience&quot;>
+                        <option value=&quot;gen-z&quot;>Gen Z (18-24)</option>
+                        <option value=&quot;millennial&quot;>Millennials (25-40)</option>
+                        <option value=&quot;gen-x&quot;>Gen X (41-56)</option>
+                        <option value=&quot;boomer&quot;>Baby Boomers (57-75)</option>
+                        <option value=&quot;business&quot;>Business Professionals</option>
+                        <option value=&quot;family&quot;>Families</option>
+                    </select>
+                </div>
+                
+                <button id=&quot;generate-story&quot;>Generate Brand Story <div class=&quot;loader&quot; id=&quot;story-loader&quot;></div></button>
+                
+                <div class=&quot;output-container&quot; id=&quot;story-output&quot;>
+                    Your brand story will appear here...
+                </div>
+                
+                <div class=&quot;tip&quot;>
+                    <strong>Pro Tip:</strong> A great brand story connects your personal journey with your business mission. When using AI to craft your story, always refine the output to match your authentic voice.
+                </div>
+                
+                <div class=&quot;comparison&quot;>
+                    <div class=&quot;before&quot;>
+                        <h4><span class=&quot;icon&quot;>⚠️</span> Generic Approach</h4>
+                        <p>&quot;Our business was founded in 2020 to provide high-quality coffee to customers.&quot;</p>
+                    </div>
+                    <div class=&quot;after&quot;>
+                        <h4><span class=&quot;icon&quot;>✅</span> AI-Enhanced Story</h4>
+                        <p>&quot;Born during the isolation of 2020, Sunrise Brew emerged from Sofia's desire to recreate the communal warmth she missed from neighborhood cafés. Every bean we source carries that same promise of connection—a shared moment of joy in each cup.&quot;</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;visual&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <div class=&quot;card-title&quot;><i>🎨</i> Visual Concept Development</div>
+                <p>Generate AI-powered visual direction for your brand's design elements, from color schemes to mood boards.</p>
+                
+                <div class=&quot;input-group&quot;>
+                    <label for=&quot;brand-description&quot;>Brand Description</label>
+                    <textarea id=&quot;brand-description&quot; rows=&quot;3&quot; placeholder=&quot;Describe your brand's personality and aesthetic direction...&quot;></textarea>
+                </div>
+                
+                <div class=&quot;input-group&quot;>
+                    <label>Visual Style</label>
+                    <div style=&quot;display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;&quot;>
+                        <button class=&quot;style-btn&quot; data-style=&quot;minimalist&quot;>Minimalist</button>
+                        <button class=&quot;style-btn&quot; data-style=&quot;vibrant&quot;>Vibrant &amp; Bold</button>
+                        <button class=&quot;style-btn&quot; data-style=&quot;organic&quot;>Organic &amp; Natural</button>
+                        <button class=&quot;style-btn&quot; data-style=&quot;tech&quot;>High-Tech</button>
+                        <button class=&quot;style-btn&quot; data-style=&quot;luxury&quot;>Luxury</button>
+                    </div>
+                    <input type=&quot;hidden&quot; id=&quot;selected-style&quot; value=&quot;&quot;>
+                </div>
+                
+                <button id=&quot;generate-visual&quot;>Generate Visual Concept <div class=&quot;loader&quot; id=&quot;visual-loader&quot;></div></button>
+                
+                <div class=&quot;output-container&quot; id=&quot;visual-output&quot;>
+                    Your visual concept will appear here...
+                </div>
+                
+                <div class=&quot;tip&quot;>
+                    <strong>Designer's Tip:</strong> Use AI-generated visual concepts as a starting point for discussions with professional designers. The AI can help articulate what you want through language, which designers can then interpret into actual visual assets.
+                </div>
+                
+                <div class=&quot;comparison&quot;>
+                    <div class=&quot;before&quot;>
+                        <h4><span class=&quot;icon&quot;>⚠️</span> Basic Request</h4>
+                        <p>&quot;I need a modern logo for my tech business.&quot;</p>
+                    </div>
+                    <div class=&quot;after&quot;>
+                        <h4><span class=&quot;icon&quot;>✅</span> AI-Enhanced Brief</h4>
+                        <p>&quot;Color palette: Deep navy blue transitioned to electric violet, representing trust evolving into innovation. Typography: Sans-serif, medium weight for clarity with subtle rounded edges suggesting accessibility. Visual elements: Abstract geometric shapes suggesting connectivity and data visualization, with light gradient effects.&quot;</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;consistency&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <div class=&quot;card-title&quot;><i>🔍</i> Brand Consistency Checker</div>
+                <p>Evaluate your brand messaging for consistency across different platforms and communications.</p>
+                
+                <div class=&quot;input-group&quot;>
+                    <label for=&quot;brand-voice&quot;>Your Brand Voice (How you want to sound)</label>
+                    <textarea id=&quot;brand-voice&quot; rows=&quot;3&quot; placeholder=&quot;Describe your brand voice (e.g., professional but warm, humorous and casual, technical and precise)...&quot;></textarea>
+                </div>
+                
+                <div class=&quot;input-group&quot;>
+                    <label for=&quot;content-check&quot;>Content to Check</label>
+                    <textarea id=&quot;content-check&quot; rows=&quot;5&quot; placeholder=&quot;Paste your marketing copy, social media post, or other content here...&quot;></textarea>
+                </div>
+                
+                <button id=&quot;check-consistency&quot;>Check Consistency <div class=&quot;loader&quot; id=&quot;consistency-loader&quot;></div></button>
+                
+                <div class=&quot;output-container&quot; id=&quot;consistency-output&quot;>
+                    Consistency analysis will appear here...
+                </div>
+                
+                <div class=&quot;tip&quot;>
+                    <strong>Consistency Tip:</strong> Developing a brand voice guide with AI can help all team members maintain a consistent tone. Include example phrases, taboo words, and content patterns that reflect your brand identity.
+                </div>
+                
+                <div class=&quot;comparison&quot;>
+                    <div class=&quot;before&quot;>
+                        <h4><span class=&quot;icon&quot;>⚠️</span> Inconsistent Messaging</h4>
+                        <p>&quot;We deliver premium quality solutions through innovative approaches tailored to your needs. Get in touch to grab a deal today!&quot;</p>
+                    </div>
+                    <div class=&quot;after&quot;>
+                        <h4><span class=&quot;icon&quot;>✅</span> Consistent Messaging</h4>
+                        <p>&quot;We craft premium solutions through purposeful innovation, always aligned with your unique challenges. Contact us to explore how we can elevate your business together.&quot;</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;templates&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <div class=&quot;card-title&quot;><i>📊</i> Brand Template Generator</div>
+                <p>Create reusable templates for your brand communications to maintain consistent messaging across channels.</p>
+                
+                <div class=&quot;input-group&quot;>
+                    <label for=&quot;template-type&quot;>Template Type</label>
+                    <select id=&quot;template-type&quot;>
+                        <option value=&quot;social&quot;>Social Media Post</option>
+                        <option value=&quot;email&quot;>Email Newsletter</option>
+                        <option value=&quot;announcement&quot;>Product Announcement</option>
+                        <option value=&quot;customer&quot;>Customer Response</option>
+                    </select>
+                </div>
+                
+                <div class=&quot;input-group&quot;>
+                    <label for=&quot;brand-keywords&quot;>Brand Keywords</label>
+                    <input type=&quot;text&quot; id=&quot;brand-keywords&quot; placeholder=&quot;Enter keywords that define your brand (comma separated)...&quot;>
+                </div>
+                
+                <div class=&quot;input-group&quot;>
+                    <label for=&quot;template-tone&quot;>Communication Tone</label>
+                    <select id=&quot;template-tone&quot;>
+                        <option value=&quot;professional&quot;>Professional &amp; Formal</option>
+                        <option value=&quot;casual&quot;>Casual &amp; Friendly</option>
+                        <option value=&quot;enthusiastic&quot;>Enthusiastic &amp; Energetic</option>
+                        <option value=&quot;informative&quot;>Informative &amp; Educational</option>
+                        <option value=&quot;humorous&quot;>Humorous &amp; Playful</option>
+                    </select>
+                </div>
+                
+                <button id=&quot;generate-template&quot;>Generate Template <div class=&quot;loader&quot; id=&quot;template-loader&quot;></div></button>
+                
+                <div class=&quot;output-container&quot; id=&quot;template-output&quot;>
+                    Your template will appear here...
+                </div>
+                
+                <div class=&quot;tip&quot;>
+                    <strong>Template Tip:</strong> Create a library of AI-generated templates for different scenarios and channels. This ensures your team can quickly produce on-brand content without starting from scratch each time.
+                </div>
+                
+                <div class=&quot;comparison&quot;>
+                    <div class=&quot;before&quot;>
+                        <h4><span class=&quot;icon&quot;>⚠️</span> Generic Template</h4>
+                        <p>&quot;Check out our new product! It's now available on our website. Click here to learn more.&quot;</p>
+                    </div>
+                    <div class=&quot;after&quot;>
+                        <h4><span class=&quot;icon&quot;>✅</span> Brand-Specific Template</h4>
+                        <p>&quot;🌱 SUSTAINABILITY MILESTONE 🌱<br><br>Our [product name] just launched, featuring [key eco-friendly feature]!<br><br>This is part of our commitment to [brand value].<br><br>Explore how it makes a difference: [CTA]<br><br>🌍 #EcoConscious #[BrandHashtag]&quot;</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Tab functionality
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const tabId = btn.getAttribute('data-tab');
+                    
+                    tabBtns.forEach(b => b.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    btn.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Core Values Selection
+            const valueButtons = document.querySelectorAll('.value-btn');
+            const selectedValuesInput = document.getElementById('selected-values');
+            let selectedValues = [];
+            
+            valueButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const value = btn.getAttribute('data-value');
+                    
+                    if (btn.classList.contains('active')) {
+                        btn.classList.remove('active');
+                        selectedValues = selectedValues.filter(v => v !== value);
+                    } else if (selectedValues.length < 3) {
+                        btn.classList.add('active');
+                        selectedValues.push(value);
+                    }
+                    
+                    selectedValuesInput.value = selectedValues.join(',');
+                });
+            });
+            
+            // Style Selection
+            const styleButtons = document.querySelectorAll('.style-btn');
+            const selectedStyleInput = document.getElementById('selected-style');
+            
+            styleButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    styleButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedStyleInput.value = btn.getAttribute('data-style');
+                });
+            });
+            
+            // Brand Story Generation
+            document.getElementById('generate-story').addEventListener('click', () => {
+                const loader = document.getElementById('story-loader');
+                const output = document.getElementById('story-output');
+                const businessType = document.getElementById('business-type').value;
+                const values = selectedValuesInput.value;
+                const audience = document.getElementById('audience').value;
+                
+                if (!values) {
+                    output.textContent = &quot;Please select at least one core value.&quot;;
+                    return;
+                }
+                
+                loader.style.display = 'inline-block';
+                output.textContent = &quot;Generating your brand story...&quot;;
+                
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    
+                    const responses = {
+                        'cafe-innovation': &quot;At Horizon Coffee, our journey began when founder Maya Chen, a software engineer by training, became frustrated with the outdated coffee experience. She envisioned a café that would use technology not to replace the human touch, but to enhance it. In 2019, she launched our first location featuring our signature Smart Brew system that personalizes each cup based on customer preferences stored in our app. Our mission is to modernize coffee culture while maintaining its soul—creating a space where technology facilitates deeper connections rather than distracting from them.&quot;,
+                        'cafe-sustainability': &quot;Roots &amp; Grounds wasn't born from a business plan, but from a promise. After visiting coffee farms in Colombia and witnessing environmental degradation firsthand, Emma and Luis Torres committed to creating a café that would honor both the earth and the farmers who nurture it. Since opening our doors in 2018, every decision—from our biodegradable packaging to our direct-trade beans—stems from our founding pledge. Our café is more than a business; it's a demonstration that ethical choices and exceptional coffee aren't mutually exclusive.&quot;,
+                        'cafe-community': &quot;Gather Cup started with a simple observation: despite living in a crowded neighborhood, founder Sam felt disconnected from those around him. The café emerged as an antidote to urban anonymity—a living room for the community where neighbors become friends. Our baristas are trained not just in coffee craft but in fostering connection, remembering names and preferences, and making introductions between regulars who might share interests. Each location features community boards, hosts local events, and reserves a communal table where sitting means you're open to conversation.&quot;,
+                        'tech-innovation': &quot;QuantumShift was born in a university lab where Dr. Amara Patel's breakthrough in quantum computing algorithms promised to solve problems previously thought impossible. Rather than keeping this innovation within academic circles, she assembled a team of visionaries equally committed to translating complex technology into real-world impact. Founded in 2020, our company bridges the gap between theoretical advancement and practical application, making quantum computing accessible to enterprises ready to transcend the limitations of classical computing approaches.&quot;,
+                        'retail-authenticity': &quot;Heritage Goods began as a rebellion against mass production. Founder Jackson Wei, a third-generation craftsman, watched as manufacturing moved overseas and quality standards declined. In 2016, he opened a small workshop dedicated to creating products with integrity—where materials are ethically sourced, craftsmanship is transparent, and every item tells a story. We've since grown to a collective of 30 artisans, but our commitment remains unchanged: creating goods with honest materials, authentic processes, and respect for both traditions and the consumer's intelligence.&quot;
+                    };
+                    
+                    let combinedKey = `${businessType}-${values.split(',')[0]}`;
+                    if (responses[combinedKey]) {
+                        output.textContent = responses[combinedKey];
+                    } else {
+                        output.textContent = &quot;Our brand story begins with a passion for solving real problems. Founded on the principles of &quot; + values.split(',').join(', ') + &quot;, we set out to create a &quot; + businessType + &quot; experience unlike any other. Our founder recognized that the traditional approach wasn't serving people who value &quot; + values + &quot;. Today, we continue to innovate and serve our community with products and services that embody these core values, creating meaningful connections with our customers who appreciate our authentic approach.&quot;;
+                    }
+                }, 1500);
+            });
+            
+            // Visual Concept Generation
+            document.getElementById('generate-visual').addEventListener('click', () => {
+                const loader = document.getElementById('visual-loader');
+                const output = document.getElementById('visual-output');
+                const description = document.getElementById('brand-description').value;
+                const style = document.getElementById('selected-style').value;
+                
+                if (!description) {
+                    output.textContent = &quot;Please provide a description of your brand.&quot;;
+                    return;
+                }
+                
+                if (!style) {
+                    output.textContent = &quot;Please select a visual style.&quot;;
+                    return;
+                }
+                
+                loader.style.display = 'inline-block';
+                output.textContent = &quot;Generating your visual concept...&quot;;
+                
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    
+                    const visualConcepts = {
+                        'minimalist': `
+VISUAL IDENTITY CONCEPT: REFINED MINIMALISM
+
+COLOR PALETTE:
+• Primary: Soft ivory (#F5F5F0)
+• Secondary: Warm taupe (#B8A99A)
+• Accent: Muted sage (#BBC4BB)
+• Text: Charcoal gray (#333333)
+
+TYPOGRAPHY:
+• Headings: Helvetica Neue Light - clean, understated elegance
+• Body: Roboto Light - exceptional readability with minimalist character
+
+VISUAL ELEMENTS:
+• Plenty of negative space creating room for content to breathe
+• Thin, single-weight lines as dividers and subtle decorative elements
+• Photography style: high contrast, desaturated imagery with simple compositions
+• Icons: outline-only style with consistent 1px stroke weight
+
+TEXTURE &amp; PATTERNS:
+• Subtle paper texture for warmth without distraction
+• Occasional use of fine grid patterns at 5% opacity
+
+This concept embodies sophisticated restraint, allowing your content to take center stage while conveying timeless quality and thoughtful design.`,
+                        'vibrant': `
+VISUAL IDENTITY CONCEPT: DYNAMIC VIBRANCY
+
+COLOR PALETTE:
+• Primary: Electric blue (#0066FF)
+• Secondary: Vivid coral (#FF6A5A)
+• Supporting: Sunshine yellow (#FFD100)
+• Neutrals: Deep navy (#192B42) and crisp white (#FFFFFF)
+
+TYPOGRAPHY:
+• Headings: Montserrat Bold - confident, modern, with strong geometry
+• Body: Open Sans - balanced letterforms with friendly, open counters
+
+VISUAL ELEMENTS:
+• Overlapping transparent color blocks creating depth and energy
+• Diagonal lines and asymmetrical compositions suggesting forward movement
+• Photography style: high saturation, strong color contrasts, dynamic angles
+• Custom illustrations with bold outlines and color-blocking technique
+
+TEXTURE &amp; PATTERNS:
+• Halftone dot patterns adding dimension and graphic interest
+• Abstract geometric shapes in varying opacities
+
+This concept creates an energetic, contemporary brand presence that stands out in digital environments while maintaining consistency across applications.`,
+                        'organic': `
+VISUAL IDENTITY CONCEPT: NATURAL HARMONY
+
+COLOR PALETTE:
+• Primary: Forest green (#2C5E35)
+• Secondary: Earth brown (#7D5A3C)
+• Accents: Terracotta (#D96A4F) and meadow green (#A8C66C)
+• Background: Soft cream (#F8F5E9)
+
+TYPOGRAPHY:
+• Headings: Garamond - classic serifs with organic, flowing lines
+• Body: Avenir - humanist sans-serif with natural proportions
+
+VISUAL ELEMENTS:
+• Hand-drawn botanical illustrations with fine line detail
+• Watercolor textures and washes with natural bleeding edges
+• Photography style: natural lighting, earth tones, shallow depth of field
+• Organic shapes and irregular borders mimicking natural forms
+
+TEXTURE &amp; PATTERNS:
+• Subtle linen texture for print materials
+• Pressed leaf and natural fiber patterns
+• Handmade paper effects
+
+This concept creates a warm, authentic brand presence rooted in natural materials and processes, conveying sustainability and craftsmanship.`,
+                        'tech': `
+VISUAL IDENTITY CONCEPT: TECHNOLOGICAL PRECISION
+
+COLOR PALETTE:
+• Primary: Deep space blue (#1A2040)
+• Secondary: Quantum silver (#D8D8D8)
+• Accent: Neon blue (#00C2FF)
+• Interface: Pure black (#000000) and white (#FFFFFF)
+
+TYPOGRAPHY:
+• Headings: Eurostile Extended - technical, futuristic authority
+• Body: IBM Plex Sans - engineered precision with excellent screen readability
+
+VISUAL ELEMENTS:
+• Circuit-like grid systems organizing content
+• Thin, precise line work with perfect geometric construction
+• Photography style: high contrast, blue color grading, macro technology details
+• Data visualization elements: graphs, code snippets, and analytical displays
+
+TEXTURE &amp; PATTERNS:
+• Subtle pixel patterns suggesting digital resolution
+• Circuit board-inspired linear patterns
+• Low-poly 3D elements suggesting computational precision
+
+This concept projects technological sophistication and innovation, establishing authority in digital spaces while maintaining clarity of communication.`,
+                        'luxury': `
+VISUAL IDENTITY CONCEPT: REFINED LUXURY
+
+COLOR PALETTE:
+• Primary: Deep aubergine (#38152C)
+• Secondary: Burnished gold (#D4AC63)
+• Accent: Warm ivory (#F5F0E6)
+• Background: Charcoal black (#212121)
+
+TYPOGRAPHY:
+• Headings: Didot - high contrast serifs with elegant proportions
+• Body: Gotham Light - sophisticated geometry with perfect balance
+
+VISUAL ELEMENTS:
+• Embossed gold foil effects for digital and print applications
+• Subtle light flares suggesting premium materials
+• Photography style: dramatic lighting, rich textures, curated compositions
+• Monogram or custom emblem with intricate detailing
+
+TEXTURE &amp; PATTERNS:
+• Subtle marble and natural stone textures
+• Fine leather grain patterns
+• Custom jacquard-inspired repeating patterns
+
+This concept conveys timeless sophistication through meticulous detailing, premium material references, and balanced restraint, positioning the brand in the luxury space without ostentation.`
+                    };
+                    
+                    output.textContent = visualConcepts[style] || &quot;Based on your description and selected style, we've created a visual concept that captures your brand essence. The concept includes color palette recommendations, typography selections, and visual element suggestions that align with your brand personality.&quot;;
+                }, 2000);
+            });
+            
+            // Consistency Checker
+            document.getElementById('check-consistency').addEventListener('click', () => {
+                const loader = document.getElementById('consistency-loader');
+                const output = document.getElementById('consistency-output');
+                const voice = document.getElementById('brand-voice').value;
+                const content = document.getElementById('content-check').value;
+                
+                if (!voice || !content) {
+                    output.textContent = &quot;Please provide both your brand voice description and content to check.&quot;;
+                    return;
+                }
+                
+                loader.style.display = 'inline-block';
+                output.textContent = &quot;Analyzing consistency...&quot;;
+                
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    
+                    // Simplified analysis
+                    const analysis = `
+BRAND VOICE CONSISTENCY ANALYSIS
+
+ALIGNMENT SCORE: 7/10
+
+STRENGTHS:
+✓ Tone generally matches your described brand voice
+✓ Key terminology is consistent with industry expectations
+✓ Sentence structure variety creates good rhythm
+
+AREAS FOR IMPROVEMENT:
+⚠ Some phrases feel more generic than distinctive to your brand
+⚠ Consider stronger opening to immediately establish voice
+⚠ The closing call-to-action could better reflect your unique value proposition
+
+SUGGESTED REVISIONS:
+→ Replace &quot;We offer solutions&quot; with more specific language about your approach
+→ Add a brand-specific signature phrase at the end
+→ Consider incorporating one of your key metaphors mentioned in your voice description
+
+This content is mostly aligned with your brand voice but could be enhanced to make it distinctively yours rather than something any competitor could say.`;
+                    
+                    output.textContent = analysis;
+                }, 2000);
+            });
+            
+            // Template Generator
+            document.getElementById('generate-template').addEventListener('click', () => {
+                const loader = document.getElementById('template-loader');
+                const output = document.getElementById('template-output');
+                const type = document.getElementById('template-type').value;
+                const keywords = document.getElementById('brand-keywords').value;
+                const tone = document.getElementById('template-tone').value;
+                
+                if (!keywords) {
+                    output.textContent = &quot;Please provide brand keywords.&quot;;
+                    return;
+                }
+                
+                loader.style.display = 'inline-block';
+                output.textContent = &quot;Generating your template...&quot;;
+                
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    
+                    const templates = {
+                        'social-professional': `
+SOCIAL MEDIA POST TEMPLATE - PROFESSIONAL TONE
+
+[Company Name] is pleased to announce [new development/product/service] designed to [primary benefit].
+
+This [product/initiative] reflects our commitment to [relevant brand keyword] and [another brand keyword] in everything we deliver.
+
+Key features include:
+• [Feature 1]: [Brief description of benefit]
+• [Feature 2]: [Brief description of benefit]
+• [Feature 3]: [Brief description of benefit]
+
+Learn more: [Link]
+
+#[BrandHashtag] #[IndustryHashtag] #[RelevantTrendingHashtag]`,
+                        'social-casual': `
+SOCIAL MEDIA POST TEMPLATE - CASUAL &amp; FRIENDLY TONE
+
+Hey [community name]! 👋
+
+We're super excited to share our latest [product/update/news] with you! 
+
+✨ Introducing [name/title] ✨
+
+It's all about [brief value proposition] so you can [primary benefit]. We created this because [authentic reason tied to brand values].
+
+Drop a 💙 if you're as excited as we are!
+
+Check it out here: [Link]
+
+#[BrandHashtag] #[FunHashtag] #[CommunityHashtag]`,
+                        'email-professional': `
+EMAIL NEWSLETTER TEMPLATE - PROFESSIONAL TONE
+
+Subject: [Timely Topic]: [Specific Benefit] for [Target Audience]
+
+Dear [First Name],
+
+I hope this message finds you well.
+
+[OPENING PARAGRAPH]
+At [Company Name], we've observed [industry trend/challenge] affecting many of our clients. Today, we're sharing insights on how to [achieve desired outcome] while maintaining [brand keyword].
+
+[MAIN CONTENT SECTION]
+Recently, we've [developed/discovered/implemented] a [new approach/solution] that addresses:
+
+• [Key Point 1]: [Brief elaboration]
+• [Key Point 2]: [Brief elaboration]
+• [Key Point 3]: [Brief elaboration]
+
+[CASE EXAMPLE]
+One of our clients, [generic company description], experienced [specific result] after implementing these strategies.
+
+[CALL TO ACTION]
+I invite you to [specific next step] by [date] to [benefit of taking action].
+
+[CLOSING]
+Thank you for your continued [trust/partnership/relationship]. We remain committed to [brand promise].
+
+Regards,
+
+[Name]
+[Position]
+[Company Name]
+[Contact Information]`,
+                        'announcement-enthusiastic': `
+PRODUCT ANNOUNCEMENT TEMPLATE - ENTHUSIASTIC TONE
+
+🎉 INTRODUCING [PRODUCT NAME]! 🎉
+
+We're THRILLED to finally reveal what we've been working on!
+
+Meet [Product Name] – the [product category] that [primary value proposition]!
+
+🚀 WHY WE'RE EXCITED:
+• [Exciting Feature 1] that delivers [benefit]!
+• [Exciting Feature 2] unlike anything else in the market!
+• [Exciting Feature 3] that we developed based on YOUR feedback!
+
+This launch represents everything we stand for: [brand keyword], [brand keyword], and [brand keyword].
+
+🗓️ LAUNCH DETAILS:
+Available: [Date]
+Early Access: [Details if applicable]
+Special Launch Offer: [Promotion details]
+
+We CANNOT WAIT for you to experience the difference!
+
+[Call to action with enthusiasm]
+
+The passionate team at [Company Name]`
+                    };
+                    
+                    let templateKey = `${type}-${tone}`;
+                    if (templates[templateKey]) {
+                        output.textContent = templates[templateKey];
+                    } else {
+                        output.textContent = `
+${type.toUpperCase()} TEMPLATE - ${tone.toUpperCase()} TONE
+
+[Attention-grabbing headline incorporating ${keywords}]
+
+[Opening that establishes your brand voice and introduces the topic]
+
+[Main content section highlighting key points about your offering]
+• [Key point 1 related to ${keywords.split(',')[0]}]
+• [Key point 2 that reinforces your brand position]
+• [Key point 3 with specific benefit to the audience]
+
+[Supporting details that build credibility]
+
+[Clear call-to-action that aligns with your brand goals]
+
+[Brand signature element or tagline]`;
+                    }
+                }, 1800);
+            });
+            
+            // Add active class styling for buttons
+            const styleBtn = document.querySelector('.style-btn');
+            if (styleBtn) {
+                styleBtn.addEventListener('click', function() {
+                    this.classList.add('active');
+                });
+            }
+        });
+        
+        // CSS styles for active buttons
+        document.head.insertAdjacentHTML('beforeend', `
+        <style>
+            .value-btn.active, .style-btn.active {
+                background-color: var(--highlight);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+            }
+        </style>
+        `);
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_8aez75bh';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_8aez75bh" style="width: 100%; height: 2035px; border: none;"></iframe>

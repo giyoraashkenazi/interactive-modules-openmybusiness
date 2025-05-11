@@ -1,0 +1,1122 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Restaurant Market Research Analyzer</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6200EA;
+            --primary-light: #7c4dff;
+            --secondary: #03DAC6;
+            --background: #121212;
+            --surface: #1E1E1E;
+            --surface-light: #2d2d2d;
+            --error: #CF6679;
+            --on-primary: #FFFFFF;
+            --on-background: #E1E1E1;
+            --on-surface: #DDDDDD;
+            --on-error: #000000;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--on-background);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--secondary);
+        }
+        
+        .description {
+            font-size: 1rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .tab-button {
+            background-color: var(--surface);
+            color: var(--on-surface);
+            border: none;
+            padding: 12px 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 120px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .tab-button:hover {
+            background-color: var(--surface-light);
+        }
+        
+        .tab-button.active {
+            background-color: var(--primary);
+            color: var(--on-primary);
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: var(--surface);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input[type=&quot;text&quot;], 
+        input[type=&quot;number&quot;],
+        input[type=&quot;range&quot;],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            background-color: var(--surface-light);
+            color: var(--on-surface);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        
+        input[type=&quot;text&quot;]:focus, 
+        input[type=&quot;number&quot;]:focus,
+        input[type=&quot;range&quot;]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 2px rgba(124, 77, 255, 0.2);
+        }
+        
+        .slider-container {
+            margin-top: 10px;
+            position: relative;
+        }
+        
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin-right: 15px;
+        }
+        
+        .checkbox-item input {
+            margin-right: 6px;
+        }
+        
+        .button {
+            background-color: var(--primary);
+            color: var(--on-primary);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin: 10px 0;
+            display: inline-block;
+        }
+        
+        .button:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+        
+        .results-container {
+            background-color: var(--surface);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .results-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        .insight-box {
+            background-color: var(--surface-light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .insight-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .insight-title svg {
+            margin-right: 8px;
+        }
+        
+        .insight-content {
+            opacity: 0.9;
+        }
+        
+        .recommendations {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .recommendation-card {
+            background-color: var(--surface-light);
+            border-radius: 8px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .recommendation-category {
+            font-size: 0.8rem;
+            color: var(--secondary);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .persona-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .persona-card {
+            background-color: var(--surface-light);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .persona-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .persona-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .persona-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        .persona-tag {
+            font-size: 0.8rem;
+            background-color: var(--primary-light);
+            color: var(--on-primary);
+            padding: 3px 8px;
+            border-radius: 12px;
+            margin-left: 10px;
+        }
+        
+        .persona-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .persona-detail {
+            background-color: rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+        }
+        
+        .persona-detail-label {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading-spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--secondary);
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .tabs {
+                flex-wrap: nowrap;
+                overflow-x: auto;
+            }
+            
+            .tab-button {
+                min-width: 100px;
+                padding: 10px 15px;
+                font-size: 0.8rem;
+            }
+            
+            .recommendations {
+                grid-template-columns: 1fr;
+            }
+            
+            .persona-details {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .tab-button {
+                min-width: 80px;
+                padding: 8px 12px;
+            }
+            
+            .tab-content {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>Restaurant Market Research Analyzer</h1>
+            <p class=&quot;description&quot;>Input different audience data points to receive instant insights on how they should influence your menu, pricing, and service style.</p>
+        </header>
+        
+        <div class=&quot;tabs&quot;>
+            <button class=&quot;tab-button active&quot; data-tab=&quot;demographics&quot;>Demographics</button>
+            <button class=&quot;tab-button&quot; data-tab=&quot;psychographics&quot;>Psychographics</button>
+            <button class=&quot;tab-button&quot; data-tab=&quot;behavior&quot;>Behavioral</button>
+            <button class=&quot;tab-button&quot; data-tab=&quot;trends&quot;>Market Trends</button>
+            <button class=&quot;tab-button&quot; data-tab=&quot;results&quot;>Insights</button>
+        </div>
+        
+        <div id=&quot;demographics&quot; class=&quot;tab-content active&quot;>
+            <h2>Demographics Information</h2>
+            <p>Enter key demographic information about your target audience.</p>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Primary Age Range</label>
+                <select id=&quot;age-range&quot;>
+                    <option value=&quot;18-24&quot;>18-24 years</option>
+                    <option value=&quot;25-34&quot;>25-34 years</option>
+                    <option value=&quot;35-44&quot;>35-44 years</option>
+                    <option value=&quot;45-54&quot;>45-54 years</option>
+                    <option value=&quot;55-64&quot;>55-64 years</option>
+                    <option value=&quot;65+&quot;>65+ years</option>
+                </select>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Secondary Age Range (if applicable)</label>
+                <select id=&quot;secondary-age-range&quot;>
+                    <option value=&quot;none&quot;>None</option>
+                    <option value=&quot;18-24&quot;>18-24 years</option>
+                    <option value=&quot;25-34&quot;>25-34 years</option>
+                    <option value=&quot;35-44&quot;>35-44 years</option>
+                    <option value=&quot;45-54&quot;>45-54 years</option>
+                    <option value=&quot;55-64&quot;>55-64 years</option>
+                    <option value=&quot;65+&quot;>65+ years</option>
+                </select>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Average Income Level</label>
+                <select id=&quot;income-level&quot;>
+                    <option value=&quot;low&quot;>Lower income</option>
+                    <option value=&quot;middle&quot;>Middle income</option>
+                    <option value=&quot;upper-middle&quot;>Upper-middle income</option>
+                    <option value=&quot;high&quot;>High income</option>
+                </select>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Education Level (select predominant)</label>
+                <select id=&quot;education-level&quot;>
+                    <option value=&quot;high-school&quot;>High School</option>
+                    <option value=&quot;some-college&quot;>Some College</option>
+                    <option value=&quot;college&quot;>College Graduate</option>
+                    <option value=&quot;advanced-degree&quot;>Advanced Degree</option>
+                </select>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Household Composition</label>
+                <div class=&quot;checkbox-container&quot;>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;singles&quot; value=&quot;singles&quot;>
+                        <label for=&quot;singles&quot;>Singles</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;couples&quot; value=&quot;couples&quot;>
+                        <label for=&quot;couples&quot;>Couples (no children)</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;families&quot; value=&quot;families&quot;>
+                        <label for=&quot;families&quot;>Families with children</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;empty-nesters&quot; value=&quot;empty-nesters&quot;>
+                        <label for=&quot;empty-nesters&quot;>Empty nesters</label>
+                    </div>
+                </div>
+            </div>
+            
+            <button class=&quot;button next-tab&quot; data-next=&quot;psychographics&quot;>Next: Psychographics</button>
+        </div>
+        
+        <div id=&quot;psychographics&quot; class=&quot;tab-content&quot;>
+            <h2>Psychographic Information</h2>
+            <p>Enter key psychographic traits of your target customers.</p>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Primary Values (select up to 3)</label>
+                <div class=&quot;checkbox-container&quot;>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;health-conscious&quot; value=&quot;health-conscious&quot;>
+                        <label for=&quot;health-conscious&quot;>Health-conscious</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;convenience&quot; value=&quot;convenience&quot;>
+                        <label for=&quot;convenience&quot;>Convenience/Speed</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;sustainability&quot; value=&quot;sustainability&quot;>
+                        <label for=&quot;sustainability&quot;>Sustainability/Eco-friendly</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;quality&quot; value=&quot;quality&quot;>
+                        <label for=&quot;quality&quot;>Premium Quality</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;family&quot; value=&quot;family&quot;>
+                        <label for=&quot;family&quot;>Family-oriented</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;local&quot; value=&quot;local&quot;>
+                        <label for=&quot;local&quot;>Local/Community focused</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;instagram&quot; value=&quot;instagram&quot;>
+                        <label for=&quot;instagram&quot;>Instagram/Social-worthy</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Food Interest Level</label>
+                <div class=&quot;slider-container&quot;>
+                    <input type=&quot;range&quot; id=&quot;food-interest&quot; min=&quot;1&quot; max=&quot;5&quot; value=&quot;3&quot;>
+                    <div class=&quot;range-labels&quot;>
+                        <span>Basic eater</span>
+                        <span>Food enthusiast</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Digital Savviness</label>
+                <div class=&quot;slider-container&quot;>
+                    <input type=&quot;range&quot; id=&quot;digital-savviness&quot; min=&quot;1&quot; max=&quot;5&quot; value=&quot;3&quot;>
+                    <div class=&quot;range-labels&quot;>
+                        <span>Traditional</span>
+                        <span>Tech-forward</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Social Dining Preference</label>
+                <div class=&quot;slider-container&quot;>
+                    <input type=&quot;range&quot; id=&quot;social-dining&quot; min=&quot;1&quot; max=&quot;5&quot; value=&quot;3&quot;>
+                    <div class=&quot;range-labels&quot;>
+                        <span>Private/Intimate</span>
+                        <span>Social/Communal</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button class=&quot;button prev-tab&quot; data-prev=&quot;demographics&quot;>Previous</button>
+            <button class=&quot;button next-tab&quot; data-next=&quot;behavior&quot;>Next: Behavior</button>
+        </div>
+        
+        <div id=&quot;behavior&quot; class=&quot;tab-content&quot;>
+            <h2>Behavioral Characteristics</h2>
+            <p>Enter key behavioral traits of your target customers.</p>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Average Dining Frequency at Restaurants</label>
+                <select id=&quot;dining-frequency&quot;>
+                    <option value=&quot;daily&quot;>Daily</option>
+                    <option value=&quot;several-times-week&quot;>Several times per week</option>
+                    <option value=&quot;weekly&quot;>Weekly</option>
+                    <option value=&quot;several-times-month&quot;>Several times per month</option>
+                    <option value=&quot;monthly&quot;>Monthly</option>
+                    <option value=&quot;special-occasions&quot;>Special occasions only</option>
+                </select>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Preferred Service Channels</label>
+                <div class=&quot;checkbox-container&quot;>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;dine-in&quot; value=&quot;dine-in&quot;>
+                        <label for=&quot;dine-in&quot;>Dine-in</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;takeaway&quot; value=&quot;takeaway&quot;>
+                        <label for=&quot;takeaway&quot;>Takeaway</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;delivery&quot; value=&quot;delivery&quot;>
+                        <label for=&quot;delivery&quot;>Delivery</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;catering&quot; value=&quot;catering&quot;>
+                        <label for=&quot;catering&quot;>Catering</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Price Sensitivity</label>
+                <div class=&quot;slider-container&quot;>
+                    <input type=&quot;range&quot; id=&quot;price-sensitivity&quot; min=&quot;1&quot; max=&quot;5&quot; value=&quot;3&quot;>
+                    <div class=&quot;range-labels&quot;>
+                        <span>Very price-sensitive</span>
+                        <span>Price insensitive</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Brand Loyalty</label>
+                <div class=&quot;slider-container&quot;>
+                    <input type=&quot;range&quot; id=&quot;brand-loyalty&quot; min=&quot;1&quot; max=&quot;5&quot; value=&quot;3&quot;>
+                    <div class=&quot;range-labels&quot;>
+                        <span>Variety seekers</span>
+                        <span>Loyal repeaters</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Primary Dining Motivation</label>
+                <select id=&quot;dining-motivation&quot;>
+                    <option value=&quot;convenience&quot;>Convenience/Time-saving</option>
+                    <option value=&quot;experience&quot;>Experience/Ambiance</option>
+                    <option value=&quot;social&quot;>Social gathering</option>
+                    <option value=&quot;celebration&quot;>Celebration/Special occasion</option>
+                    <option value=&quot;culinary&quot;>Culinary exploration</option>
+                    <option value=&quot;business&quot;>Business meetings</option>
+                    <option value=&quot;dietary&quot;>Dietary needs</option>
+                </select>
+            </div>
+            
+            <button class=&quot;button prev-tab&quot; data-prev=&quot;psychographics&quot;>Previous</button>
+            <button class=&quot;button next-tab&quot; data-next=&quot;trends&quot;>Next: Market Trends</button>
+        </div>
+        
+        <div id=&quot;trends&quot; class=&quot;tab-content&quot;>
+            <h2>Market Trends &amp; Competition</h2>
+            <p>Provide information about local market trends and competitors.</p>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Location Type</label>
+                <select id=&quot;location-type&quot;>
+                    <option value=&quot;urban&quot;>Urban center</option>
+                    <option value=&quot;suburban&quot;>Suburban</option>
+                    <option value=&quot;rural&quot;>Rural</option>
+                    <option value=&quot;tourist&quot;>Tourist destination</option>
+                    <option value=&quot;business&quot;>Business district</option>
+                    <option value=&quot;mixed&quot;>Mixed-use area</option>
+                </select>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Emerging Food Trends in Your Area (select all that apply)</label>
+                <div class=&quot;checkbox-container&quot;>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;plant-based&quot; value=&quot;plant-based&quot;>
+                        <label for=&quot;plant-based&quot;>Plant-based options</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;fusion&quot; value=&quot;fusion&quot;>
+                        <label for=&quot;fusion&quot;>Fusion cuisine</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;farm-to-table&quot; value=&quot;farm-to-table&quot;>
+                        <label for=&quot;farm-to-table&quot;>Farm-to-table</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;ghost-kitchens&quot; value=&quot;ghost-kitchens&quot;>
+                        <label for=&quot;ghost-kitchens&quot;>Ghost kitchens</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;ethnic&quot; value=&quot;ethnic&quot;>
+                        <label for=&quot;ethnic&quot;>Global/Ethnic cuisine</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;bowl-concepts&quot; value=&quot;bowl-concepts&quot;>
+                        <label for=&quot;bowl-concepts&quot;>Bowl concepts</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;health-focused&quot; value=&quot;health-focused&quot;>
+                        <label for=&quot;health-focused&quot;>Health-focused menus</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Competitor Density</label>
+                <select id=&quot;competitor-density&quot;>
+                    <option value=&quot;low&quot;>Low (few similar restaurants)</option>
+                    <option value=&quot;moderate&quot;>Moderate</option>
+                    <option value=&quot;high&quot;>High (many similar options)</option>
+                    <option value=&quot;saturated&quot;>Saturated market</option>
+                </select>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Competitor Strengths (select all that apply)</label>
+                <div class=&quot;checkbox-container&quot;>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;pricing&quot; value=&quot;pricing&quot;>
+                        <label for=&quot;pricing&quot;>Low pricing</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;speed&quot; value=&quot;speed&quot;>
+                        <label for=&quot;speed&quot;>Speed of service</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;variety&quot; value=&quot;variety&quot;>
+                        <label for=&quot;variety&quot;>Menu variety</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;quality&quot; value=&quot;quality&quot;>
+                        <label for=&quot;quality&quot;>Food quality</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;reputation&quot; value=&quot;reputation&quot;>
+                        <label for=&quot;reputation&quot;>Established reputation</label>
+                    </div>
+                    <div class=&quot;checkbox-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;marketing&quot; value=&quot;marketing&quot;>
+                        <label for=&quot;marketing&quot;>Strong marketing</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Untapped Opportunities (what's missing in the market?)</label>
+                <textarea id=&quot;untapped-opportunities&quot; rows=&quot;3&quot; placeholder=&quot;Describe any gaps you've noticed in the local market...&quot;></textarea>
+            </div>
+            
+            <button class=&quot;button prev-tab&quot; data-prev=&quot;behavior&quot;>Previous</button>
+            <button class=&quot;button&quot; id=&quot;generate-insights&quot;>Generate Insights</button>
+        </div>
+        
+        <div id=&quot;results&quot; class=&quot;tab-content&quot;>
+            <div id=&quot;loading-results&quot; class=&quot;loading&quot;>
+                <div class=&quot;loading-spinner&quot;></div>
+                <p>Analyzing your audience data...</p>
+            </div>
+            
+            <div id=&quot;insights-content&quot; style=&quot;display: none;&quot;>
+                <div class=&quot;results-header&quot;>
+                    <h2 class=&quot;results-title&quot;>Your Restaurant Audience Insights</h2>
+                </div>
+                
+                <div class=&quot;persona-container&quot; id=&quot;persona-container&quot;>
+                    <!-- Personas will be generated here -->
+                </div>
+                
+                <h3 style=&quot;margin-top: 30px; margin-bottom: 15px;&quot;>Strategic Recommendations</h3>
+                
+                <div class=&quot;insight-box&quot;>
+                    <div class=&quot;insight-title&quot;>
+                        <svg width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;>
+                            <path d=&quot;M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM11 7H13V9H11V7ZM11 11H13V17H11V11Z&quot; fill=&quot;#03DAC6&quot;/>
+                        </svg>
+                        <span>Menu Insights</span>
+                    </div>
+                    <div class=&quot;insight-content&quot; id=&quot;menu-insights&quot;>
+                        <!-- Menu insights will be populated here -->
+                    </div>
+                </div>
+                
+                <div class=&quot;insight-box&quot;>
+                    <div class=&quot;insight-title&quot;>
+                        <svg width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;>
+                            <path d=&quot;M11.8 10.9C9.53 10.31 8.8 9.7 8.8 8.75C8.8 7.66 9.81 6.9 11.5 6.9C13.28 6.9 13.94 7.75 14 9H16.21C16.14 7.28 15.09 5.7 13 5.19V3H10V5.16C8.06 5.58 6.5 6.84 6.5 8.77C6.5 11.08 8.41 12.23 11.2 12.9C13.7 13.5 14.2 14.38 14.2 15.31C14.2 16 13.71 17.1 11.5 17.1C9.44 17.1 8.63 16.18 8.5 15H6.32C6.44 17.19 8.08 18.42 10 18.83V21H13V18.85C14.95 18.48 16.5 17.35 16.5 15.3C16.5 12.46 14.07 11.49 11.8 10.9Z&quot; fill=&quot;#03DAC6&quot;/>
+                        </svg>
+                        <span>Pricing Strategy</span>
+                    </div>
+                    <div class=&quot;insight-content&quot; id=&quot;pricing-insights&quot;>
+                        <!-- Pricing insights will be populated here -->
+                    </div>
+                </div>
+                
+                <div class=&quot;insight-box&quot;>
+                    <div class=&quot;insight-title&quot;>
+                        <svg width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;>
+                            <path d=&quot;M21 3H3C1.9 3 1 3.9 1 5V19C1 20.1 1.9 21 3 21H21C22.1 21 23 20.1 23 19V5C23 3.9 22.1 3 21 3ZM21 19H3V5H21V19ZM8 15C8.55 15 9 14.55 9 14V10C9 9.45 8.55 9 8 9C7.45 9 7 9.45 7 10V14C7 14.55 7.45 15 8 15ZM12 15C12.55 15 13 14.55 13 14V10C13 9.45 12.55 9 12 9C11.45 9 11 9.45 11 10V14C11 14.55 11.45 15 12 15ZM16 15C16.55 15 17 14.55 17 14V10C17 9.45 16.55 9 16 9C15.45 9 15 9.45 15 10V14C15 14.55 15.45 15 16 15Z&quot; fill=&quot;#03DAC6&quot;/>
+                        </svg>
+                        <span>Service Style</span>
+                    </div>
+                    <div class=&quot;insight-content&quot; id=&quot;service-insights&quot;>
+                        <!-- Service insights will be populated here -->
+                    </div>
+                </div>
+                
+                <div class=&quot;insight-box&quot;>
+                    <div class=&quot;insight-title&quot;>
+                        <svg width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;>
+                            <path d=&quot;M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3ZM19 19H5V5H19V19ZM7 10H9V17H7V10ZM11 7H13V17H11V7ZM15 13H17V17H15V13Z&quot; fill=&quot;#03DAC6&quot;/>
+                        </svg>
+                        <span>Marketing Approach</span>
+                    </div>
+                    <div class=&quot;insight-content&quot; id=&quot;marketing-insights&quot;>
+                        <!-- Marketing insights will be populated here -->
+                    </div>
+                </div>
+                
+                <button class=&quot;button prev-tab&quot; data-prev=&quot;trends&quot;>Edit Inputs</button>
+                <button class=&quot;button&quot; id=&quot;download-insights&quot;>Download Insights</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab Navigation
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    button.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Next/Previous Tab Buttons
+            const nextButtons = document.querySelectorAll('.next-tab');
+            const prevButtons = document.querySelectorAll('.prev-tab');
+            
+            nextButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const nextTabId = button.getAttribute('data-next');
+                    
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    document.querySelector(`[data-tab=&quot;${nextTabId}&quot;]`).classList.add('active');
+                    document.getElementById(nextTabId).classList.add('active');
+                });
+            });
+            
+            prevButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const prevTabId = button.getAttribute('data-prev');
+                    
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    document.querySelector(`[data-tab=&quot;${prevTabId}&quot;]`).classList.add('active');
+                    document.getElementById(prevTabId).classList.add('active');
+                });
+            });
+            
+            // Generate Insights Button
+            const generateInsightsButton = document.getElementById('generate-insights');
+            generateInsightsButton.addEventListener('click', () => {
+                // Switch to results tab
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                document.querySelector('[data-tab=&quot;results&quot;]').classList.add('active');
+                document.getElementById('results').classList.add('active');
+                
+                // Show loading animation
+                document.getElementById('loading-results').style.display = 'block';
+                document.getElementById('insights-content').style.display = 'none';
+                
+                // Simulate analysis (replace with actual analysis logic)
+                setTimeout(() => {
+                    document.getElementById('loading-results').style.display = 'none';
+                    document.getElementById('insights-content').style.display = 'block';
+                    generatePersonas();
+                    generateInsights();
+                }, 2000);
+            });
+            
+            // Function to generate customer personas
+            function generatePersonas() {
+                const personaContainer = document.getElementById('persona-container');
+                personaContainer.innerHTML = '';
+                
+                // Get some of the input values to create somewhat relevant personas
+                const ageRange = document.getElementById('age-range').value;
+                const incomeLevel = document.getElementById('income-level').value;
+                const diningFrequency = document.getElementById('dining-frequency').value;
+                const priceSlider = document.getElementById('price-sensitivity').value;
+                const motivation = document.getElementById('dining-motivation').value;
+                
+                // Create first persona
+                const persona1 = document.createElement('div');
+                persona1.className = 'persona-card';
+                
+                let persona1Name, persona1Tag, persona1Description, persona1Details;
+                
+                if (parseInt(ageRange) < 35) {
+                    persona1Name = &quot;Alex Chen&quot;;
+                    persona1Tag = &quot;Urban Explorer&quot;;
+                    persona1Description = &quot;Tech-savvy professional who values experiences and convenience. Regularly uses delivery apps but enjoys social dining on weekends.&quot;;
+                    persona1Details = [
+                        {label: &quot;Age&quot;, value: &quot;28&quot;},
+                        {label: &quot;Income&quot;, value: &quot;Upper-middle&quot;},
+                        {label: &quot;Frequency&quot;, value: &quot;2-3 times weekly&quot;},
+                        {label: &quot;Key Values&quot;, value: &quot;Convenience, social status, food quality&quot;},
+                        {label: &quot;Pain Points&quot;, value: &quot;Lack of time, wants unique experiences&quot;}
+                    ];
+                } else {
+                    persona1Name = &quot;Jennifer Walker&quot;;
+                    persona1Tag = &quot;Quality Seeker&quot;;
+                    persona1Description = &quot;Established professional with disposable income who appreciates quality ingredients and thoughtful service. Will pay premium for excellence.&quot;;
+                    persona1Details = [
+                        {label: &quot;Age&quot;, value: &quot;42&quot;},
+                        {label: &quot;Income&quot;, value: &quot;High&quot;},
+                        {label: &quot;Frequency&quot;, value: &quot;Weekly&quot;},
+                        {label: &quot;Key Values&quot;, value: &quot;Quality, authenticity, health-conscious&quot;},
+                        {label: &quot;Pain Points&quot;, value: &quot;Inconsistent quality, rushed service&quot;}
+                    ];
+                }
+                
+                persona1.innerHTML = `
+                    <div class=&quot;persona-header&quot;>
+                        <div class=&quot;persona-avatar&quot;>${persona1Name.charAt(0)}</div>
+                        <div>
+                            <div class=&quot;persona-name&quot;>${persona1Name} <span class=&quot;persona-tag&quot;>${persona1Tag}</span></div>
+                            <p>${persona1Description}</p>
+                        </div>
+                    </div>
+                    <div class=&quot;persona-details&quot;>
+                        ${persona1Details.map(detail => `
+                            <div class=&quot;persona-detail&quot;>
+                                <div class=&quot;persona-detail-label&quot;>${detail.label}</div>
+                                <div>${detail.value}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                // Create second persona based on another aspect of the inputs
+                const persona2 = document.createElement('div');
+                persona2.className = 'persona-card';
+                
+                let persona2Name, persona2Tag, persona2Description, persona2Details;
+                
+                if (motivation === 'family' || motivation === 'social') {
+                    persona2Name = &quot;The Rodriguez Family&quot;;
+                    persona2Tag = &quot;Family Diners&quot;;
+                    persona2Description = &quot;Parents with school-age children looking for family-friendly environments with options for everyone. Value venues where kids are welcomed.&quot;;
+                    persona2Details = [
+                        {label: &quot;Family Stage&quot;, value: &quot;Parents with young children&quot;},
+                        {label: &quot;Income&quot;, value: &quot;Middle&quot;},
+                        {label: &quot;Frequency&quot;, value: &quot;Weekends, special occasions&quot;},
+                        {label: &quot;Key Values&quot;, value: &quot;Family-friendly atmosphere, value, variety&quot;},
+                        {label: &quot;Pain Points&quot;, value: &quot;Limited children's options, long waits&quot;}
+                    ];
+                } else {
+                    persona2Name = &quot;Sam Taylor&quot;;
+                    persona2Tag = &quot;Convenience Diner&quot;;
+                    persona2Description = &quot;Busy professional who relies on takeout and delivery for most meals. Prioritizes speed and reliability over ambiance.&quot;;
+                    persona2Details = [
+                        {label: &quot;Age&quot;, value: &quot;32&quot;},
+                        {label: &quot;Income&quot;, value: &quot;Middle&quot;},
+                        {label: &quot;Frequency&quot;, value: &quot;4-5 times weekly&quot;},
+                        {label: &quot;Key Values&quot;, value: &quot;Convenience, consistency, digital ordering&quot;},
+                        {label: &quot;Pain Points&quot;, value: &quot;Delivery delays, order accuracy&quot;}
+                    ];
+                }
+                
+                persona2.innerHTML = `
+                    <div class=&quot;persona-header&quot;>
+                        <div class=&quot;persona-avatar&quot;>${persona2Name.charAt(0)}</div>
+                        <div>
+                            <div class=&quot;persona-name&quot;>${persona2Name} <span class=&quot;persona-tag&quot;>${persona2Tag}</span></div>
+                            <p>${persona2Description}</p>
+                        </div>
+                    </div>
+                    <div class=&quot;persona-details&quot;>
+                        ${persona2Details.map(detail => `
+                            <div class=&quot;persona-detail&quot;>
+                                <div class=&quot;persona-detail-label&quot;>${detail.label}</div>
+                                <div>${detail.value}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+                personaContainer.appendChild(persona1);
+                personaContainer.appendChild(persona2);
+            }
+            
+            // Function to generate insights based on input data
+            function generateInsights() {
+                // Get key input values
+                const ageRange = document.getElementById('age-range').value;
+                const incomeLevel = document.getElementById('income-level').value;
+                const priceSensitivity = document.getElementById('price-sensitivity').value;
+                const diningFrequency = document.getElementById('dining-frequency').value;
+                const motivation = document.getElementById('dining-motivation').value;
+                const location = document.getElementById('location-type').value;
+                const competitorDensity = document.getElementById('competitor-density').value;
+                
+                // Generate menu insights
+                let menuInsights = '';
+                if (ageRange === '18-24' || ageRange === '25-34') {
+                    menuInsights += '<p>• Focus on shareable plates and photogenic presentations that encourage social media sharing.</p>';
+                    menuInsights += '<p>• Include trendy ingredients and globally-inspired flavors that appeal to younger diners\' adventurous tastes.</p>';
+                } else {
+                    menuInsights += '<p>• Prioritize quality and portion consistency with detailed menu descriptions highlighting ingredient sourcing.</p>';
+                    menuInsights += '<p>• Consider offering &quot;signature&quot; dishes that become conversation pieces and destination items.</p>';
+                }
+                
+                if (document.getElementById('health-conscious').checked) {
+                    menuInsights += '<p>• Include nutritional information and dietary indicators (GF, V, etc.) on your menu.</p>';
+                    menuInsights += '<p>• Feature at least 25-30% plant-forward or health-conscious options across menu categories.</p>';
+                }
+                
+                document.getElementById('menu-insights').innerHTML = menuInsights;
+                
+                // Generate pricing insights
+                let pricingInsights = '';
+                if (priceSensitivity < 3) {
+                    pricingInsights += '<p>• Implement a tiered pricing strategy with clear value propositions at different price points.</p>';
+                    pricingInsights += '<p>• Consider &quot;happy hour&quot; or time-based promotions to attract price-sensitive customers during off-peak hours.</p>';
+                } else {
+                    pricingInsights += '<p>• Focus on quality perception rather than discounting – your core audience values excellence over savings.</p>';
+                    pricingInsights += '<p>• Implement prix fixe or tasting menu options to increase average check sizes.</p>';
+                }
+                
+                if (incomeLevel === 'high' || incomeLevel === 'upper-middle') {
+                    pricingInsights += '<p>• Don\'t shy away from premium pricing on signature items – your audience has the means to splurge on quality.</p>';
+                }
+                
+                document.getElementById('pricing-insights').innerHTML = pricingInsights;
+                
+                // Generate service insights
+                let serviceInsights = '';
+                if (motivation === 'experience' || motivation === 'celebration') {
+                    serviceInsights += '<p>• Train staff on experience enhancement – remembering preferences, acknowledging special occasions.</p>';
+                    serviceInsights += '<p>• Consider adding tableside elements or interactive components to dining experience.</p>';
+                } else if (motivation === 'convenience') {
+                    serviceInsights += '<p>• Streamline operations for speed without sacrificing quality – aim for under 7 minutes for takeout orders.</p>';
+                    serviceInsights += '<p>• Invest in user-friendly digital ordering systems and dedicated takeout/delivery areas.</p>';
+                }
+                
+                if (document.getElementById('dine-in').checked) {
+                    serviceInsights += '<p>• Create a comfortable dining environment with appropriate music, lighting and seating arrangements for your target demographic.</p>';
+                }
+                
+                document.getElementById('service-insights').innerHTML = serviceInsights;
+                
+                // Generate marketing insights
+                let marketingInsights = '';
+                if (ageRange === '18-24' || ageRange === '25-34') {
+                    marketingInsights += '<p>• Prioritize Instagram and TikTok content showing behind-the-scenes preparation and photogenic presentations.</p>';
+                    marketingInsights += '<p>• Implement a text-based loyalty program with exclusive offers and early access to special events.</p>';
+                } else if (ageRange === '35-44' || ageRange === '45-54') {
+                    marketingInsights += '<p>• Balance digital presence with targeted local print media and community partnerships.</p>';
+                    marketingInsights += '<p>• Focus on quality storytelling about your ingredients, team and culinary approach.</p>';
+                } else {
+                    marketingInsights += '<p>• Emphasize traditional marketing channels including direct mail and local publications.</p>';
+                    marketingInsights += '<p>• Consider &quot;friends and family&quot; referral incentives to tap into established social networks.</p>';
+                }
+                
+                if (competitorDensity === 'high' || competitorDensity === 'saturated') {
+                    marketingInsights += '<p>• Clearly differentiate your concept from competitors through focused messaging on your unique value proposition.</p>';
+                }
+                
+                document.getElementById('marketing-insights').innerHTML = marketingInsights;
+            }
+            
+            // Download insights functionality
+            document.getElementById('download-insights').addEventListener('click', function() {
+                alert('Download functionality would be implemented here in a production environment.');
+            });
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_erlrb3i7';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_erlrb3i7" style="width: 100%; height: 1083px; border: none;"></iframe>

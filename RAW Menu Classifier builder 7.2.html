@@ -1,0 +1,591 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Menu Matrix Classifier</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #7E57C2;
+            --secondary: #4527A0;
+            --background: #121212;
+            --surface: #1E1E1E;
+            --surface-lighter: #2A2A2A;
+            --text-primary: #FFFFFF;
+            --text-secondary: #B0B0B0;
+            --success: #4CAF50;
+            --error: #F44336;
+            --warning: #FFC107;
+            --info: #2196F3;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 16px;
+            position: relative;
+        }
+        
+        header {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .tab-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: var(--surface);
+        }
+        
+        .tab {
+            padding: 12px 16px;
+            cursor: pointer;
+            flex-grow: 1;
+            text-align: center;
+            background-color: var(--surface);
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            background-color: var(--surface-lighter);
+            color: var(--text-primary);
+            border-bottom: 3px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .menu-items-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: var(--surface);
+            border-radius: 8px;
+        }
+        
+        .menu-item {
+            background-color: var(--surface-lighter);
+            padding: 12px;
+            border-radius: 6px;
+            cursor: grab;
+            width: calc(50% - 5px);
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .menu-item:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+        
+        .menu-item h3 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .menu-item .stats {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .matrix-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            height: 400px;
+            margin-bottom: 20px;
+        }
+        
+        .quadrant {
+            background-color: var(--surface);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: auto;
+        }
+        
+        .quadrant-title {
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 5px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        
+        #stars .quadrant-title {
+            background-color: var(--info);
+        }
+        
+        #plowhorses .quadrant-title {
+            background-color: var(--warning);
+        }
+        
+        #puzzles .quadrant-title {
+            background-color: var(--success);
+        }
+        
+        #dogs .quadrant-title {
+            background-color: var(--error);
+        }
+        
+        .axis-label {
+            position: absolute;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .x-label {
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .y-label {
+            top: 50%;
+            left: 5px;
+            transform: translateY(-50%) rotate(-90deg);
+            transform-origin: left;
+        }
+        
+        .info-container {
+            background-color: var(--surface);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .feedback {
+            background-color: var(--surface-lighter);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .feedback-text {
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+        
+        .score {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .reset-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .reset-btn:hover {
+            background-color: var(--secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .matrix-container {
+                height: 500px;
+            }
+            
+            .menu-item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Menu Matrix Classifier</h1>
+        <p>Drag and drop menu items into their correct quadrant based on profit and popularity data.</p>
+    </header>
+    
+    <div class=&quot;tab-container&quot;>
+        <div class=&quot;tab active&quot; data-tab=&quot;game&quot;>Activity</div>
+        <div class=&quot;tab&quot; data-tab=&quot;learn&quot;>Learn</div>
+        <div class=&quot;tab&quot; data-tab=&quot;info&quot;>Info</div>
+    </div>
+    
+    <div id=&quot;game&quot; class=&quot;tab-content active&quot;>
+        <div class=&quot;menu-items-container&quot; id=&quot;menuItems&quot;>
+            <!-- Menu items will be generated with JavaScript -->
+        </div>
+        
+        <div class=&quot;matrix-container&quot;>
+            <div class=&quot;quadrant drop-zone&quot; id=&quot;stars&quot;>
+                <div class=&quot;quadrant-title&quot;>Stars</div>
+                <div class=&quot;axis-label x-label&quot;>High Popularity</div>
+                <div class=&quot;axis-label y-label&quot;>High Profit</div>
+            </div>
+            <div class=&quot;quadrant drop-zone&quot; id=&quot;plowhorses&quot;>
+                <div class=&quot;quadrant-title&quot;>Plowhorses</div>
+                <div class=&quot;axis-label x-label&quot;>High Popularity</div>
+                <div class=&quot;axis-label y-label&quot;>Low Profit</div>
+            </div>
+            <div class=&quot;quadrant drop-zone&quot; id=&quot;puzzles&quot;>
+                <div class=&quot;quadrant-title&quot;>Puzzles</div>
+                <div class=&quot;axis-label x-label&quot;>Low Popularity</div>
+                <div class=&quot;axis-label y-label&quot;>High Profit</div>
+            </div>
+            <div class=&quot;quadrant drop-zone&quot; id=&quot;dogs&quot;>
+                <div class=&quot;quadrant-title&quot;>Dogs</div>
+                <div class=&quot;axis-label x-label&quot;>Low Popularity</div>
+                <div class=&quot;axis-label y-label&quot;>Low Profit</div>
+            </div>
+        </div>
+        
+        <div class=&quot;feedback&quot;>
+            <div class=&quot;feedback-text&quot;>Drag all menu items to their correct quadrants to see your score.</div>
+            <div class=&quot;score&quot;>Score: <span id=&quot;scoreDisplay&quot;>0</span> / <span id=&quot;totalItems&quot;>0</span></div>
+            <button class=&quot;reset-btn&quot; id=&quot;resetBtn&quot;>Reset Activity</button>
+        </div>
+    </div>
+    
+    <div id=&quot;learn&quot; class=&quot;tab-content&quot;>
+        <div class=&quot;info-container&quot;>
+            <h2>Menu Engineering Matrix</h2>
+            <p>Map every dish by two dimensions: <strong>Profitability</strong> (gross profit per plate) and <strong>Popularity</strong> (sales volume).</p>
+            <ul>
+                <li><strong>Stars:</strong> High profit, high popularity—feature these in dedicated call-outs or boxes.</li>
+                <li><strong>Plowhorses:</strong> Low profit, high popularity—keep prominent but consider a slight price increase or recipe tweak.</li>
+                <li><strong>Puzzles:</strong> High profit, low popularity—boost visibility with evocative descriptions or prime placement.</li>
+                <li><strong>Dogs:</strong> Low profit, low popularity—remove or hide in a low-traffic corner of the menu.</li>
+            </ul>
+        </div>
+        
+        <div class=&quot;info-container&quot;>
+            <h2>Strategic Pricing Tactics</h2>
+            <ul>
+                <li><strong>Charm Pricing:</strong> End prices in .99 or .95 to make them appear significantly lower.</li>
+                <li><strong>Cost-Plus Pricing:</strong> Calculate total plate cost then add your target food-cost percentage.</li>
+                <li><strong>Perceived-Value Pricing:</strong> Set prices based on customer willingness to pay for premium ingredients or chef-curated experiences.</li>
+                <li><strong>Decoy Anchoring:</strong> Introduce an intentionally high-priced &quot;anchor&quot; item so other premium dishes seem like bargains.</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div id=&quot;info&quot; class=&quot;tab-content&quot;>
+        <div class=&quot;info-container&quot;>
+            <h2>About This Activity</h2>
+            <p>This interactive tool helps you understand menu engineering principles by classifying menu items into a 2x2 matrix based on profitability and popularity.</p>
+            <p>Analyze each menu item's data and place it in the correct quadrant:</p>
+            <ul>
+                <li><strong>Stars:</strong> High profit, high popularity</li>
+                <li><strong>Plowhorses:</strong> Low profit, high popularity</li>
+                <li><strong>Puzzles:</strong> High profit, low popularity</li>
+                <li><strong>Dogs:</strong> Low profit, low popularity</li>
+            </ul>
+            <p>Get instant feedback on your classification accuracy to test your understanding of menu engineering principles.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Update active content
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Menu items data
+            const menuItems = [
+                { 
+                    id: 1, 
+                    name: &quot;Signature Ramen&quot;, 
+                    price: &quot;¥18&quot;, 
+                    profit: &quot;High&quot;, 
+                    popularity: &quot;High&quot;, 
+                    category: &quot;stars&quot; 
+                },
+                { 
+                    id: 2, 
+                    name: &quot;Classic Burger&quot;, 
+                    price: &quot;$12&quot;, 
+                    profit: &quot;Low&quot;, 
+                    popularity: &quot;High&quot;, 
+                    category: &quot;plowhorses&quot; 
+                },
+                { 
+                    id: 3, 
+                    name: &quot;Truffle Mac &amp; Cheese&quot;, 
+                    price: &quot;$16&quot;, 
+                    profit: &quot;High&quot;, 
+                    popularity: &quot;Low&quot;, 
+                    category: &quot;puzzles&quot; 
+                },
+                { 
+                    id: 4, 
+                    name: &quot;Lentil Soup&quot;, 
+                    price: &quot;$8&quot;, 
+                    profit: &quot;Low&quot;, 
+                    popularity: &quot;Low&quot;, 
+                    category: &quot;dogs&quot; 
+                },
+                { 
+                    id: 5, 
+                    name: &quot;Chef's Special Steak&quot;, 
+                    price: &quot;$28&quot;, 
+                    profit: &quot;High&quot;, 
+                    popularity: &quot;High&quot;, 
+                    category: &quot;stars&quot; 
+                },
+                { 
+                    id: 6, 
+                    name: &quot;Caesar Salad&quot;, 
+                    price: &quot;$10&quot;, 
+                    profit: &quot;Low&quot;, 
+                    popularity: &quot;High&quot;, 
+                    category: &quot;plowhorses&quot; 
+                },
+                { 
+                    id: 7, 
+                    name: &quot;Lobster Risotto&quot;, 
+                    price: &quot;$24&quot;, 
+                    profit: &quot;High&quot;, 
+                    popularity: &quot;Low&quot;, 
+                    category: &quot;puzzles&quot; 
+                },
+                { 
+                    id: 8, 
+                    name: &quot;Vegetable Sandwich&quot;, 
+                    price: &quot;$9&quot;, 
+                    profit: &quot;Low&quot;, 
+                    popularity: &quot;Low&quot;, 
+                    category: &quot;dogs&quot; 
+                }
+            ];
+            
+            // Display total items
+            document.getElementById('totalItems').textContent = menuItems.length;
+            
+            // Generate menu items
+            const menuItemsContainer = document.getElementById('menuItems');
+            
+            menuItems.sort(() => Math.random() - 0.5).forEach(item => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'menu-item';
+                itemElement.setAttribute('draggable', 'true');
+                itemElement.setAttribute('data-id', item.id);
+                itemElement.setAttribute('data-category', item.category);
+                
+                itemElement.innerHTML = `
+                    <h3>${item.name} (${item.price})</h3>
+                    <div class=&quot;stats&quot;>
+                        <span>Profit: ${item.profit}</span>
+                        <span>Popularity: ${item.popularity}</span>
+                    </div>
+                `;
+                
+                itemElement.addEventListener('dragstart', handleDragStart);
+                menuItemsContainer.appendChild(itemElement);
+            });
+            
+            // Drag and drop functionality
+            let draggedItem = null;
+            
+            function handleDragStart(e) {
+                draggedItem = e.target;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', e.target.getAttribute('data-id'));
+                
+                setTimeout(() => {
+                    e.target.style.opacity = '0.4';
+                }, 0);
+            }
+            
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    zone.classList.add('drag-over');
+                });
+                
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('drag-over');
+                });
+                
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    
+                    if (draggedItem) {
+                        zone.appendChild(draggedItem);
+                        draggedItem.style.opacity = '1';
+                        
+                        // Check if the placement is correct
+                        checkClassification();
+                    }
+                });
+            });
+            
+            // Reset functionality
+            document.getElementById('resetBtn').addEventListener('click', resetActivity);
+            
+            function resetActivity() {
+                const menuItemsContainer = document.getElementById('menuItems');
+                const items = document.querySelectorAll('.menu-item');
+                
+                items.forEach(item => {
+                    menuItemsContainer.appendChild(item);
+                });
+                
+                document.getElementById('scoreDisplay').textContent = '0';
+                document.querySelector('.feedback-text').textContent = 'Drag all menu items to their correct quadrants to see your score.';
+            }
+            
+            // Check classification
+            function checkClassification() {
+                let score = 0;
+                const total = menuItems.length;
+                
+                // Check if all items have been classified
+                const menuItemElements = document.querySelectorAll('.menu-item');
+                const allClassified = Array.from(menuItemElements).every(item => {
+                    return item.parentElement.classList.contains('quadrant');
+                });
+                
+                if (allClassified) {
+                    // Calculate score
+                    menuItemElements.forEach(item => {
+                        const correctCategory = item.getAttribute('data-category');
+                        const currentZone = item.parentElement.id;
+                        
+                        if (correctCategory === currentZone) {
+                            score++;
+                            item.style.boxShadow = '0 0 0 2px var(--success)';
+                        } else {
+                            item.style.boxShadow = '0 0 0 2px var(--error)';
+                        }
+                    });
+                    
+                    // Update score display
+                    document.getElementById('scoreDisplay').textContent = score;
+                    
+                    // Update feedback
+                    const feedbackText = document.querySelector('.feedback-text');
+                    if (score === total) {
+                        feedbackText.textContent = 'Perfect! You've correctly classified all menu items.';
+                        feedbackText.style.color = 'var(--success)';
+                    } else if (score >= total * 0.75) {
+                        feedbackText.textContent = 'Good job! You're getting the hang of menu engineering.';
+                        feedbackText.style.color = 'var(--info)';
+                    } else if (score >= total * 0.5) {
+                        feedbackText.textContent = 'Not bad! Review the items marked in red.';
+                        feedbackText.style.color = 'var(--warning)';
+                    } else {
+                        feedbackText.textContent = 'Keep trying! Review the matrix definitions and try again.';
+                        feedbackText.style.color = 'var(--error)';
+                    }
+                }
+            }
+            
+            // Prevent default drag behaviors for items in original container
+            document.addEventListener('dragend', function(e) {
+                if (draggedItem) {
+                    draggedItem.style.opacity = '1';
+                    draggedItem = null;
+                }
+            });
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_tweltcdk';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_tweltcdk" style="width: 100%; height: 1858px; border: none;"></iframe>

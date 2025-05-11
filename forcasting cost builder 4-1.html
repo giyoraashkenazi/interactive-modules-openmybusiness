@@ -1,0 +1,733 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Budget Allocation Visualizer</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <script src=&quot;https://cdn.jsdelivr.net/npm/chart.js&quot;></script>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --background: #111827;
+            --card-bg: #1f2937;
+            --text: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border: #374151;
+            --slider-track: #4b5563;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            padding: 1rem;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s;
+        }
+        
+        .tab.active {
+            color: var(--text);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .slider-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+        
+        .slider-label span:first-child {
+            font-weight: 500;
+        }
+        
+        .slider-label .percentage {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--slider-track);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: background 0.3s;
+            border: none;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            background: var(--primary-hover);
+        }
+        
+        .slider::-moz-range-thumb:hover {
+            background: var(--primary-hover);
+        }
+        
+        .chart-container {
+            position: relative;
+            margin: 1.5rem auto;
+            height: 300px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .total-budget {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 1.5rem 0;
+        }
+        
+        .total-budget .amount {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: block;
+            margin-top: 0.5rem;
+        }
+        
+        .benchmark-container {
+            margin-top: 2rem;
+        }
+        
+        .benchmark-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        
+        .benchmark-bar {
+            height: 8px;
+            background: var(--slider-track);
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .benchmark-fill {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+            position: relative;
+        }
+        
+        .benchmark-marker {
+            position: absolute;
+            height: 16px;
+            width: 3px;
+            background: #fff;
+            top: -4px;
+            transform: translateX(-50%);
+        }
+        
+        .benchmark-marker::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            color: var(--text-muted);
+            font-size: 0.75rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .status-good {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        .status-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        
+        .status-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .tips-list {
+            margin-top: 1rem;
+            padding-left: 1.5rem;
+        }
+        
+        .tips-list li {
+            margin-bottom: 0.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 1.5rem;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <div class=&quot;header&quot;>
+            <h1>Budget Allocation Visualizer</h1>
+            <p>Adjust the sliders to see how changing cost allocations affects your food-business startup budget.</p>
+        </div>
+        
+        <div class=&quot;tabs&quot;>
+            <button class=&quot;tab active&quot; data-tab=&quot;allocation&quot;>Allocation</button>
+            <button class=&quot;tab&quot; data-tab=&quot;benchmarks&quot;>Benchmarks</button>
+            <button class=&quot;tab&quot; data-tab=&quot;tips&quot;>Tips &amp; Insights</button>
+        </div>
+        
+        <div id=&quot;allocation&quot; class=&quot;tab-content active&quot;>
+            <div class=&quot;grid&quot;>
+                <div class=&quot;card&quot;>
+                    <h2>Budget Allocation</h2>
+                    <div class=&quot;slider-group&quot;>
+                        <div class=&quot;slider-label&quot;>
+                            <span>One-Time Setup Costs</span>
+                            <span class=&quot;percentage&quot; id=&quot;setup-percentage&quot;>15%</span>
+                        </div>
+                        <input type=&quot;range&quot; min=&quot;5&quot; max=&quot;25&quot; value=&quot;15&quot; class=&quot;slider&quot; id=&quot;setup-slider&quot; data-category=&quot;setup&quot;>
+                    </div>
+                    
+                    <div class=&quot;slider-group&quot;>
+                        <div class=&quot;slider-label&quot;>
+                            <span>Fit-Out &amp; Construction</span>
+                            <span class=&quot;percentage&quot; id=&quot;construction-percentage&quot;>40%</span>
+                        </div>
+                        <input type=&quot;range&quot; min=&quot;20&quot; max=&quot;60&quot; value=&quot;40&quot; class=&quot;slider&quot; id=&quot;construction-slider&quot; data-category=&quot;construction&quot;>
+                    </div>
+                    
+                    <div class=&quot;slider-group&quot;>
+                        <div class=&quot;slider-label&quot;>
+                            <span>Equipment &amp; Furnishings</span>
+                            <span class=&quot;percentage&quot; id=&quot;equipment-percentage&quot;>20%</span>
+                        </div>
+                        <input type=&quot;range&quot; min=&quot;10&quot; max=&quot;35&quot; value=&quot;20&quot; class=&quot;slider&quot; id=&quot;equipment-slider&quot; data-category=&quot;equipment&quot;>
+                    </div>
+                    
+                    <div class=&quot;slider-group&quot;>
+                        <div class=&quot;slider-label&quot;>
+                            <span>Pre-Opening Expenses</span>
+                            <span class=&quot;percentage&quot; id=&quot;preopening-percentage&quot;>10%</span>
+                        </div>
+                        <input type=&quot;range&quot; min=&quot;5&quot; max=&quot;20&quot; value=&quot;10&quot; class=&quot;slider&quot; id=&quot;preopening-slider&quot; data-category=&quot;preopening&quot;>
+                    </div>
+                    
+                    <div class=&quot;slider-group&quot;>
+                        <div class=&quot;slider-label&quot;>
+                            <span>Working Capital Buffer</span>
+                            <span class=&quot;percentage&quot; id=&quot;capital-percentage&quot;>10%</span>
+                        </div>
+                        <input type=&quot;range&quot; min=&quot;5&quot; max=&quot;25&quot; value=&quot;10&quot; class=&quot;slider&quot; id=&quot;capital-slider&quot; data-category=&quot;capital&quot;>
+                    </div>
+                    
+                    <div class=&quot;slider-group&quot;>
+                        <div class=&quot;slider-label&quot;>
+                            <span>Contingency Reserve</span>
+                            <span class=&quot;percentage&quot; id=&quot;contingency-percentage&quot;>5%</span>
+                        </div>
+                        <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;20&quot; value=&quot;5&quot; class=&quot;slider&quot; id=&quot;contingency-slider&quot; data-category=&quot;contingency&quot;>
+                    </div>
+                </div>
+                
+                <div class=&quot;card&quot;>
+                    <div class=&quot;chart-container&quot;>
+                        <canvas id=&quot;budget-chart&quot;></canvas>
+                    </div>
+                    
+                    <div class=&quot;total-budget&quot;>
+                        <span>Total Estimated Budget</span>
+                        <span class=&quot;amount&quot; id=&quot;total-budget&quot;>$200,000</span>
+                    </div>
+                    
+                    <div class=&quot;status-container&quot;>
+                        <div class=&quot;benchmark-label&quot;>Business Viability</div>
+                        <div class=&quot;benchmark-bar&quot;>
+                            <div class=&quot;benchmark-fill&quot; id=&quot;viability-indicator&quot; style=&quot;width: 70%;&quot;></div>
+                            <div class=&quot;benchmark-marker&quot; style=&quot;left: 30%;&quot; data-label=&quot;High Risk&quot;></div>
+                            <div class=&quot;benchmark-marker&quot; style=&quot;left: 70%;&quot; data-label=&quot;Balanced&quot;></div>
+                            <div class=&quot;benchmark-marker&quot; style=&quot;left: 90%;&quot; data-label=&quot;Optimized&quot;></div>
+                        </div>
+                        <div id=&quot;viability-status&quot; class=&quot;status-indicator status-warning&quot;>Moderate Risk</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;benchmarks&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <h2>Industry Benchmarks</h2>
+                <p>Compare your budget allocation to industry standards for food-business startups.</p>
+                
+                <div class=&quot;benchmark-container&quot;>
+                    <div class=&quot;benchmark-label&quot;>One-Time Setup Costs (Industry Avg: 12-18%)</div>
+                    <div class=&quot;benchmark-bar&quot;>
+                        <div class=&quot;benchmark-fill&quot; id=&quot;setup-benchmark&quot; style=&quot;width: 15%;&quot;></div>
+                        <div class=&quot;benchmark-marker&quot; style=&quot;left: 12%;&quot; data-label=&quot;Min&quot;></div>
+                        <div class=&quot;benchmark-marker&quot; style=&quot;left: 18%;&quot; data-label=&quot;Max&quot;></div>
+                    </div>
+                    
+                    <div class=&quot;benchmark-label&quot;>Fit-Out &amp; Construction (Industry Avg: 35-45%)</div>
+                    <div class=&quot;benchmark-bar&quot;>
+                        <div class=&quot;benchmark-fill&quot; id=&quot;construction-benchmark&quot; style=&quot;width: 40%;&quot;></div>
+                        <div class=&quot;benchmark-marker&quot; style=&quot;left: 35%;&quot; data-label=&quot;Min&quot;></div>
+                        <div class=&quot;benchmark-marker&quot; style=&quot;left: 45%;&quot; data-label=&quot;Max&quot;></div>
+                    </div>
+                    
+                    <div class=&quot;benchmark-label&quot;>Equipment &amp; Furnishings (Industry Avg: 15-25%)</div>
+                    <div class=&quot;benchmark-bar&quot;>
+                        <div class=&quot;benchmark-fill&quot; id=&quot;equipment-benchmark&quot; style=&quot;width: 20%;&quot;></div>
+                        <div class=&quot;benchmark-marker&quot; style=&quot;left: 15%;&quot; data-label=&quot;Min&quot;></div>
+                        <div class=&quot;benchmark-marker&quot; style=&quot;left: 25%;&quot; data-label=&quot;Max&quot;></div>
+                    </div>
+                    
+                    <div class=&quot;benchmark-label&quot;>Pre-Opening Expenses (Industry Avg: 8-12%)</div>
+                    <div class=&quot;benchmark-bar&quot;>
+                        <div class=&quot;benchmark-fill&quot; id=&quot;preopening-benchmark&quot; style=&quot;width: 10%;&quot;></div>
+                        <div class=&quot;benchmark-marker&quot; style=&quot;left: 8%;&quot; data-label=&quot;Min&quot;></div>
+                        <div class=&quot;benchmark-marker&quot; style=&quot;left: 12%;&quot; data-label=&quot;Max&quot;></div>
+                    </div>
+                    
+                    <div class=&quot;benchmark-label&quot;>Working Capital Buffer (Industry Avg: 10-20%)</div>
+                    <div class=&quot;benchmark-bar&quot;>
+                        <div class=&quot;benchmark-fill&quot; id=&quot;capital-benchmark&quot; style=&quot;width: 10%;&quot;></div>
+                        <div class=&quot;benchmark-marker&quot; style=&quot;left: 10%;&quot; data-label=&quot;Min&quot;></div>
+                        <div class=&quot;benchmark-marker&quot; style=&quot;left: 20%;&quot; data-label=&quot;Max&quot;></div>
+                    </div>
+                    
+                    <div class=&quot;benchmark-label&quot;>Contingency Reserve (Recommended: 10-15%)</div>
+                    <div class=&quot;benchmark-bar&quot;>
+                        <div class=&quot;benchmark-fill&quot; id=&quot;contingency-benchmark&quot; style=&quot;width: 5%;&quot;></div>
+                        <div class=&quot;benchmark-marker&quot; style=&quot;left: 10%;&quot; data-label=&quot;Min&quot;></div>
+                        <div class=&quot;benchmark-marker&quot; style=&quot;left: 15%;&quot; data-label=&quot;Max&quot;></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;tips&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <h2>Tips &amp; Insights</h2>
+                <p>Expert recommendations based on your current budget allocation:</p>
+                
+                <div id=&quot;tips-content&quot;>
+                    <div class=&quot;status-indicator status-warning&quot;>Your allocation needs adjustment</div>
+                    <ul class=&quot;tips-list&quot;>
+                        <li>Your contingency reserve (5%) is below the recommended minimum of 10%. Consider increasing this to protect against unexpected costs.</li>
+                        <li>Working capital buffer is adequate but could be increased to provide more runway during the initial months of operation.</li>
+                        <li>Your construction budget allocation aligns with industry standards, which is positive.</li>
+                        <li>Consider how your equipment budget affects your operating efficiency and customer experience.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class=&quot;card&quot;>
+                <h2>Budget Planning Tips</h2>
+                <ul class=&quot;tips-list&quot;>
+                    <li><strong>Map All Touchpoints:</strong> List every necessary expense—from permits to menu printing—to ensure comprehensive coverage.</li>
+                    <li><strong>Gather Reliable Estimates:</strong> Get multiple quotes from contractors and suppliers to benchmark against industry data.</li>
+                    <li><strong>Build in Buffers:</strong> Add both contingency and working-capital cushions to absorb overruns and early-stage cash needs.</li>
+                    <li><strong>Run Sensitivity Tests:</strong> Test scenarios like increased construction costs or lower initial sales to gauge impact.</li>
+                    <li><strong>Review &amp; Refine:</strong> Update your model as you finalize quotes and uncover new requirements.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize variables
+        let budgetData = {
+            setup: 15,
+            construction: 40,
+            equipment: 20,
+            preopening: 10,
+            capital: 10,
+            contingency: 5
+        };
+        
+        const baseBudget = 200000; // $200,000 baseline budget
+        let totalBudget = baseBudget;
+        
+        // Color palette for chart
+        const colors = [
+            '#6366f1', // Primary
+            '#ec4899', // Pink
+            '#8b5cf6', // Purple
+            '#14b8a6', // Teal
+            '#f59e0b', // Amber
+            '#ef4444'  // Red
+        ];
+        
+        // Initialize chart
+        const ctx = document.getElementById('budget-chart').getContext('2d');
+        const budgetChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    'One-Time Setup',
+                    'Fit-Out &amp; Construction',
+                    'Equipment &amp; Furnishings',
+                    'Pre-Opening Expenses',
+                    'Working Capital Buffer',
+                    'Contingency Reserve'
+                ],
+                datasets: [{
+                    data: Object.values(budgetData),
+                    backgroundColor: colors,
+                    borderWidth: 0,
+                    hoverOffset: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#f3f4f6',
+                            padding: 15,
+                            usePointStyle: true,
+                            font: {
+                                family: 'Inter',
+                                size: 11
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                const allValues = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / allValues) * 100);
+                                const budget = Math.round((percentage / 100) * totalBudget);
+                                return `${label}: ${percentage}% ($${budget.toLocaleString()})`;
+                            }
+                        }
+                    }
+                },
+                cutout: '65%',
+                animation: {
+                    animateScale: true
+                }
+            }
+        });
+        
+        // Update chart and calculations
+        function updateChart() {
+            // Update chart data
+            budgetChart.data.datasets[0].data = Object.values(budgetData);
+            budgetChart.update();
+            
+            // Update total budget (with adjustments based on allocations)
+            let multiplier = 1.0;
+            // Adjust multiplier based on risk factors
+            if (budgetData.contingency < 10) multiplier += 0.15; // Higher risk
+            if (budgetData.capital < 10) multiplier += 0.1;
+            if (budgetData.construction > 45) multiplier += 0.05;
+            
+            totalBudget = Math.round(baseBudget * multiplier);
+            document.getElementById('total-budget').textContent = `$${totalBudget.toLocaleString()}`;
+            
+            // Update benchmarks
+            updateBenchmarks();
+            
+            // Update viability indicator
+            updateViabilityIndicator();
+            
+            // Update tips
+            updateTips();
+        }
+        
+        // Update benchmarks view
+        function updateBenchmarks() {
+            document.getElementById('setup-benchmark').style.width = `${budgetData.setup}%`;
+            document.getElementById('construction-benchmark').style.width = `${budgetData.construction}%`;
+            document.getElementById('equipment-benchmark').style.width = `${budgetData.equipment}%`;
+            document.getElementById('preopening-benchmark').style.width = `${budgetData.preopening}%`;
+            document.getElementById('capital-benchmark').style.width = `${budgetData.capital}%`;
+            document.getElementById('contingency-benchmark').style.width = `${budgetData.contingency}%`;
+        }
+        
+        // Update viability indicator
+        function updateViabilityIndicator() {
+            let score = 0;
+            
+            // Calculate viability score based on allocations
+            if (budgetData.contingency >= 10) score += 30;
+            else if (budgetData.contingency >= 5) score += 15;
+            
+            if (budgetData.capital >= 15) score += 25;
+            else if (budgetData.capital >= 10) score += 15;
+            
+            if (budgetData.construction <= 45 &amp;&amp; budgetData.construction >= 35) score += 20;
+            else score += 10;
+            
+            if (budgetData.equipment >= 15 &amp;&amp; budgetData.equipment <= 25) score += 15;
+            else score += 5;
+            
+            if (budgetData.setup <= 18 &amp;&amp; budgetData.setup >= 12) score += 10;
+            
+            // Update viability indicator
+            document.getElementById('viability-indicator').style.width = `${score}%`;
+            
+            // Update status
+            const statusElement = document.getElementById('viability-status');
+            if (score >= 80) {
+                statusElement.textContent = 'Optimized Allocation';
+                statusElement.className = 'status-indicator status-good';
+            } else if (score >= 60) {
+                statusElement.textContent = 'Balanced Allocation';
+                statusElement.className = 'status-indicator status-warning';
+            } else {
+                statusElement.textContent = 'High-Risk Allocation';
+                statusElement.className = 'status-indicator status-danger';
+            }
+        }
+        
+        // Update tips based on current allocation
+        function updateTips() {
+            const tipsContent = document.getElementById('tips-content');
+            let tips = '<ul class=&quot;tips-list&quot;>';
+            let statusClass = 'status-good';
+            let statusText = 'Your allocation looks balanced';
+            
+            if (budgetData.contingency < 10) {
+                tips += '<li>Your contingency reserve is below the recommended minimum of 10%. Consider increasing this to protect against unexpected costs.</li>';
+                statusClass = 'status-warning';
+                statusText = 'Your allocation needs adjustment';
+            }
+            
+            if (budgetData.capital < 10) {
+                tips += '<li>Working capital buffer is too low. Increase to at least 10-15% to provide adequate runway during initial months.</li>';
+                statusClass = 'status-warning';
+                statusText = 'Your allocation needs adjustment';
+            }
+            
+            if (budgetData.construction > 45) {
+                tips += '<li>Your construction budget is above industry average. Consider ways to optimize or phase your build-out costs.</li>';
+                statusClass = 'status-warning';
+                statusText = 'Your allocation needs adjustment';
+            }
+            
+            if (budgetData.contingency < 5) {
+                tips += '<li>Critical: Your contingency reserve is dangerously low. This significantly increases your risk of budget overruns.</li>';
+                statusClass = 'status-danger';
+                statusText = 'High-risk allocation detected';
+            }
+            
+            if (statusClass === 'status-good') {
+                tips += '<li>Your budget allocation aligns well with industry benchmarks.</li>';
+                tips += '<li>Maintaining a good balance between construction, equipment, and operational reserves.</li>';
+                tips += '<li>Your contingency reserve provides adequate protection against unexpected costs.</li>';
+            }
+            
+            tips += '</ul>';
+            
+            tipsContent.innerHTML = `<div class=&quot;status-indicator ${statusClass}&quot;>${statusText}</div>${tips}`;
+        }
+        
+        // Event listeners for sliders
+        document.querySelectorAll('.slider').forEach(slider => {
+            slider.addEventListener('input', function() {
+                const category = this.dataset.category;
+                const value = parseInt(this.value);
+                
+                // Update percentage display
+                document.getElementById(`${category}-percentage`).textContent = `${value}%`;
+                
+                // Update data object
+                budgetData[category] = value;
+                
+                // Check if total exceeds 100%
+                const total = Object.values(budgetData).reduce((sum, val) => sum + val, 0);
+                if (total > 100) {
+                    // Adjust other categories proportionally
+                    const excess = total - 100;
+                    const categories = Object.keys(budgetData).filter(cat => cat !== category);
+                    
+                    // Distribute excess among other categories
+                    categories.forEach(cat => {
+                        if (budgetData[cat] > 5) { // Don't reduce below 5%
+                            const reduction = Math.ceil((budgetData[cat] / (total - budgetData[category])) * excess);
+                            const newValue = Math.max(5, budgetData[cat] - reduction);
+                            
+                            budgetData[cat] = newValue;
+                            document.getElementById(`${cat}-slider`).value = newValue;
+                            document.getElementById(`${cat}-percentage`).textContent = `${newValue}%`;
+                        }
+                    });
+                }
+                
+                // Update chart
+                updateChart();
+            });
+        });
+        
+        // Tab functionality
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                this.classList.add('active');
+                
+                // Hide all tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Show corresponding tab content
+                const tabId = this.dataset.tab;
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Initialize
+        updateChart();
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_kbdvzdfc';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_kbdvzdfc" style="width: 100%; height: 1028px; border: none;"></iframe>

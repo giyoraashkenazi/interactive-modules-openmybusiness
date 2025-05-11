@@ -1,0 +1,810 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Funding Mix Optimizer</title>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary: #10b981;
+            --bg-dark: #111827;
+            --bg-card: #1f2937;
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --border: #374151;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 16px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .description {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-size: 1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            position: relative;
+            white-space: nowrap;
+        }
+        
+        .tab.active {
+            color: var(--text-primary);
+        }
+        
+        .tab.active::after {
+            content: &quot;&quot;;
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background-color: var(--bg-card);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-title {
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-title svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .slider-container {
+            margin-bottom: 20px;
+        }
+        
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .slider-label {
+            font-weight: 500;
+        }
+        
+        .slider-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--border);
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 2px solid var(--bg-dark);
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 2px solid var(--bg-dark);
+        }
+        
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        .metric-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .recommendation {
+            border-left: 4px solid var(--secondary);
+            padding: 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 0 8px 8px 0;
+            margin-top: 24px;
+        }
+        
+        .recommendation-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--secondary);
+        }
+        
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .badge-default {
+            background-color: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+        }
+        
+        .badge-success {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--secondary);
+        }
+        
+        .badge-warning {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        
+        .text-sm {
+            font-size: 0.875rem;
+        }
+        
+        .btn {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .reset-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            margin-right: 8px;
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+        
+        .funding-allocation {
+            height: 24px;
+            width: 100%;
+            background-color: var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            margin-top: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .allocation-debt {
+            height: 100%;
+            background-color: #4f46e5;
+        }
+        
+        .allocation-equity {
+            height: 100%;
+            background-color: #10b981;
+        }
+        
+        .allocation-alternative {
+            height: 100%;
+            background-color: #f59e0b;
+        }
+        
+        .allocation-legend {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.875rem;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        @media (max-width: 600px) {
+            .metric-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .btn-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .reset-btn {
+                margin-right: 0;
+                margin-bottom: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>Funding Mix Optimizer</h1>
+            <p class=&quot;description&quot;>Balance debt, equity, and alternative funding sources to optimize your business metrics</p>
+        </header>
+        
+        <div class=&quot;tabs&quot;>
+            <button class=&quot;tab active&quot; data-tab=&quot;funding-mix&quot;>Funding Mix</button>
+            <button class=&quot;tab&quot; data-tab=&quot;metrics&quot;>Metrics Impact</button>
+            <button class=&quot;tab&quot; data-tab=&quot;recommendations&quot;>Recommendations</button>
+            <button class=&quot;tab&quot; data-tab=&quot;about&quot;>About</button>
+        </div>
+        
+        <div id=&quot;funding-mix&quot; class=&quot;tab-content active&quot;>
+            <div class=&quot;card&quot;>
+                <h2 class=&quot;card-title&quot;>
+                    <svg xmlns=&quot;http://www.w3.org/2000/svg&quot; fill=&quot;none&quot; viewBox=&quot;0 0 24 24&quot; stroke-width=&quot;1.5&quot; stroke=&quot;currentColor&quot;>
+                        <path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; d=&quot;M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z&quot; />
+                        <path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; d=&quot;M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z&quot; />
+                    </svg>
+                    Funding Allocation
+                </h2>
+                
+                <div class=&quot;funding-allocation&quot;>
+                    <div class=&quot;allocation-debt&quot; id=&quot;debt-visual&quot;></div>
+                    <div class=&quot;allocation-equity&quot; id=&quot;equity-visual&quot;></div>
+                    <div class=&quot;allocation-alternative&quot; id=&quot;alternative-visual&quot;></div>
+                </div>
+                
+                <div class=&quot;allocation-legend&quot;>
+                    <div class=&quot;legend-item&quot;>
+                        <div class=&quot;legend-color&quot; style=&quot;background-color: #4f46e5;&quot;></div>
+                        <span>Debt</span>
+                    </div>
+                    <div class=&quot;legend-item&quot;>
+                        <div class=&quot;legend-color&quot; style=&quot;background-color: #10b981;&quot;></div>
+                        <span>Equity</span>
+                    </div>
+                    <div class=&quot;legend-item&quot;>
+                        <div class=&quot;legend-color&quot; style=&quot;background-color: #f59e0b;&quot;></div>
+                        <span>Alternative</span>
+                    </div>
+                </div>
+                
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Debt Financing</span>
+                        <span class=&quot;slider-value&quot; id=&quot;debt-value&quot;>40%</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;100&quot; value=&quot;40&quot; class=&quot;slider&quot; id=&quot;debt-slider&quot;>
+                </div>
+                
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Equity Financing</span>
+                        <span class=&quot;slider-value&quot; id=&quot;equity-value&quot;>35%</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;100&quot; value=&quot;35&quot; class=&quot;slider&quot; id=&quot;equity-slider&quot;>
+                </div>
+                
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Alternative Funding</span>
+                        <span class=&quot;slider-value&quot; id=&quot;alternative-value&quot;>25%</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;100&quot; value=&quot;25&quot; class=&quot;slider&quot; id=&quot;alternative-slider&quot;>
+                </div>
+                
+                <div class=&quot;text-sm&quot; style=&quot;color: var(--text-secondary); margin-top: 8px;&quot;>
+                    Alternative funding includes grants, crowdfunding, and supplier financing.
+                </div>
+                
+                <div class=&quot;btn-group&quot;>
+                    <button class=&quot;btn reset-btn&quot; id=&quot;reset-btn&quot;>Reset Values</button>
+                    <button class=&quot;btn btn-primary&quot; id=&quot;calculate-btn&quot;>Calculate Impact</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;metrics&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <h2 class=&quot;card-title&quot;>
+                    <svg xmlns=&quot;http://www.w3.org/2000/svg&quot; fill=&quot;none&quot; viewBox=&quot;0 0 24 24&quot; stroke-width=&quot;1.5&quot; stroke=&quot;currentColor&quot;>
+                        <path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; d=&quot;M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z&quot; />
+                    </svg>
+                    Business Metrics
+                </h2>
+                
+                <div class=&quot;metric-grid&quot;>
+                    <div class=&quot;metric&quot;>
+                        <div class=&quot;metric-title&quot;>Control Retention</div>
+                        <div class=&quot;metric-value&quot; id=&quot;control-metric&quot;>72%</div>
+                    </div>
+                    <div class=&quot;metric&quot;>
+                        <div class=&quot;metric-title&quot;>Cost of Capital</div>
+                        <div class=&quot;metric-value&quot; id=&quot;cost-metric&quot;>9.4%</div>
+                    </div>
+                    <div class=&quot;metric&quot;>
+                        <div class=&quot;metric-title&quot;>Runway Length</div>
+                        <div class=&quot;metric-value&quot; id=&quot;runway-metric&quot;>18 mo</div>
+                    </div>
+                    <div class=&quot;metric&quot;>
+                        <div class=&quot;metric-title&quot;>Flexibility</div>
+                        <div class=&quot;metric-value&quot; id=&quot;flexibility-metric&quot;>65%</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;metric-grid&quot;>
+                    <div class=&quot;metric&quot;>
+                        <div class=&quot;metric-title&quot;>Risk Level</div>
+                        <div class=&quot;metric-value&quot; id=&quot;risk-metric&quot;>Medium</div>
+                    </div>
+                    <div class=&quot;metric&quot;>
+                        <div class=&quot;metric-title&quot;>Growth Potential</div>
+                        <div class=&quot;metric-value&quot; id=&quot;growth-metric&quot;>High</div>
+                    </div>
+                    <div class=&quot;metric&quot;>
+                        <div class=&quot;metric-title&quot;>Cash Flow Impact</div>
+                        <div class=&quot;metric-value&quot; id=&quot;cashflow-metric&quot;>-$8.2K/mo</div>
+                    </div>
+                    <div class=&quot;metric&quot;>
+                        <div class=&quot;metric-title&quot;>Investor Appeal</div>
+                        <div class=&quot;metric-value&quot; id=&quot;appeal-metric&quot;>7.5/10</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;recommendation&quot;>
+                    <h3 class=&quot;recommendation-title&quot;>Current Mix Assessment</h3>
+                    <p id=&quot;mix-assessment&quot;>Your current funding mix provides a balanced approach with moderate control retention and reasonable cost of capital. Consider increasing alternative funding sources to extend runway.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;recommendations&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <h2 class=&quot;card-title&quot;>
+                    <svg xmlns=&quot;http://www.w3.org/2000/svg&quot; fill=&quot;none&quot; viewBox=&quot;0 0 24 24&quot; stroke-width=&quot;1.5&quot; stroke=&quot;currentColor&quot;>
+                        <path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; d=&quot;M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z&quot; />
+                    </svg>
+                    Strategic Recommendations
+                </h2>
+                
+                <div>
+                    <div class=&quot;badge badge-default&quot;>Funding Structure</div>
+                    <div class=&quot;badge badge-success&quot;>Business Stage</div>
+                    <div class=&quot;badge badge-warning&quot;>Risk Assessment</div>
+                </div>
+                
+                <div id=&quot;recommendations-list&quot;>
+                    <div class=&quot;recommendation&quot; style=&quot;margin-top: 16px;&quot;>
+                        <h3 class=&quot;recommendation-title&quot;>Diversify Funding Sources</h3>
+                        <p>With your current allocation, consider exploring revenue-based financing options to complement your equity stake while maintaining control.</p>
+                    </div>
+                    
+                    <div class=&quot;recommendation&quot;>
+                        <h3 class=&quot;recommendation-title&quot;>Staged Equity Releases</h3>
+                        <p>Structure your equity investments in milestone-based tranches to maintain leverage with investors and protect dilution while extending runway.</p>
+                    </div>
+                    
+                    <div class=&quot;recommendation&quot;>
+                        <h3 class=&quot;recommendation-title&quot;>Alternative Funding Opportunities</h3>
+                        <p>Your business model appears suitable for industry-specific grants and strategic partnerships. Consider allocating resources to securing these non-dilutive funding sources.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;about&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <h2 class=&quot;card-title&quot;>
+                    <svg xmlns=&quot;http://www.w3.org/2000/svg&quot; fill=&quot;none&quot; viewBox=&quot;0 0 24 24&quot; stroke-width=&quot;1.5&quot; stroke=&quot;currentColor&quot;>
+                        <path stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot; d=&quot;M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z&quot; />
+                    </svg>
+                    About This Tool
+                </h2>
+                
+                <p>The Funding Mix Optimizer helps entrepreneurs and startups find the optimal balance between debt, equity, and alternative funding sources to maximize business outcomes.</p>
+                
+                <h3 style=&quot;margin-top: 20px; margin-bottom: 12px;&quot;>How It Works</h3>
+                <p>Adjust the sliders to change your funding allocation percentages. The tool calculates the impact on key business metrics in real-time and provides strategic recommendations based on your specific funding mix.</p>
+                
+                <h3 style=&quot;margin-top: 20px; margin-bottom: 12px;&quot;>Key Concepts</h3>
+                <ul style=&quot;padding-left: 20px; margin-top: 8px;&quot;>
+                    <li><strong>Debt Financing:</strong> Loans, credit lines, and other interest-bearing instruments</li>
+                    <li><strong>Equity Financing:</strong> Investment in exchange for ownership stakes</li>
+                    <li><strong>Alternative Funding:</strong> Grants, crowdfunding, supplier financing, etc.</li>
+                    <li><strong>Control Retention:</strong> Your ability to maintain decision-making authority</li>
+                    <li><strong>Runway Length:</strong> How long your business can operate before needing additional funds</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Deactivate all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Activate clicked tab
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Sliders
+        const debtSlider = document.getElementById('debt-slider');
+        const equitySlider = document.getElementById('equity-slider');
+        const alternativeSlider = document.getElementById('alternative-slider');
+        
+        const debtValue = document.getElementById('debt-value');
+        const equityValue = document.getElementById('equity-value');
+        const alternativeValue = document.getElementById('alternative-value');
+        
+        const debtVisual = document.getElementById('debt-visual');
+        const equityVisual = document.getElementById('equity-visual');
+        const alternativeVisual = document.getElementById('alternative-visual');
+        
+        // Metrics elements
+        const controlMetric = document.getElementById('control-metric');
+        const costMetric = document.getElementById('cost-metric');
+        const runwayMetric = document.getElementById('runway-metric');
+        const flexibilityMetric = document.getElementById('flexibility-metric');
+        const riskMetric = document.getElementById('risk-metric');
+        const growthMetric = document.getElementById('growth-metric');
+        const cashflowMetric = document.getElementById('cashflow-metric');
+        const appealMetric = document.getElementById('appeal-metric');
+        const mixAssessment = document.getElementById('mix-assessment');
+        
+        // Function to adjust sliders to maintain total of 100%
+        function adjustSliders(changedSlider) {
+            let debt = parseInt(debtSlider.value);
+            let equity = parseInt(equitySlider.value);
+            let alternative = parseInt(alternativeSlider.value);
+            
+            const total = debt + equity + alternative;
+            
+            if (total !== 100) {
+                if (changedSlider !== 'debt') {
+                    // Calculate the new value to make the total 100
+                    const newValue = 100 - equity - alternative;
+                    debtSlider.value = Math.max(0, Math.min(100, newValue));
+                    debt = parseInt(debtSlider.value);
+                } else if (changedSlider !== 'equity') {
+                    const newValue = 100 - debt - alternative;
+                    equitySlider.value = Math.max(0, Math.min(100, newValue));
+                    equity = parseInt(equitySlider.value);
+                } else if (changedSlider !== 'alternative') {
+                    const newValue = 100 - debt - equity;
+                    alternativeSlider.value = Math.max(0, Math.min(100, newValue));
+                    alternative = parseInt(alternativeSlider.value);
+                }
+            }
+            
+            // Update displayed values
+            debtValue.textContent = `${debt}%`;
+            equityValue.textContent = `${equity}%`;
+            alternativeValue.textContent = `${alternative}%`;
+            
+            // Update visualization
+            debtVisual.style.width = `${debt}%`;
+            equityVisual.style.width = `${equity}%`;
+            alternativeVisual.style.width = `${alternative}%`;
+            
+            // Calculate metrics
+            calculateMetrics(debt, equity, alternative);
+        }
+        
+        // Calculate metrics based on funding mix
+        function calculateMetrics(debt, equity, alternative) {
+            // Control retention (inverse to equity percentage)
+            const control = 100 - (equity * 0.8);
+            controlMetric.textContent = `${Math.round(control)}%`;
+            
+            // Cost of capital
+            // Higher debt = lower cost, higher equity = higher cost
+            const cost = (debt * 0.07 + equity * 0.15 + alternative * 0.05) / 100;
+            costMetric.textContent = `${cost.toFixed(1)}%`;
+            
+            // Runway length
+            // More equity and alternative typically means longer runway
+            const runwayMonths = Math.round(12 + (equity * 0.15) + (alternative * 0.2));
+            runwayMetric.textContent = `${runwayMonths} mo`;
+            
+            // Flexibility
+            // More alternative and less debt means more flexibility
+            const flexibility = Math.round(50 + alternative * 0.8 - debt * 0.3);
+            flexibilityMetric.textContent = `${Math.max(0, Math.min(100, flexibility))}%`;
+            
+            // Risk level
+            const riskScore = debt * 0.8 - alternative * 0.5;
+            let riskText = &quot;Medium&quot;;
+            if (riskScore > 40) riskText = &quot;High&quot;;
+            if (riskScore < 10) riskText = &quot;Low&quot;;
+            riskMetric.textContent = riskText;
+            
+            // Growth potential
+            const growthScore = equity * 0.8 + alternative * 0.4 - debt * 0.3;
+            let growthText = &quot;Medium&quot;;
+            if (growthScore > 40) growthText = &quot;High&quot;;
+            if (growthScore < 15) growthText = &quot;Low&quot;;
+            growthMetric.textContent = growthText;
+            
+            // Cash flow impact
+            const cashFlow = -((debt * 100) + (equity * 20)) / 12;
+            cashflowMetric.textContent = `$${cashFlow.toFixed(1)}K/mo`;
+            
+            // Investor appeal
+            const appeal = (equity * 0.05 + alternative * 0.03 + (100-debt) * 0.03);
+            appealMetric.textContent = `${Math.min(10, (appeal/10).toFixed(1))}/10`;
+            
+            // Mix assessment
+            updateAssessment(debt, equity, alternative);
+            
+            // Update recommendations
+            updateRecommendations(debt, equity, alternative);
+        }
+        
+        // Update the mix assessment text
+        function updateAssessment(debt, equity, alternative) {
+            let assessment = &quot;&quot;;
+            
+            if (debt > 60) {
+                assessment = &quot;Your funding mix is heavily debt-focused. This maximizes control but creates cash flow pressure and may limit flexibility for pivots or expansion.&quot;;
+            } else if (equity > 60) {
+                assessment = &quot;Your high equity allocation provides strong runway and growth potential, but significantly dilutes your control. Consider balancing with alternative funding sources.&quot;;
+            } else if (alternative > 50) {
+                assessment = &quot;Your alternative-heavy approach offers excellent flexibility and control retention, but may not provide sufficient capital for rapid scaling.&quot;;
+            } else if (debt >= 30 &amp;&amp; equity >= 30 &amp;&amp; alternative >= 20) {
+                assessment = &quot;Your balanced funding approach provides good compromise between control, cost, and flexibility. This diversified strategy reduces overall risk.&quot;;
+            } else {
+                assessment = &quot;Your current funding mix is somewhat unbalanced. Consider adjusting toward a more diversified approach for better risk management.&quot;;
+            }
+            
+            mixAssessment.textContent = assessment;
+        }
+        
+        // Update recommendations based on funding mix
+        function updateRecommendations(debt, equity, alternative) {
+            const recommendationsList = document.getElementById('recommendations-list');
+            recommendationsList.innerHTML = '';
+            
+            let recommendations = [];
+            
+            if (debt > 50) {
+                recommendations.push({
+                    title: &quot;Debt Restructuring Opportunity&quot;,
+                    content: &quot;With your high debt allocation, explore refinancing options to reduce interest burden and negotiate longer repayment terms to improve cash flow.&quot;
+                });
+            }
+            
+            if (equity > 50) {
+                recommendations.push({
+                    title: &quot;Staged Equity Releases&quot;,
+                    content: &quot;Structure your equity investments in milestone-based tranches to maintain leverage with investors and protect against excessive dilution.&quot;
+                });
+            }
+            
+            if (alternative < 20) {
+                recommendations.push({
+                    title: &quot;Expand Alternative Funding&quot;,
+                    content: &quot;Your alternative funding allocation is low. Research industry-specific grants, strategic partnerships, and revenue-based financing to reduce reliance on traditional sources.&quot;
+                });
+            }
+            
+            if (debt < 20 &amp;&amp; equity < 40) {
+                recommendations.push({
+                    title: &quot;Consider Strategic Debt&quot;,
+                    content: &quot;Your low debt allocation suggests an opportunity to leverage favorable interest rates with targeted debt instruments for specific assets or inventory.&quot;
+                });
+            }
+            
+            if (debt >= 30 &amp;&amp; equity >= 30 &amp;&amp; alternative >= 20) {
+                recommendations.push({
+                    title: &quot;Maintain Balanced Approach&quot;,
+                    content: &quot;Your diversified funding strategy balances risk effectively. Focus on optimizing terms within each category rather than major reallocation.&quot;
+                });
+            }
+            
+            // Always include this recommendation
+            recommendations.push({
+                title: &quot;Risk Mitigation Planning&quot;,
+                content: &quot;Implement sensitivity testing for your financial forecasts and create contingency funding plans for different scenarios.&quot;
+            });
+            
+            // Limit to 3 recommendations
+            recommendations = recommendations.slice(0, 3);
+            
+            // Create recommendation elements
+            recommendations.forEach(rec => {
+                const recDiv = document.createElement('div');
+                recDiv.className = 'recommendation';
+                recDiv.style.marginTop = '16px';
+                
+                const title = document.createElement('h3');
+                title.className = 'recommendation-title';
+                title.textContent = rec.title;
+                
+                const content = document.createElement('p');
+                content.textContent = rec.content;
+                
+                recDiv.appendChild(title);
+                recDiv.appendChild(content);
+                recommendationsList.appendChild(recDiv);
+            });
+        }
+        
+        // Event listeners for sliders
+        debtSlider.addEventListener('input', () => adjustSliders('debt'));
+        equitySlider.addEventListener('input', () => adjustSliders('equity'));
+        alternativeSlider.addEventListener('input', () => adjustSliders('alternative'));
+        
+        // Reset button
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            debtSlider.value = 40;
+            equitySlider.value = 35;
+            alternativeSlider.value = 25;
+            adjustSliders();
+        });
+        
+        // Calculate button - switch to metrics tab
+        document.getElementById('calculate-btn').addEventListener('click', () => {
+            // Find the metrics tab and click it
+            document.querySelector('.tab[data-tab=&quot;metrics&quot;]').click();
+        });
+        
+        // Initialize with default values
+        adjustSliders();
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_xolny1ya';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_xolny1ya" style="width: 100%; height: 856px; border: none;"></iframe>

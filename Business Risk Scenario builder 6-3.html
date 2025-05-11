@@ -1,0 +1,733 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Business Risk Scenario Analyzer</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: #121212;
+            color: #f5f5f5;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        
+        .description {
+            font-size: 0.9rem;
+            color: #bbbbbb;
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            border-bottom: 1px solid #333;
+        }
+        
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab {
+            padding: 12px 16px;
+            cursor: pointer;
+            background-color: transparent;
+            color: #999;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            color: #fff;
+            border-bottom: 3px solid #4a8cff;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .scenario-card {
+            background-color: #1e1e1e;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .scenario-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .scenario-description {
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .option {
+            background-color: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .option:hover {
+            background-color: #333;
+        }
+        
+        .option.selected {
+            background-color: #1a3a5f;
+            border-color: #4a8cff;
+        }
+        
+        .option.correct {
+            background-color: rgba(39, 174, 96, 0.3);
+            border-color: #27ae60;
+        }
+        
+        .option.incorrect {
+            background-color: rgba(231, 76, 60, 0.3);
+            border-color: #e74c3c;
+        }
+        
+        .feedback {
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+            font-size: 0.9rem;
+        }
+        
+        .feedback.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .progress-container {
+            margin: 30px 0 20px;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            color: #aaa;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #2a2a2a;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #4a8cff;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+        
+        button {
+            background-color: #4a8cff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        button:disabled {
+            background-color: #333;
+            color: #777;
+            cursor: not-allowed;
+        }
+        
+        button:not(:disabled):hover {
+            background-color: #3a7ced;
+        }
+        
+        .results-container {
+            text-align: center;
+            display: none;
+        }
+        
+        .results-container.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .results-score {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+            color: #4a8cff;
+        }
+        
+        .results-message {
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px 0;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .description {
+                font-size: 0.85rem;
+            }
+            
+            .tab {
+                padding: 10px 14px;
+                font-size: 0.8rem;
+            }
+            
+            .scenario-title {
+                font-size: 1rem;
+            }
+            
+            .scenario-description, .option, .feedback {
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>Business Risk Scenario Analyzer</h1>
+            <p class=&quot;description&quot;>Interactive scenarios presenting common food business risks where you must identify appropriate legal protections and insurance coverage needed for each situation.</p>
+        </header>
+        
+        <div class=&quot;tabs&quot;>
+            <button class=&quot;tab active&quot; data-tab=&quot;contracts&quot;>Employment Contracts</button>
+            <button class=&quot;tab&quot; data-tab=&quot;suppliers&quot;>Supplier Agreements</button>
+            <button class=&quot;tab&quot; data-tab=&quot;insurance&quot;>Insurance Coverage</button>
+            <button class=&quot;tab&quot; data-tab=&quot;ai&quot;>AI Tools</button>
+        </div>
+        
+        <div class=&quot;tab-content active&quot; id=&quot;contracts&quot;>
+            <div class=&quot;scenario-container&quot;></div>
+        </div>
+        
+        <div class=&quot;tab-content&quot; id=&quot;suppliers&quot;>
+            <div class=&quot;scenario-container&quot;></div>
+        </div>
+        
+        <div class=&quot;tab-content&quot; id=&quot;insurance&quot;>
+            <div class=&quot;scenario-container&quot;></div>
+        </div>
+        
+        <div class=&quot;tab-content&quot; id=&quot;ai&quot;>
+            <div class=&quot;scenario-container&quot;></div>
+        </div>
+        
+        <div class=&quot;progress-container&quot;>
+            <div class=&quot;progress-text&quot;>
+                <span class=&quot;progress-current&quot;>Scenario 1 of 3</span>
+                <span class=&quot;progress-percentage&quot;>0% complete</span>
+            </div>
+            <div class=&quot;progress-bar&quot;>
+                <div class=&quot;progress-fill&quot;></div>
+            </div>
+        </div>
+        
+        <div class=&quot;btn-container&quot;>
+            <button id=&quot;prev-btn&quot; disabled>Previous</button>
+            <button id=&quot;next-btn&quot; disabled>Next</button>
+        </div>
+        
+        <div class=&quot;results-container&quot;>
+            <h2>Your Results</h2>
+            <div class=&quot;results-score&quot;>0/0</div>
+            <p class=&quot;results-message&quot;>You've completed all scenarios!</p>
+            <button id=&quot;restart-btn&quot;>Start Again</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab Switching
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and tab contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to current tab and tab content
+                    tab.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                    
+                    // Reset scenarios for the new tab
+                    currentScenarioIndex = 0;
+                    loadScenario();
+                    updateProgressBar();
+                });
+            });
+            
+            // Scenarios Data
+            const scenarios = {
+                contracts: [
+                    {
+                        title: &quot;The Verbal Agreement Issue&quot;,
+                        description: &quot;Your head chef joined your restaurant six months ago with only a verbal agreement about salary and duties. Now he's demanding a raise, claiming you promised it during the interview, which you don't recall. What could have prevented this dispute?&quot;,
+                        options: [
+                            &quot;A handshake agreement with a witness present&quot;,
+                            &quot;A written employment contract specifying compensation terms and review periods&quot;,
+                            &quot;A verbal recording of the interview&quot;,
+                            &quot;A trial period before full employment&quot;
+                        ],
+                        correctIndex: 1,
+                        feedback: &quot;A written employment contract is essential as it clearly defines duties, compensation, raise schedules, and other terms, preventing disputes over verbal promises that are difficult to prove.&quot;
+                    },
+                    {
+                        title: &quot;The Recipe Theft Problem&quot;,
+                        description: &quot;After working at your bakery for two years, your pastry chef quits and opens a competing shop using your signature recipes. You're upset but unsure if you have any recourse. What legal protection should have been in place?&quot;,
+                        options: [
+                            &quot;A non-compete agreement only&quot;,
+                            &quot;A copyright registration for your recipes&quot;,
+                            &quot;An employment contract with confidentiality and intellectual property clauses&quot;,
+                            &quot;A trademark for your bakery name&quot;
+                        ],
+                        correctIndex: 2,
+                        feedback: &quot;An employment contract with confidentiality and IP clauses would establish that recipes developed during employment belong to the business and cannot be used by employees after leaving.&quot;
+                    },
+                    {
+                        title: &quot;The Wrongful Termination Claim&quot;,
+                        description: &quot;You fired a server for repeatedly arriving late, but now they're threatening a wrongful termination lawsuit, claiming their lateness was due to a medical condition they never disclosed. What would best protect your business?&quot;,
+                        options: [
+                            &quot;Having fired them on the spot without documentation&quot;,
+                            &quot;A clear employment contract with attendance policies and termination clauses&quot;,
+                            &quot;Paying them severance even though it wasn't required&quot;,
+                            &quot;Hiring only part-time employees&quot;
+                        ],
+                        correctIndex: 1,
+                        feedback: &quot;A clear employment contract that outlines attendance expectations, disciplinary procedures, and grounds for termination provides legal protection when terminating employees for policy violations.&quot;
+                    }
+                ],
+                suppliers: [
+                    {
+                        title: &quot;The Spoiled Delivery&quot;,
+                        description: &quot;Your restaurant received a seafood delivery that was partially spoiled, but the supplier refuses a refund, saying their responsibility ended when the delivery truck left their facility. What agreement would have prevented this?&quot;,
+                        options: [
+                            &quot;A handshake deal with the delivery driver&quot;,
+                            &quot;A verbal agreement with the supplier&quot;,
+                            &quot;A written supplier agreement with quality specifications and rejection rights&quot;,
+                            &quot;A payment-after-inspection policy&quot;
+                        ],
+                        correctIndex: 2,
+                        feedback: &quot;A written supplier agreement should specify quality standards, delivery conditions, inspection rights, and remedies for substandard goods, including refund or replacement policies.&quot;
+                    },
+                    {
+                        title: &quot;The Price Increase Surprise&quot;,
+                        description: &quot;Your key ingredient supplier suddenly increases prices by 40% without warning, claiming market fluctuations. Your profit margins can't absorb this increase, but you need the ingredients for tomorrow's service. What would have helped?&quot;,
+                        options: [
+                            &quot;Having multiple suppliers for all ingredients&quot;,
+                            &quot;A supplier agreement with price stability clauses and notice periods for increases&quot;,
+                            &quot;Paying suppliers in advance for better rates&quot;,
+                            &quot;Changing your menu every week&quot;
+                        ],
+                        correctIndex: 1,
+                        feedback: &quot;A proper supplier agreement would include pricing terms, caps on increases, required notice periods before price changes, and possibly price lock guarantees for specific time periods.&quot;
+                    },
+                    {
+                        title: &quot;The Delayed Delivery Crisis&quot;,
+                        description: &quot;Your supplier is consistently late with deliveries, causing inventory problems and customer disappointment. When confronted, they say delivery timing was never specified. What's the best solution to this issue?&quot;,
+                        options: [
+                            &quot;Ordering earlier than needed&quot;,
+                            &quot;Threatening to leave negative reviews&quot;,
+                            &quot;A supplier agreement with specific delivery windows and penalties for late deliveries&quot;,
+                            &quot;Paying extra for priority service&quot;
+                        ],
+                        correctIndex: 2,
+                        feedback: &quot;A comprehensive supplier agreement should include specific delivery schedules, acceptable delivery windows, and consequences for late deliveries such as discounts or penalty fees.&quot;
+                    }
+                ],
+                insurance: [
+                    {
+                        title: &quot;The Food Poisoning Incident&quot;,
+                        description: &quot;A customer claims they got food poisoning from your restaurant and is threatening to sue for $50,000 in medical expenses and lost wages. Which insurance coverage is critical in this situation?&quot;,
+                        options: [
+                            &quot;Property insurance&quot;,
+                            &quot;Workers' compensation insurance&quot;,
+                            &quot;General liability insurance with product liability coverage&quot;,
+                            &quot;Business interruption insurance&quot;
+                        ],
+                        correctIndex: 2,
+                        feedback: &quot;General liability insurance with product liability coverage protects against claims of bodily injury from your food products, including food poisoning claims, covering legal fees, settlements, and medical expenses.&quot;
+                    },
+                    {
+                        title: &quot;The Kitchen Fire Disaster&quot;,
+                        description: &quot;A small grease fire damages your kitchen equipment and forces you to close for three weeks for repairs. Which combination of insurance policies would provide the most comprehensive protection?&quot;,
+                        options: [
+                            &quot;General liability insurance only&quot;,
+                            &quot;Property insurance only&quot;,
+                            &quot;Property insurance and business interruption insurance&quot;,
+                            &quot;Workers' compensation and liability insurance&quot;
+                        ],
+                        correctIndex: 2,
+                        feedback: &quot;Property insurance covers the physical damage to equipment and facilities, while business interruption insurance replaces lost income during the closure period, paying for ongoing expenses like rent and staff wages.&quot;
+                    },
+                    {
+                        title: &quot;The Delivery Driver Accident&quot;,
+                        description: &quot;Your delivery driver gets into an accident while delivering food, injuring both themselves and the other driver. Which insurance coverage is most important in this scenario?&quot;,
+                        options: [
+                            &quot;Personal auto insurance of the driver&quot;,
+                            &quot;Commercial auto insurance and workers' compensation&quot;,
+                            &quot;General liability insurance only&quot;,
+                            &quot;Property insurance&quot;
+                        ],
+                        correctIndex: 1,
+                        feedback: &quot;Commercial auto insurance covers the vehicle and liability for the other driver's injuries, while workers' compensation covers your employee's medical expenses and lost wages from their injuries.&quot;
+                    }
+                ],
+                ai: [
+                    {
+                        title: &quot;The Compliance Challenge&quot;,
+                        description: &quot;Your restaurant is expanding to three new states, each with different employment laws. You need to create compliant contracts quickly without spending thousands on legal fees. Which AI solution would help most?&quot;,
+                        options: [
+                            &quot;AI-powered translation tool&quot;,
+                            &quot;AI contract review and template generation system&quot;,
+                            &quot;AI customer service chatbot&quot;,
+                            &quot;AI inventory management system&quot;
+                        ],
+                        correctIndex: 1,
+                        feedback: &quot;An AI contract review and template generation system can create jurisdiction-specific employment contracts that comply with state-specific requirements while flagging potential compliance issues.&quot;
+                    },
+                    {
+                        title: &quot;The Insurance Cost Problem&quot;,
+                        description: &quot;You've received quotes from five different insurance providers with varying coverage limits, deductibles, and exclusions. It's overwhelming to compare them all. Which AI tool would be most helpful?&quot;,
+                        options: [
+                            &quot;AI-powered social media manager&quot;,
+                            &quot;AI recipe developer&quot;,
+                            &quot;AI policy comparison and recommendation engine&quot;,
+                            &quot;AI customer feedback analyzer&quot;
+                        ],
+                        correctIndex: 2,
+                        feedback: &quot;An AI policy comparison tool can analyze multiple insurance quotes simultaneously, highlighting differences in coverage, identifying gaps, and recommending the most cost-effective options for your specific business risks.&quot;
+                    },
+                    {
+                        title: &quot;The Legal Question Overflow&quot;,
+                        description: &quot;Your managers frequently have basic legal questions about employee rights, service refusals, and health code compliance that require quick answers. Which AI solution would be most efficient?&quot;,
+                        options: [
+                            &quot;AI-powered reservation system&quot;,
+                            &quot;AI legal research database&quot;,
+                            &quot;AI menu optimization tool&quot;,
+                            &quot;AI legal chatbot with jurisdiction-specific knowledge&quot;
+                        ],
+                        correctIndex: 3,
+                        feedback: &quot;An AI legal chatbot can provide immediate, accurate responses to routine legal questions based on your location's laws, saving time and reducing the need for frequent attorney consultations for basic questions.&quot;
+                    }
+                ]
+            };
+            
+            // Variables
+            let currentTab = 'contracts';
+            let currentScenarioIndex = 0;
+            let userScore = 0;
+            let answeredScenarios = 0;
+            let selectedOption = null;
+            
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            const restartBtn = document.getElementById('restart-btn');
+            
+            // Initial load
+            loadScenario();
+            updateProgressBar();
+            
+            // Event Listeners
+            prevBtn.addEventListener('click', goToPreviousScenario);
+            nextBtn.addEventListener('click', goToNextScenario);
+            restartBtn.addEventListener('click', restartQuiz);
+            
+            // Functions
+            function loadScenario() {
+                const activeTab = document.querySelector('.tab.active').getAttribute('data-tab');
+                currentTab = activeTab;
+                const currentScenarios = scenarios[currentTab];
+                
+                // Hide results container if visible
+                document.querySelector('.results-container').classList.remove('show');
+                
+                // If we've gone through all scenarios, show results
+                if (currentScenarioIndex >= currentScenarios.length) {
+                    showResults();
+                    return;
+                }
+                
+                const scenario = currentScenarios[currentScenarioIndex];
+                const scenarioContainer = document.querySelector(`#${currentTab} .scenario-container`);
+                
+                // Clear previous scenario
+                scenarioContainer.innerHTML = '';
+                
+                // Create new scenario card
+                const scenarioCard = document.createElement('div');
+                scenarioCard.className = 'scenario-card';
+                
+                scenarioCard.innerHTML = `
+                    <h2 class=&quot;scenario-title&quot;>${scenario.title}</h2>
+                    <p class=&quot;scenario-description&quot;>${scenario.description}</p>
+                    <div class=&quot;options&quot;>
+                        ${scenario.options.map((option, index) => `
+                            <div class=&quot;option&quot; data-index=&quot;${index}&quot;>${option}</div>
+                        `).join('')}
+                    </div>
+                    <div class=&quot;feedback&quot;>${scenario.feedback}</div>
+                `;
+                
+                scenarioContainer.appendChild(scenarioCard);
+                
+                // Add click handlers to options
+                const options = scenarioCard.querySelectorAll('.option');
+                options.forEach(option => {
+                    option.addEventListener('click', () => selectOption(option));
+                });
+                
+                // Update buttons
+                updateButtons();
+            }
+            
+            function selectOption(optionElement) {
+                const activeTab = document.querySelector('.tab.active').getAttribute('data-tab');
+                const currentScenarios = scenarios[activeTab];
+                const scenario = currentScenarios[currentScenarioIndex];
+                
+                // Get all options and remove selected class
+                const options = document.querySelectorAll('.option');
+                options.forEach(opt => opt.classList.remove('selected', 'correct', 'incorrect'));
+                
+                // Add selected class to clicked option
+                optionElement.classList.add('selected');
+                
+                // Store the selected option index
+                selectedOption = parseInt(optionElement.getAttribute('data-index'));
+                
+                // Show correct/incorrect indicators
+                const correctIndex = scenario.correctIndex;
+                options[correctIndex].classList.add('correct');
+                
+                if (selectedOption !== correctIndex) {
+                    optionElement.classList.add('incorrect');
+                }
+                
+                // Show feedback
+                const feedback = document.querySelector('.feedback');
+                feedback.classList.add('show');
+                
+                // Enable next button
+                nextBtn.disabled = false;
+            }
+            
+            function goToPreviousScenario() {
+                if (currentScenarioIndex > 0) {
+                    currentScenarioIndex--;
+                    loadScenario();
+                    updateProgressBar();
+                }
+            }
+            
+            function goToNextScenario() {
+                const activeTab = document.querySelector('.tab.active').getAttribute('data-tab');
+                const currentScenarios = scenarios[activeTab];
+                
+                // If this scenario hasn't been counted yet
+                if (selectedOption !== null) {
+                    answeredScenarios++;
+                    
+                    // Check if the answer was correct
+                    if (selectedOption === currentScenarios[currentScenarioIndex].correctIndex) {
+                        userScore++;
+                    }
+                    
+                    selectedOption = null;
+                }
+                
+                currentScenarioIndex++;
+                loadScenario();
+                updateProgressBar();
+            }
+            
+            function updateProgressBar() {
+                const activeTab = document.querySelector('.tab.active').getAttribute('data-tab');
+                const totalScenarios = scenarios[activeTab].length;
+                const progressPercent = totalScenarios > 0 ? (currentScenarioIndex / totalScenarios) * 100 : 0;
+                
+                document.querySelector('.progress-fill').style.width = `${progressPercent}%`;
+                document.querySelector('.progress-current').textContent = `Scenario ${Math.min(currentScenarioIndex + 1, totalScenarios)} of ${totalScenarios}`;
+                document.querySelector('.progress-percentage').textContent = `${Math.round(progressPercent)}% complete`;
+                
+                // Update buttons
+                updateButtons();
+            }
+            
+            function updateButtons() {
+                const activeTab = document.querySelector('.tab.active').getAttribute('data-tab');
+                const totalScenarios = scenarios[activeTab].length;
+                
+                // Previous button
+                prevBtn.disabled = currentScenarioIndex === 0;
+                
+                // Next button - disabled until an option is selected, or we're at the end
+                if (currentScenarioIndex >= totalScenarios) {
+                    nextBtn.disabled = true;
+                } else {
+                    // Disable next until an option is selected
+                    nextBtn.disabled = selectedOption === null;
+                }
+            }
+            
+            function showResults() {
+                const totalScenarios = Object.values(scenarios).flat().length; // All scenarios from all tabs
+                const resultsContainer = document.querySelector('.results-container');
+                const scenarioContainers = document.querySelectorAll('.scenario-container');
+                
+                // Hide scenario containers
+                scenarioContainers.forEach(container => {
+                    container.style.display = 'none';
+                });
+                
+                // Update score display
+                document.querySelector('.results-score').textContent = `${userScore}/${answeredScenarios}`;
+                
+                // Show results container
+                resultsContainer.classList.add('show');
+                
+                // Hide progress and buttons
+                document.querySelector('.progress-container').style.display = 'none';
+                document.querySelector('.btn-container').style.display = 'none';
+            }
+            
+            function restartQuiz() {
+                // Reset variables
+                currentScenarioIndex = 0;
+                userScore = 0;
+                answeredScenarios = 0;
+                selectedOption = null;
+                
+                // Show scenario containers
+                const scenarioContainers = document.querySelectorAll('.scenario-container');
+                scenarioContainers.forEach(container => {
+                    container.style.display = 'block';
+                });
+                
+                // Show progress and buttons
+                document.querySelector('.progress-container').style.display = 'block';
+                document.querySelector('.btn-container').style.display = 'flex';
+                
+                // Load first scenario
+                loadScenario();
+                updateProgressBar();
+            }
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_q0grlvci';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_q0grlvci" style="width: 100%; height: 510px; border: none;"></iframe>

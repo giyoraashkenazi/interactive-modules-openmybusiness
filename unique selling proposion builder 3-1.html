@@ -1,0 +1,675 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>USP Builder Tool</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-light: #8174e8;
+            --secondary: #2ecc71;
+            --dark: #1a1a2e;
+            --darker: #16161d;
+            --light: #e1e1e6;
+            --gray: #2d3748;
+            --gray-light: #4a5568;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 2rem 1rem;
+            background-color: var(--dark);
+            border-radius: var(--border-radius);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        
+        .description {
+            font-size: 1rem;
+            color: var(--light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .tab-button {
+            background-color: var(--gray);
+            color: var(--light);
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .tab-button.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tab-button:hover:not(.active) {
+            background-color: var(--gray-light);
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: var(--dark);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        h2 {
+            margin-bottom: 1rem;
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--gray);
+            border: 1px solid var(--gray-light);
+            border-radius: var(--border-radius);
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+        }
+        
+        select {
+            appearance: none;
+            background-image: url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23e1e1e6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E&quot;);
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+        
+        .button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: inline-block;
+        }
+        
+        .button:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        .preview-section {
+            background-color: var(--dark);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+        
+        .preview-container {
+            background-color: var(--gray);
+            padding: 24px;
+            border-radius: var(--border-radius);
+            margin-top: 1rem;
+            min-height: 100px;
+        }
+        
+        .usp-preview {
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+        
+        .card {
+            background-color: var(--gray);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        
+        ul, ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-text {
+            font-size: 0.9rem;
+            color: #a0aec0;
+            margin-top: 0.5rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .secondary-button {
+            background-color: var(--gray);
+            color: white;
+            border: 1px solid var(--gray-light);
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .secondary-button:hover {
+            background-color: var(--gray-light);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--secondary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+            
+            .tab-button {
+                padding: 10px 15px;
+                min-width: 100px;
+                font-size: 0.9rem;
+            }
+            
+            .tabs {
+                gap: 3px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .tab-button {
+                flex: 0 0 auto;
+                min-width: 90px;
+                font-size: 0.85rem;
+                padding: 8px 12px;
+            }
+            
+            .tabs {
+                justify-content: flex-start;
+                padding-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>USP Builder Tool</h1>
+            <p class=&quot;description&quot;>Create a powerful Unique Selling Proposition for your food business by filling in the key components below.</p>
+        </header>
+        
+        <div class=&quot;tabs&quot;>
+            <button class=&quot;tab-button active&quot; data-tab=&quot;target-market&quot;>Target Market</button>
+            <button class=&quot;tab-button&quot; data-tab=&quot;strengths&quot;>Your Strengths</button>
+            <button class=&quot;tab-button&quot; data-tab=&quot;competition&quot;>Competition</button>
+            <button class=&quot;tab-button&quot; data-tab=&quot;usp-builder&quot;>USP Builder</button>
+        </div>
+        
+        <div id=&quot;target-market&quot; class=&quot;tab-content active&quot;>
+            <h2>Understanding Your Target Market</h2>
+            <p>Before creating your USP, identify who your ideal customers are.</p>
+            
+            <div class=&quot;form-group&quot;>
+                <label for=&quot;primary-demographic&quot;>Primary Demographic</label>
+                <select id=&quot;primary-demographic&quot; onchange=&quot;updateUSP()&quot;>
+                    <option value=&quot;&quot;>Select a demographic</option>
+                    <option value=&quot;busy professionals&quot;>Busy Professionals</option>
+                    <option value=&quot;health-conscious families&quot;>Health-Conscious Families</option>
+                    <option value=&quot;fitness enthusiasts&quot;>Fitness Enthusiasts</option>
+                    <option value=&quot;food lovers&quot;>Food Lovers/Foodies</option>
+                    <option value=&quot;budget-conscious shoppers&quot;>Budget-Conscious Shoppers</option>
+                    <option value=&quot;dietary restricted individuals&quot;>Dietary Restricted Individuals</option>
+                    <option value=&quot;eco-conscious consumers&quot;>Eco-Conscious Consumers</option>
+                    <option value=&quot;elderly&quot;>Elderly</option>
+                    <option value=&quot;students&quot;>Students</option>
+                    <option value=&quot;children&quot;>Children</option>
+                    <option value=&quot;custom&quot;>Other (Custom)</option>
+                </select>
+            </div>
+            
+            <div class=&quot;form-group&quot; id=&quot;custom-demographic-group&quot; style=&quot;display: none;&quot;>
+                <label for=&quot;custom-demographic&quot;>Custom Demographic</label>
+                <input type=&quot;text&quot; id=&quot;custom-demographic&quot; placeholder=&quot;Describe your target demographic&quot; onchange=&quot;updateUSP()&quot;>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label for=&quot;customer-needs&quot;>What are their primary needs?</label>
+                <textarea id=&quot;customer-needs&quot; rows=&quot;3&quot; placeholder=&quot;e.g., convenience, health benefits, unique flavors, etc.&quot; onchange=&quot;updateUSP()&quot;></textarea>
+            </div>
+            
+            <div class=&quot;card&quot;>
+                <h3 class=&quot;card-title&quot;>Why This Matters</h3>
+                <p>Understanding your target market helps you tailor your USP to resonate with them effectively. Your USP should directly address their specific needs, preferences, and pain points.</p>
+            </div>
+            
+            <button class=&quot;button&quot; onclick=&quot;nextTab('strengths')&quot;>Next: Your Strengths</button>
+        </div>
+        
+        <div id=&quot;strengths&quot; class=&quot;tab-content&quot;>
+            <h2>Identifying Your Strengths</h2>
+            <p>What makes your food business special? Select your top strengths below.</p>
+            
+            <div class=&quot;form-group&quot;>
+                <label>Select your top strengths (choose up to 3)</label>
+                <div>
+                    <input type=&quot;checkbox&quot; id=&quot;quality&quot; name=&quot;strengths&quot; value=&quot;high-quality ingredients&quot; onchange=&quot;updateUSP(); checkLimits(this)&quot;>
+                    <label for=&quot;quality&quot; style=&quot;display: inline;&quot;>High-quality ingredients</label>
+                </div>
+                <div>
+                    <input type=&quot;checkbox&quot; id=&quot;innovative&quot; name=&quot;strengths&quot; value=&quot;innovative recipes&quot; onchange=&quot;updateUSP(); checkLimits(this)&quot;>
+                    <label for=&quot;innovative&quot; style=&quot;display: inline;&quot;>Innovative recipes</label>
+                </div>
+                <div>
+                    <input type=&quot;checkbox&quot; id=&quot;service&quot; name=&quot;strengths&quot; value=&quot;exceptional customer service&quot; onchange=&quot;updateUSP(); checkLimits(this)&quot;>
+                    <label for=&quot;service&quot; style=&quot;display: inline;&quot;>Exceptional customer service</label>
+                </div>
+                <div>
+                    <input type=&quot;checkbox&quot; id=&quot;health&quot; name=&quot;strengths&quot; value=&quot;health-conscious options&quot; onchange=&quot;updateUSP(); checkLimits(this)&quot;>
+                    <label for=&quot;health&quot; style=&quot;display: inline;&quot;>Health-conscious options</label>
+                </div>
+                <div>
+                    <input type=&quot;checkbox&quot; id=&quot;local&quot; name=&quot;strengths&quot; value=&quot;locally-sourced ingredients&quot; onchange=&quot;updateUSP(); checkLimits(this)&quot;>
+                    <label for=&quot;local&quot; style=&quot;display: inline;&quot;>Locally-sourced ingredients</label>
+                </div>
+                <div>
+                    <input type=&quot;checkbox&quot; id=&quot;sustainable&quot; name=&quot;strengths&quot; value=&quot;sustainable practices&quot; onchange=&quot;updateUSP(); checkLimits(this)&quot;>
+                    <label for=&quot;sustainable&quot; style=&quot;display: inline;&quot;>Sustainable practices</label>
+                </div>
+                <div>
+                    <input type=&quot;checkbox&quot; id=&quot;value&quot; name=&quot;strengths&quot; value=&quot;excellent value for money&quot; onchange=&quot;updateUSP(); checkLimits(this)&quot;>
+                    <label for=&quot;value&quot; style=&quot;display: inline;&quot;>Excellent value for money</label>
+                </div>
+                <div>
+                    <input type=&quot;checkbox&quot; id=&quot;custom-strength-checkbox&quot; name=&quot;strengths&quot; value=&quot;custom&quot; onchange=&quot;toggleCustomStrength(); updateUSP(); checkLimits(this)&quot;>
+                    <label for=&quot;custom-strength-checkbox&quot; style=&quot;display: inline;&quot;>Other (Custom)</label>
+                </div>
+                <p class=&quot;info-text&quot; id=&quot;strength-counter&quot;>0 of 3 selected</p>
+            </div>
+            
+            <div class=&quot;form-group&quot; id=&quot;custom-strength-group&quot; style=&quot;display: none;&quot;>
+                <label for=&quot;custom-strength&quot;>Custom Strength</label>
+                <input type=&quot;text&quot; id=&quot;custom-strength&quot; placeholder=&quot;Describe your unique strength&quot; onchange=&quot;updateUSP()&quot;>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label for=&quot;product-type&quot;>What's your main product or service?</label>
+                <input type=&quot;text&quot; id=&quot;product-type&quot; placeholder=&quot;e.g., meal kits, restaurant, catering, bakery&quot; onchange=&quot;updateUSP()&quot;>
+            </div>
+            
+            <div class=&quot;card&quot;>
+                <h3 class=&quot;card-title&quot;>Why This Matters</h3>
+                <p>Your unique strengths form the foundation of your USP. These are the qualities that set you apart from competitors and provide value to your customers.</p>
+            </div>
+            
+            <div class=&quot;action-buttons&quot;>
+                <button class=&quot;secondary-button&quot; onclick=&quot;prevTab('target-market')&quot;>Previous</button>
+                <button class=&quot;button&quot; onclick=&quot;nextTab('competition')&quot;>Next: Competition</button>
+            </div>
+        </div>
+        
+        <div id=&quot;competition&quot; class=&quot;tab-content&quot;>
+            <h2>Analyzing the Competition</h2>
+            <p>Understanding what makes you different from your competitors is crucial to defining your USP.</p>
+            
+            <div class=&quot;form-group&quot;>
+                <label for=&quot;competitor-names&quot;>Who are your main competitors?</label>
+                <textarea id=&quot;competitor-names&quot; rows=&quot;2&quot; placeholder=&quot;List your top competitors&quot;></textarea>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label for=&quot;competitor-weakness&quot;>What's missing from your competitors' offerings?</label>
+                <textarea id=&quot;competitor-weakness&quot; rows=&quot;3&quot; placeholder=&quot;e.g., quality, convenience, specific dietary options&quot; onchange=&quot;updateUSP()&quot;></textarea>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label for=&quot;unique-benefit&quot;>What unique benefit do you provide that others don't?</label>
+                <textarea id=&quot;unique-benefit&quot; rows=&quot;3&quot; placeholder=&quot;What problem do you solve or need do you meet better than anyone else?&quot; onchange=&quot;updateUSP()&quot;></textarea>
+            </div>
+            
+            <div class=&quot;card&quot;>
+                <h3 class=&quot;card-title&quot;>Why This Matters</h3>
+                <p>Identifying gaps in the market helps you position your business strategically. Your USP should highlight how you address needs that competitors aren't meeting effectively.</p>
+            </div>
+            
+            <div class=&quot;action-buttons&quot;>
+                <button class=&quot;secondary-button&quot; onclick=&quot;prevTab('strengths')&quot;>Previous</button>
+                <button class=&quot;button&quot; onclick=&quot;nextTab('usp-builder')&quot;>Next: Build Your USP</button>
+            </div>
+        </div>
+        
+        <div id=&quot;usp-builder&quot; class=&quot;tab-content&quot;>
+            <h2>Craft Your USP Statement</h2>
+            <p>Based on your inputs, we've created a draft USP. Refine it to make it perfect for your business.</p>
+            
+            <div class=&quot;preview-section&quot;>
+                <h3>Your USP Preview</h3>
+                <div class=&quot;preview-container&quot;>
+                    <p class=&quot;usp-preview&quot;>We offer <span id=&quot;product-preview&quot; class=&quot;highlight&quot;>your product/service</span> for <span id=&quot;audience-preview&quot; class=&quot;highlight&quot;>your target market</span> that provides <span id=&quot;benefit-preview&quot; class=&quot;highlight&quot;>unique benefits</span> through <span id=&quot;strength-preview&quot; class=&quot;highlight&quot;>your unique strengths</span>.</p>
+                </div>
+            </div>
+            
+            <div class=&quot;form-group&quot;>
+                <label for=&quot;final-usp&quot;>Edit Your Final USP</label>
+                <textarea id=&quot;final-usp&quot; rows=&quot;4&quot; placeholder=&quot;Customize your USP statement here&quot;></textarea>
+                <p class=&quot;info-text&quot;>Keep it clear, concise, and compelling. Your USP should be easy to understand and remember.</p>
+            </div>
+            
+            <div class=&quot;card&quot;>
+                <h3 class=&quot;card-title&quot;>Next Steps</h3>
+                <p>After finalizing your USP:</p>
+                <ol>
+                    <li>Incorporate it into your branding materials (website, packaging, marketing)</li>
+                    <li>Test it with potential customers for feedback</li>
+                    <li>Refine it based on customer responses and business evolution</li>
+                </ol>
+            </div>
+            
+            <div class=&quot;action-buttons&quot;>
+                <button class=&quot;secondary-button&quot; onclick=&quot;prevTab('competition')&quot;>Previous</button>
+                <button class=&quot;button&quot; onclick=&quot;saveUSP()&quot;>Save Your USP</button>
+                <button class=&quot;secondary-button&quot; onclick=&quot;resetForm()&quot;>Start Over</button>
+            </div>
+        </div>
+        
+        <div id=&quot;toast&quot; class=&quot;toast&quot;>USP saved successfully!</div>
+    </div>
+
+    <script>
+        // Tab functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        function switchTab(tabId) {
+            tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.tab === tabId) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            tabContents.forEach(content => {
+                content.classList.remove('active');
+                if (content.id === tabId) {
+                    content.classList.add('active');
+                }
+            });
+        }
+        
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                switchTab(button.dataset.tab);
+            });
+        });
+        
+        function nextTab(tabId) {
+            switchTab(tabId);
+        }
+        
+        function prevTab(tabId) {
+            switchTab(tabId);
+        }
+        
+        // Custom demographic
+        document.getElementById('primary-demographic').addEventListener('change', function() {
+            if (this.value === 'custom') {
+                document.getElementById('custom-demographic-group').style.display = 'block';
+            } else {
+                document.getElementById('custom-demographic-group').style.display = 'none';
+            }
+        });
+        
+        // Limit strength selections to 3
+        function checkLimits(checkbox) {
+            const checkboxes = document.querySelectorAll('input[name=&quot;strengths&quot;]:checked');
+            const counter = document.getElementById('strength-counter');
+            counter.textContent = `${checkboxes.length} of 3 selected`;
+            
+            if (checkboxes.length > 3) {
+                checkbox.checked = false;
+                counter.textContent = `3 of 3 selected`;
+                alert('Please select at most 3 strengths.');
+            }
+        }
+        
+        // Toggle custom strength input
+        function toggleCustomStrength() {
+            const customStrengthCheckbox = document.getElementById('custom-strength-checkbox');
+            const customStrengthGroup = document.getElementById('custom-strength-group');
+            
+            if (customStrengthCheckbox.checked) {
+                customStrengthGroup.style.display = 'block';
+            } else {
+                customStrengthGroup.style.display = 'none';
+            }
+        }
+        
+        // Update USP preview based on form inputs
+        function updateUSP() {
+            // Get target market
+            let targetMarket = document.getElementById('primary-demographic').value;
+            if (targetMarket === 'custom') {
+                targetMarket = document.getElementById('custom-demographic').value;
+            }
+            if (!targetMarket) targetMarket = &quot;your target market&quot;;
+            
+            // Get product/service
+            let product = document.getElementById('product-type').value;
+            if (!product) product = &quot;your product/service&quot;;
+            
+            // Get strengths
+            let strengths = [];
+            document.querySelectorAll('input[name=&quot;strengths&quot;]:checked').forEach(checkbox => {
+                if (checkbox.value === 'custom') {
+                    const customStrength = document.getElementById('custom-strength').value;
+                    if (customStrength) strengths.push(customStrength);
+                } else {
+                    strengths.push(checkbox.value);
+                }
+            });
+            let strengthText = strengths.length > 0 ? strengths.join(', ') : &quot;your unique strengths&quot;;
+            
+            // Get unique benefit
+            let benefit = document.getElementById('unique-benefit').value;
+            if (!benefit) benefit = &quot;unique benefits&quot;;
+            
+            // Update the preview
+            document.getElementById('product-preview').textContent = product;
+            document.getElementById('audience-preview').textContent = targetMarket;
+            document.getElementById('benefit-preview').textContent = benefit;
+            document.getElementById('strength-preview').textContent = strengthText;
+            
+            // Build the full USP
+            const uspText = `We offer ${product} for ${targetMarket} that provides ${benefit} through ${strengthText}.`;
+            document.getElementById('final-usp').value = uspText;
+        }
+        
+        // Save USP functionality
+        function saveUSP() {
+            const uspText = document.getElementById('final-usp').value;
+            
+            // In a real app, you'd save this to a database or localStorage
+            localStorage.setItem('savedUSP', uspText);
+            
+            // Show success message
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Reset form
+        function resetForm() {
+            if (confirm('Are you sure you want to start over? All your inputs will be cleared.')) {
+                document.querySelectorAll('input[type=&quot;text&quot;], textarea, select').forEach(input => {
+                    input.value = '';
+                });
+                
+                document.querySelectorAll('input[type=&quot;checkbox&quot;]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                document.getElementById('custom-demographic-group').style.display = 'none';
+                document.getElementById('custom-strength-group').style.display = 'none';
+                document.getElementById('strength-counter').textContent = '0 of 3 selected';
+                
+                updateUSP();
+                switchTab('target-market');
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if there's a saved USP
+            const savedUSP = localStorage.getItem('savedUSP');
+            if (savedUSP) {
+                document.getElementById('final-usp').value = savedUSP;
+            }
+            
+            // Initialize counter
+            document.getElementById('strength-counter').textContent = '0 of 3 selected';
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_5doq012t';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_5doq012t" style="width: 100%; height: 1054px; border: none;"></iframe>
