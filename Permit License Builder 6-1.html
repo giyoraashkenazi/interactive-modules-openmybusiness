@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Permit & License Checklist Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"/>
+  <style>
+    :root {
+      --primary:       #6366f1;
+      --primary-dark:  #4f46e5;
+      --background:    #121212;
+      --card-bg:       #1e1e1e;
+      --text:          #f3f4f6;
+      --text-secondary:#a1a1aa;
+      --border:        #2e2e2e;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body {
+      font-family:'Inter',sans-serif;
+      background:var(--background);
+      color:var(--text);
+      min-height:100vh;
+    }
+    .container {
+      max-width:800px; margin:auto; padding:1rem;
+    }
+    header { text-align:center; padding:1.5rem 0; }
+    .logo { max-width:120px; margin-bottom:1rem; }
+    header h1 { font-size:1.8rem; margin-bottom:.5rem; font-weight:700; }
+    header p { color:var(--text-secondary); max-width:600px; margin:auto; }
+
+    .progress-container { margin:2rem 0; }
+    .progress-bar { height:8px; background:var(--border); border-radius:4px; overflow:hidden; }
+    .progress-fill {
+      height:100%; width:0; background:var(--primary);
+      transition:width .3s ease;
+    }
+    .progress-text {
+      display:flex; justify-content:space-between;
+      font-size:.875rem; color:var(--text-secondary);
+      margin-top:.3rem;
+    }
+
+    .card {
+      background:var(--card-bg);
+      border-radius:12px;
+      padding:2rem;
+      box-shadow:0 4px 6px rgba(0,0,0,.1);
+    }
+    .tab-container {
+      overflow-x:auto; scrollbar-width:none; margin-bottom:2rem;
+    }
+    .tab-container::-webkit-scrollbar { display:none; }
+    .tabs { display:flex; border-bottom:1px solid var(--border); }
+    .tab {
+      padding:.75rem 1.5rem;
+      cursor:pointer;
+      color:var(--text-secondary);
+      border-bottom:2px solid transparent;
+      font-weight:500;
+      transition:all .3s;
+      flex-shrink:0;
+    }
+    .tab.active {
+      color:var(--text);
+      border-bottom:2px solid var(--primary);
+    }
+    .tab-content {
+      display:none;
+      animation:fadeIn .5s ease;
+    }
+    .tab-content.active { display:block; }
+    @keyframes fadeIn {
+      from { opacity:0; transform:translateY(10px) }
+      to   { opacity:1; transform:translateY(0)    }
+    }
+
+    .form-group { margin-bottom:1.5rem; }
+    label { display:block; margin-bottom:.5rem; font-weight:500; }
+    input, textarea, select {
+      width:100%;
+      padding:.75rem;
+      background:rgba(255,255,255,.05);
+      border:1px solid var(--border);
+      border-radius:6px;
+      color:var(--text);
+      font-family:inherit;
+      transition:all .3s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline:none;
+      border-color:var(--primary);
+      box-shadow:0 0 0 2px rgba(99,102,241,.2);
+    }
+    select, option {
+      background:var(--card-bg);
+      color:var(--text);
+    }
+
+    .toggle-container {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:1rem; border:1px solid var(--border);
+      border-radius:8px; margin-bottom:.75rem;
+      transition:background .3s;
+    }
+    .toggle-container:hover { background:rgba(255,255,255,.03); }
+    .toggle-label { flex:1; }
+    .toggle-title { font-weight:500; margin-bottom:.25rem; }
+    .toggle-description { color:var(--text-secondary); font-size:.875rem; }
+    .toggle { position:relative; width:48px; height:24px; }
+    .toggle input { opacity:0; width:0; height:0; }
+    .slider {
+      position:absolute; inset:0;
+      background:var(--border);
+      border-radius:24px;
+      transition:.4s;
+    }
+    .slider:before {
+      position:absolute; content:'';
+      height:18px; width:18px;
+      left:3px; bottom:3px;
+      background:var(--text);
+      border-radius:50%;
+      transition:.4s;
+    }
+    input:checked + .slider {
+      background:var(--primary);
+    }
+    input:checked + .slider:before {
+      transform:translateX(24px);
+    }
+
+    .btn {
+      display:inline-block;
+      padding:.75rem 1.5rem;
+      font-family:inherit;
+      font-size:1rem;
+      border-radius:6px;
+      cursor:pointer;
+      transition:all .3s;
+      border:none;
+      text-align:center;
+      font-weight:500;
+    }
+    .btn-primary {
+      background:var(--primary); color:#fff;
+    }
+    .btn-primary:hover {
+      background:var(--primary-dark);
+    }
+    .btn-outline {
+      background:transparent;
+      color:var(--text);
+      border:1px solid var(--border);
+    }
+    .btn-outline:hover {
+      background:rgba(255,255,255,.05);
+    }
+    .nav-buttons {
+      display:flex; justify-content:space-between; margin-top:2rem;
+    }
+
+    .results-list {
+      list-style:none;
+      margin-top:1rem;
+    }
+    .results-list li {
+      background:rgba(255,255,255,.05);
+      padding:.75rem;
+      border-radius:6px;
+      margin-bottom:.5rem;
+    }
+    .disclaimer {
+      margin-top:1rem;
+      font-size:.875rem;
+      color:var(--text-secondary);
+      text-align:center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <img class="logo"
+           src="https://cdn.minicoursegenerator.com/production/images/giyora638782629175372100/bf03d73a-0517-423d-95d4-a92c903f4945.png"
+           alt="Logo">
+      <h1>Permit & License Checklist Builder</h1>
+      <p>Generate a personalized checklist of required permits and licenses for your food business</p>
+    </header>
+
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-bar"></div>
+      </div>
+      <div class="progress-text">
+        <span id="progress-step">Step 1 of 5</span>
+        <span id="progress-percent">0%</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="tab-container">
+        <div class="tabs">
+          <div class="tab active" data-tab="step-1">Business Info</div>
+          <div class="tab" data-tab="step-2">Legal Structure</div>
+          <div class="tab" data-tab="step-3">Operations</div>
+          <div class="tab" data-tab="step-4">Location</div>
+          <div class="tab" data-tab="step-5">Your Checklist</div>
+        </div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="tab-content active" id="step-1">
+        <div class="form-group">
+          <label for="biz-name">Business Name</label>
+          <input type="text" id="biz-name" placeholder="Enter your business name">
+        </div>
+        <div class="form-group">
+          <label for="biz-type">Business Type</label>
+          <select id="biz-type">
+            <option value="">Select your business type</option>
+            <option value="restaurant">Restaurant</option>
+            <option value="food-truck">Food Truck / Mobile Vendor</option>
+            <option value="catering">Catering</option>
+            <option value="bakery">Bakery</option>
+            <option value="coffee-shop">Coffee Shop</option>
+            <option value="pop-up">Pop-up / Food Stand</option>
+            <option value="delivery-only">Delivery-Only Kitchen</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>New venture or upgrade existing?</label>
+          <div class="toggle-container">
+            <div class="toggle-label">
+              <div class="toggle-title">New Launch</div>
+              <div class="toggle-description">Starting from scratch</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="existing-toggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="nav-buttons">
+          <span></span>
+          <button class="btn btn-primary" id="to-2">Continue</button>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="tab-content" id="step-2">
+        <h2 class="category-title">Legal Structure</h2>
+        <div class="form-group">
+          <div class="toggle-container">
+            <div class="toggle-label">
+              <div class="toggle-title">Sole Proprietorship</div>
+              <div class="toggle-description">Single owner, no liability shield</div>
+            </div>
+            <label class="toggle">
+              <input type="radio" name="structure" value="sole">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-container">
+            <div class="toggle-label">
+              <div class="toggle-title">Partnership</div>
+              <div class="toggle-description">Shared ownership</div>
+            </div>
+            <label class="toggle">
+              <input type="radio" name="structure" value="partnership">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-container">
+            <div class="toggle-label">
+              <div class="toggle-title">LLC</div>
+              <div class="toggle-description">Limited liability company</div>
+            </div>
+            <label class="toggle">
+              <input type="radio" name="structure" value="llc">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-container">
+            <div class="toggle-label">
+              <div class="toggle-title">Corporation</div>
+              <div class="toggle-description">Standard incorporated entity</div>
+            </div>
+            <label class="toggle">
+              <input type="radio" name="structure" value="corp">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-container">
+            <div class="toggle-label">
+              <div class="toggle-title">Non-profit / Association</div>
+              <div class="toggle-description">Charitable or membership organization</div>
+            </div>
+            <label class="toggle">
+              <input type="radio" name="structure" value="nonprofit">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="nav-buttons">
+          <button class="btn btn-outline" id="back-2">Back</button>
+          <button class="btn btn-primary" id="to-3">Continue</button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="tab-content" id="step-3">
+        <h2 class="category-title">Business Operations</h2>
+        <div class="form-group">
+          <div class="toggle-container">
+            <div class="toggle-label">
+              <div class="toggle-title">Food Preparation</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" value="food-prep">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-container">
+            <div class="toggle-label">
+              <div class="toggle-title">Alcoholic Beverages</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" value="alcohol">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-container">
+            <div class="toggle-label">
+              <div class="toggle-title">Outdoor Seating / Dining</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" value="outdoor">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-container">
+            <div class="toggle-label">
+              <div class="toggle-title">Employees</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" value="employees">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="toggle-container">
+            <div class="toggle-label">
+              <div class="toggle-title">Online Sales</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" value="online-sales">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="nav-buttons">
+          <button class="btn btn-outline" id="back-3">Back</button>
+          <button class="btn btn-primary" id="to-4">Continue</button>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="tab-content" id="step-4">
+        <h2 class="category-title">Business Location</h2>
+        <div class="form-group">
+          <label for="state-select">State</label>
+          <select id="state-select">
+            <option value="">Select your state</option>
+            <option value="CA">California</option>
+            <option value="NY">New York</option>
+            <option value="TX">Texas</option>
+            <option value="FL">Florida</option>
+            <option value="IL">Illinois</option>
+          </select>
+        </div>
+        <div class="nav-buttons">
+          <button class="btn btn-outline" id="back-4">Back</button>
+          <button class="btn btn-primary" id="to-5">Continue</button>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="tab-content" id="step-5">
+        <h2>Your Permit & License Checklist:</h2>
+        <ul class="results-list" id="checklist"></ul>
+        <p class="disclaimer">
+          This checklist is a recommendation only. Please verify all requirements with your local licensing authority.
+        </p>
+        <div class="nav-buttons">
+          <button class="btn btn-outline" id="back-5">Back</button>
+          <button class="btn btn-primary" id="download">Download as PDF</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tabs        = document.querySelectorAll('.tab');
+    const contents    = document.querySelectorAll('.tab-content');
+    const bar         = document.getElementById('progress-bar');
+    const stepText    = document.getElementById('progress-step');
+    const pctText     = document.getElementById('progress-percent');
+    let current = 1, total = 5;
+
+    function show(n) {
+      current = n;
+      tabs.forEach(t=> t.classList.toggle('active', +t.dataset.tab.split('-')[1] === n));
+      contents.forEach(c=> c.classList.toggle('active', c.id === `step-${n}`));
+      let pct = Math.round((n-1)/(total-1)*100);
+      bar.style.width = pct+'%';
+      stepText.textContent = `Step ${n} of ${total}`;
+      pctText.textContent  = pct+'%';
+    }
+
+    document.getElementById('to-2').onclick   = ()=> show(2);
+    document.getElementById('back-2').onclick = ()=> show(1);
+    document.getElementById('to-3').onclick   = ()=> show(3);
+    document.getElementById('back-3').onclick = ()=> show(2);
+    document.getElementById('to-4').onclick   = ()=> show(4);
+    document.getElementById('back-4').onclick = ()=> show(3);
+    document.getElementById('to-5').onclick   = ()=> {
+      build();
+      show(5);
+    };
+    document.getElementById('back-5').onclick = ()=> show(4);
+
+    function build() {
+      const type     = document.getElementById('biz-type').value;
+      const existing = document.getElementById('existing-toggle').checked;
+      const struct   = document.querySelector('input[name="structure"]:checked')?.value;
+      const ops      = [...document.querySelectorAll('#step-3 input[type="checkbox"]:checked')].map(i=>i.value);
+      const state    = document.getElementById('state-select').value;
+
+      let list = ['Business License'];
+
+      if      (type==='restaurant')     list.push('Food Service Permit');
+      else if (type==='food-truck')     list.push('Mobile Vendor Permit');
+      else if (type==='catering')       list.push('Catering Permit');
+      else if (type==='bakery')         list.push('Bakery Permit');
+      else if (type==='coffee-shop')    list.push('Coffee Shop Permit');
+      else if (type==='delivery-only')  list.push('Delivery-Only Permit');
+
+      if (ops.includes('alcohol'))      list.push('Alcohol License');
+      if (ops.includes('online-sales')) list.push('Home Kitchen Escape Permit');
+      if (ops.includes('outdoor'))      list.push('Outdoor Seating Permit');
+      if (ops.includes('employees'))    list.push('Employer Identification');
+
+      if (existing)                     list.push('Renewal / Transfer');
+
+      if (state)                        list.push(`State Health Permit (${state})`);
+
+      const ul = document.getElementById('checklist');
+      ul.innerHTML = '';
+      list.forEach(txt=>{
+        let li = document.createElement('li');
+        li.textContent = txt;
+        ul.appendChild(li);
+      });
+    }
+
+    document.getElementById('download').onclick = ()=>{
+      alert('In production this would generate a PDF.');
+    };
+
+    show(1);
+  </script>
+</body>
+</html>

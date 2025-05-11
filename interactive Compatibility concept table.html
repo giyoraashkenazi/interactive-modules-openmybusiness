@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Compatibility Matrix</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f5f5f5; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    th { background: #333; color: #fff; }
+    select { padding: 4px; }
+  </style>
+</head>
+<body>
+
+  <h1>Compatibility Matrix</h1>
+  
+  <div>
+    <label>Choose Audience Segment:
+      <select id="audience">
+        <option value="kids">Kids</option>
+        <option value="business">Business</option>
+        <option value="health">Health-Conscious</option>
+        <option value="tourists">Tourists</option>
+      </select>
+    </label>
+    
+    <label>Choose Concept:
+      <select id="concept">
+        <option value="fast-food">Fast Food</option>
+        <option value="fine-dining">Fine Dining</option>
+        <option value="cafe">Cafe</option>
+        <option value="casual">Casual Bistro</option>
+      </select>
+    </label>
+    
+    <label>Choose Location Type:
+      <select id="location">
+        <option value="neighborhood">Neighborhood</option>
+        <option value="commercial">Commercial Area</option>
+        <option value="mall">Shopping Mall</option>
+        <option value="airport">Airport</option>
+      </select>
+    </label>
+  </div>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>Match %</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Audience ↔ Concept</td>
+        <td id="match-aud-concept">–</td>
+      </tr>
+      <tr>
+        <td>Audience ↔ Location</td>
+        <td id="match-aud-loc">–</td>
+      </tr>
+      <tr>
+        <td>Concept ↔ Location</td>
+        <td id="match-concept-loc">–</td>
+      </tr>
+      <tr>
+        <td>Operational Cost Weight</td>
+        <td id="operational-cost">50%</td>
+      </tr>
+      <tr>
+        <th>Total Compatibility</th>
+        <th id="total-compat">–</th>
+      </tr>
+    </tbody>
+  </table>
+  
+<script>
+  const audienceConceptMap = {
+    kids:       { "fast-food": 100, "fine-dining": 0,   "cafe": 50,  "casual": 70 },
+    business:   { "fast-food": 20,  "fine-dining": 100, "cafe": 80,  "casual": 90 },
+    health:     { "fast-food": 40,  "fine-dining": 60,  "cafe": 90,  "casual": 50 },
+    tourists:   { "fast-food": 80,  "fine-dining": 90,  "cafe": 70,  "casual": 60 }
+  };
+  
+  const audienceLocationMap = {
+    kids:       { neighborhood: 100, commercial: 20, mall: 50, airport: 0 },
+    business:   { neighborhood: 20,  commercial: 100,mall: 80, airport: 90 },
+    health:     { neighborhood: 60,  commercial: 70, mall: 90, airport: 40 },
+    tourists:   { neighborhood: 30,  commercial: 60, mall: 100,airport: 80 }
+  };
+  
+  const conceptLocationMap = {
+    "fast-food":   { neighborhood: 80, commercial: 90, mall: 100, airport: 70 },
+    "fine-dining": { neighborhood: 30, commercial: 80, mall: 60,  airport: 90 },
+    cafe:          { neighborhood: 70, commercial: 60, mall: 80,  airport: 50 },
+    casual:        { neighborhood: 90, commercial: 70, mall: 85,  airport: 65 }
+  };
+  
+  const selAud = document.getElementById('audience');
+  const selCon = document.getElementById('concept');
+  const selLoc = document.getElementById('location');
+  const outAC  = document.getElementById('match-aud-concept');
+  const outAL  = document.getElementById('match-aud-loc');
+  const outCL  = document.getElementById('match-concept-loc');
+  const outTC  = document.getElementById('total-compat');
+  
+  function update() {
+    const a = selAud.value;
+    const c = selCon.value;
+    const l = selLoc.value;
+    
+    const mAC = audienceConceptMap[a][c];
+    const mAL = audienceLocationMap[a][l];
+    const mCL = conceptLocationMap[c][l];
+    const opCost = 50; // קבוע ב־50%
+    
+    outAC.textContent = mAC + '%';
+    outAL.textContent = mAL + '%';
+    outCL.textContent = mCL + '%';
+    
+    // ממוצע פשוט של ארבעת המרכיבים
+    const total = Math.round((mAC + mAL + mCL + opCost) / 4);
+    outTC.textContent = total + '%';
+  }
+  
+  selAud.addEventListener('change', update);
+  selCon.addEventListener('change', update);
+  selLoc.addEventListener('change', update);
+  
+  // אתחל
+  update();
+</script>
+  
+</body>
+</html>
