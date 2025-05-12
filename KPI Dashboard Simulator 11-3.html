@@ -1,0 +1,763 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>KPI Dashboard Simulator</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #7e57c2;
+            --primary-light: #9575cd;
+            --secondary: #00bcd4;
+            --dark: #121212;
+            --dark-light: #1e1e1e;
+            --gray: #333333;
+            --light-gray: #666666;
+            --white: #ffffff;
+            --green: #4caf50;
+            --yellow: #ffc107;
+            --red: #f44336;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background-color: var(--dark);
+            color: var(--white);
+            min-height: 100vh;
+            padding: 16px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-fill-color: transparent;
+        }
+        header p {
+            font-size: 14px;
+            color: var(--light-gray);
+            max-width: 85%;
+            margin: 0 auto;
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--dark-light);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .tab {
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            flex: 1;
+            text-align: center;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            color: var(--primary-light);
+            border-bottom: 2px solid var(--primary-light);
+        }
+        .tab-content {
+            background-color: var(--dark-light);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .metric-card {
+            background-color: var(--gray);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .metric-card:hover {
+            transform: translateY(-2px);
+        }
+        .metric-card h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: var(--light-gray);
+        }
+        .metric-card .value {
+            font-size: 26px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .metric-card .indicator {
+            font-size: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+        }
+        .indicator.good {
+            color: var(--green);
+        }
+        .indicator.warning {
+            color: var(--yellow);
+        }
+        .indicator.bad {
+            color: var(--red);
+        }
+        .control-group {
+            margin-bottom: 20px;
+        }
+        .control-group h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--white);
+        }
+        .slider-container {
+            margin-bottom: 16px;
+        }
+        .slider-container label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .slider-container label span {
+            color: var(--primary-light);
+            font-weight: 500;
+        }
+        input[type=&quot;range&quot;] {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--gray);
+            border-radius: 3px;
+            outline: none;
+        }
+        input[type=&quot;range&quot;]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        input[type=&quot;range&quot;]::-webkit-slider-thumb:hover {
+            background: var(--primary-light);
+            transform: scale(1.2);
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+        }
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button.primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        button.primary:hover {
+            background-color: var(--primary-light);
+        }
+        button.secondary {
+            background-color: var(--gray);
+            color: var(--white);
+        }
+        button.secondary:hover {
+            background-color: var(--light-gray);
+        }
+        .chart-container {
+            width: 100%;
+            height: 200px;
+            background-color: var(--gray);
+            border-radius: 8px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .chart-bar {
+            position: absolute;
+            bottom: 0;
+            width: 14%;
+            background: linear-gradient(to top, var(--primary), var(--primary-light));
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            transition: height 0.5s ease;
+        }
+        .chart-bar:nth-child(1) { left: 5%; height: 40%; }
+        .chart-bar:nth-child(2) { left: 23%; height: 60%; }
+        .chart-bar:nth-child(3) { left: 41%; height: 30%; }
+        .chart-bar:nth-child(4) { left: 59%; height: 75%; }
+        .chart-bar:nth-child(5) { left: 77%; height: 55%; }
+        .chart-labels {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--light-gray);
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 6px;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--gray);
+            color: var(--white);
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>KPI Dashboard Simulator</h1>
+            <p>Adjust restaurant service parameters and see real-time impacts on key performance indicators</p>
+        </header>
+
+        <div class=&quot;tabs&quot;>
+            <div class=&quot;tab active&quot; data-tab=&quot;staffing&quot;>Staffing</div>
+            <div class=&quot;tab&quot; data-tab=&quot;orders&quot;>Orders</div>
+            <div class=&quot;tab&quot; data-tab=&quot;service&quot;>Service</div>
+            <div class=&quot;tab&quot; data-tab=&quot;results&quot;>Results</div>
+        </div>
+
+        <div id=&quot;staffing&quot; class=&quot;tab-content active&quot;>
+            <div class=&quot;control-group&quot;>
+                <h3>Staff Configuration</h3>
+                <div class=&quot;slider-container&quot;>
+                    <label>
+                        Front-of-House Staff
+                        <span id=&quot;foh-value&quot;>4</span>
+                    </label>
+                    <input type=&quot;range&quot; id=&quot;foh-staff&quot; min=&quot;1&quot; max=&quot;10&quot; value=&quot;4&quot; class=&quot;slider&quot;>
+                </div>
+                <div class=&quot;slider-container&quot;>
+                    <label>
+                        Kitchen Staff
+                        <span id=&quot;kitchen-value&quot;>3</span>
+                    </label>
+                    <input type=&quot;range&quot; id=&quot;kitchen-staff&quot; min=&quot;1&quot; max=&quot;8&quot; value=&quot;3&quot; class=&quot;slider&quot;>
+                </div>
+                <div class=&quot;slider-container&quot;>
+                    <label>
+                        Staff Experience Level
+                        <span id=&quot;experience-value&quot;>Medium</span>
+                    </label>
+                    <input type=&quot;range&quot; id=&quot;staff-experience&quot; min=&quot;1&quot; max=&quot;3&quot; value=&quot;2&quot; class=&quot;slider&quot;>
+                </div>
+            </div>
+            <div class=&quot;action-buttons&quot;>
+                <button class=&quot;secondary&quot; id=&quot;reset-staffing&quot;>Reset</button>
+                <button class=&quot;primary next-tab&quot; data-next=&quot;orders&quot;>Next</button>
+            </div>
+        </div>
+
+        <div id=&quot;orders&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;control-group&quot;>
+                <h3>Order Volume</h3>
+                <div class=&quot;slider-container&quot;>
+                    <label>
+                        Customers Per Hour
+                        <span id=&quot;customers-value&quot;>30</span>
+                    </label>
+                    <input type=&quot;range&quot; id=&quot;customers&quot; min=&quot;10&quot; max=&quot;100&quot; value=&quot;30&quot; class=&quot;slider&quot;>
+                </div>
+                <div class=&quot;slider-container&quot;>
+                    <label>
+                        Average Items Per Order
+                        <span id=&quot;items-value&quot;>3</span>
+                    </label>
+                    <input type=&quot;range&quot; id=&quot;items-per-order&quot; min=&quot;1&quot; max=&quot;8&quot; value=&quot;3&quot; class=&quot;slider&quot;>
+                </div>
+                <div class=&quot;slider-container&quot;>
+                    <label>
+                        Order Complexity
+                        <span id=&quot;complexity-value&quot;>Medium</span>
+                    </label>
+                    <input type=&quot;range&quot; id=&quot;order-complexity&quot; min=&quot;1&quot; max=&quot;3&quot; value=&quot;2&quot; class=&quot;slider&quot;>
+                </div>
+            </div>
+            <div class=&quot;action-buttons&quot;>
+                <button class=&quot;secondary prev-tab&quot; data-prev=&quot;staffing&quot;>Previous</button>
+                <button class=&quot;primary next-tab&quot; data-next=&quot;service&quot;>Next</button>
+            </div>
+        </div>
+
+        <div id=&quot;service&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;control-group&quot;>
+                <h3>Service Parameters</h3>
+                <div class=&quot;slider-container&quot;>
+                    <label>
+                        Target Order-to-Serve Time (min)
+                        <span id=&quot;target-time-value&quot;>15</span>
+                    </label>
+                    <input type=&quot;range&quot; id=&quot;target-time&quot; min=&quot;5&quot; max=&quot;30&quot; value=&quot;15&quot; class=&quot;slider&quot;>
+                </div>
+                <div class=&quot;slider-container&quot;>
+                    <label>
+                        Quality Check Frequency
+                        <span id=&quot;quality-value&quot;>Medium</span>
+                    </label>
+                    <input type=&quot;range&quot; id=&quot;quality-checks&quot; min=&quot;1&quot; max=&quot;3&quot; value=&quot;2&quot; class=&quot;slider&quot;>
+                </div>
+                <div class=&quot;slider-container&quot;>
+                    <label>
+                        Kitchen Organization Level
+                        <span id=&quot;organization-value&quot;>Good</span>
+                    </label>
+                    <input type=&quot;range&quot; id=&quot;organization&quot; min=&quot;1&quot; max=&quot;3&quot; value=&quot;2&quot; class=&quot;slider&quot;>
+                </div>
+            </div>
+            <div class=&quot;action-buttons&quot;>
+                <button class=&quot;secondary prev-tab&quot; data-prev=&quot;orders&quot;>Previous</button>
+                <button class=&quot;primary&quot; id=&quot;calculate-results&quot;>Calculate Results</button>
+            </div>
+        </div>
+
+        <div id=&quot;results&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;metrics-grid&quot;>
+                <div class=&quot;metric-card&quot;>
+                    <h3>Avg. Order Time</h3>
+                    <div class=&quot;value&quot; id=&quot;order-time&quot;>18 min</div>
+                    <div class=&quot;indicator warning&quot; id=&quot;order-time-indicator&quot;>
+                        <span>+3 min</span>
+                    </div>
+                </div>
+                <div class=&quot;metric-card&quot;>
+                    <h3>Order Accuracy</h3>
+                    <div class=&quot;value&quot; id=&quot;order-accuracy&quot;>92%</div>
+                    <div class=&quot;indicator good&quot; id=&quot;accuracy-indicator&quot;>
+                        <span>Good</span>
+                    </div>
+                </div>
+                <div class=&quot;metric-card&quot;>
+                    <h3>Guest Satisfaction</h3>
+                    <div class=&quot;value&quot; id=&quot;satisfaction&quot;>4.2/5</div>
+                    <div class=&quot;indicator good&quot; id=&quot;satisfaction-indicator&quot;>
+                        <span>+0.2</span>
+                    </div>
+                </div>
+                <div class=&quot;metric-card&quot;>
+                    <h3>Staff Efficiency</h3>
+                    <div class=&quot;value&quot; id=&quot;efficiency&quot;>78%</div>
+                    <div class=&quot;indicator warning&quot; id=&quot;efficiency-indicator&quot;>
+                        <span>-5%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class=&quot;control-group&quot;>
+                <h3>Revenue Impact</h3>
+                <div class=&quot;chart-container&quot;>
+                    <div class=&quot;chart-bar&quot;></div>
+                    <div class=&quot;chart-bar&quot;></div>
+                    <div class=&quot;chart-bar&quot;></div>
+                    <div class=&quot;chart-bar&quot;></div>
+                    <div class=&quot;chart-bar&quot;></div>
+                </div>
+                <div class=&quot;chart-labels&quot;>
+                    <span>Mon</span>
+                    <span>Tue</span>
+                    <span>Wed</span>
+                    <span>Thu</span>
+                    <span>Fri</span>
+                </div>
+            </div>
+
+            <div class=&quot;control-group&quot;>
+                <h3>AI Recommendations <span class=&quot;tooltip&quot;>ℹ️<span class=&quot;tooltiptext&quot;>AI-powered suggestions to improve your KPIs based on current settings</span></span></h3>
+                <ul id=&quot;recommendations&quot; style=&quot;margin-left: 20px; font-size: 14px; line-height: 1.5;&quot;>
+                    <li>Consider adding 1 more kitchen staff during peak hours</li>
+                    <li>Reduce menu complexity to improve order accuracy</li>
+                    <li>Implement table-side ordering for faster service time</li>
+                </ul>
+            </div>
+
+            <div class=&quot;action-buttons&quot;>
+                <button class=&quot;secondary prev-tab&quot; data-prev=&quot;service&quot;>Previous</button>
+                <button class=&quot;primary&quot; id=&quot;reset-all&quot;>Reset All</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.tab;
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show corresponding content
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    if (content.id === target) {
+                        content.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Next and Previous tab buttons
+        document.querySelectorAll('.next-tab').forEach(button => {
+            button.addEventListener('click', () => {
+                const nextTab = button.dataset.next;
+                document.querySelector(`.tab[data-tab=&quot;${nextTab}&quot;]`).click();
+            });
+        });
+
+        document.querySelectorAll('.prev-tab').forEach(button => {
+            button.addEventListener('click', () => {
+                const prevTab = button.dataset.prev;
+                document.querySelector(`.tab[data-tab=&quot;${prevTab}&quot;]`).click();
+            });
+        });
+
+        // Slider functionality
+        const fohSlider = document.getElementById('foh-staff');
+        const fohValue = document.getElementById('foh-value');
+        fohSlider.oninput = function() {
+            fohValue.textContent = this.value;
+            updateResults();
+        };
+
+        const kitchenSlider = document.getElementById('kitchen-staff');
+        const kitchenValue = document.getElementById('kitchen-value');
+        kitchenSlider.oninput = function() {
+            kitchenValue.textContent = this.value;
+            updateResults();
+        };
+
+        const experienceSlider = document.getElementById('staff-experience');
+        const experienceValue = document.getElementById('experience-value');
+        experienceSlider.oninput = function() {
+            const values = ['Low', 'Medium', 'High'];
+            experienceValue.textContent = values[this.value - 1];
+            updateResults();
+        };
+
+        const customersSlider = document.getElementById('customers');
+        const customersValue = document.getElementById('customers-value');
+        customersSlider.oninput = function() {
+            customersValue.textContent = this.value;
+            updateResults();
+        };
+
+        const itemsSlider = document.getElementById('items-per-order');
+        const itemsValue = document.getElementById('items-value');
+        itemsSlider.oninput = function() {
+            itemsValue.textContent = this.value;
+            updateResults();
+        };
+
+        const complexitySlider = document.getElementById('order-complexity');
+        const complexityValue = document.getElementById('complexity-value');
+        complexitySlider.oninput = function() {
+            const values = ['Low', 'Medium', 'High'];
+            complexityValue.textContent = values[this.value - 1];
+            updateResults();
+        };
+
+        const targetTimeSlider = document.getElementById('target-time');
+        const targetTimeValue = document.getElementById('target-time-value');
+        targetTimeSlider.oninput = function() {
+            targetTimeValue.textContent = this.value;
+            updateResults();
+        };
+
+        const qualitySlider = document.getElementById('quality-checks');
+        const qualityValue = document.getElementById('quality-value');
+        qualitySlider.oninput = function() {
+            const values = ['Low', 'Medium', 'High'];
+            qualityValue.textContent = values[this.value - 1];
+            updateResults();
+        };
+
+        const organizationSlider = document.getElementById('organization');
+        const organizationValue = document.getElementById('organization-value');
+        organizationSlider.oninput = function() {
+            const values = ['Poor', 'Good', 'Excellent'];
+            organizationValue.textContent = values[this.value - 1];
+            updateResults();
+        };
+
+        // Calculate Results button
+        document.getElementById('calculate-results').addEventListener('click', () => {
+            calculateAndDisplayResults();
+            document.querySelector('.tab[data-tab=&quot;results&quot;]').click();
+        });
+
+        // Reset buttons
+        document.getElementById('reset-staffing').addEventListener('click', () => {
+            fohSlider.value = 4;
+            fohValue.textContent = 4;
+            kitchenSlider.value = 3;
+            kitchenValue.textContent = 3;
+            experienceSlider.value = 2;
+            experienceValue.textContent = 'Medium';
+            updateResults();
+        });
+
+        document.getElementById('reset-all').addEventListener('click', () => {
+            document.getElementById('reset-staffing').click();
+            
+            customersSlider.value = 30;
+            customersValue.textContent = 30;
+            itemsSlider.value = 3;
+            itemsValue.textContent = 3;
+            complexitySlider.value = 2;
+            complexityValue.textContent = 'Medium';
+            
+            targetTimeSlider.value = 15;
+            targetTimeValue.textContent = 15;
+            qualitySlider.value = 2;
+            qualityValue.textContent = 'Medium';
+            organizationSlider.value = 2;
+            organizationValue.textContent = 'Good';
+            
+            updateResults();
+            document.querySelector('.tab[data-tab=&quot;staffing&quot;]').click();
+        });
+
+        // Results calculation logic
+        function calculateAndDisplayResults() {
+            const fohStaff = parseInt(fohSlider.value);
+            const kitchenStaff = parseInt(kitchenSlider.value);
+            const experience = parseInt(experienceSlider.value);
+            const customers = parseInt(customersSlider.value);
+            const itemsPerOrder = parseInt(itemsSlider.value);
+            const complexity = parseInt(complexitySlider.value);
+            const targetTime = parseInt(targetTimeSlider.value);
+            const quality = parseInt(qualitySlider.value);
+            const organization = parseInt(organizationSlider.value);
+            
+            // Calculate metrics based on inputs
+            // This is a simplified simulation
+            let orderTime = Math.round(targetTime * (1 + (customers/60) * (itemsPerOrder/3) * (complexity/2) / (fohStaff/3 + kitchenStaff/2) / (experience/2 + organization/2)));
+            
+            let orderAccuracy = Math.round(90 + quality * 3 + experience * 2 - (complexity * 2) - (customers/40) + (organization * 2));
+            orderAccuracy = Math.min(Math.max(orderAccuracy, 80), 99); // Clamp between 80-99%
+            
+            let satisfactionBase = 3.5;
+            let satisfactionMod = (orderAccuracy - 90) / 20 - (orderTime - targetTime) / 10 + (quality - 2) * 0.2;
+            let satisfaction = (satisfactionBase + satisfactionMod).toFixed(1);
+            satisfaction = Math.min(Math.max(satisfaction, 1), 5); // Clamp between 1-5
+            
+            let efficiency = Math.round(75 + organization * 5 + experience * 5 - (complexity * 3) - Math.abs(customers/fohStaff - 10) - Math.abs(customers/kitchenStaff - 12));
+            efficiency = Math.min(Math.max(efficiency, 50), 95); // Clamp between 50-95%
+            
+            // Update the display
+            document.getElementById('order-time').textContent = orderTime + ' min';
+            
+            const timeDiff = orderTime - targetTime;
+            const timeIndicator = document.getElementById('order-time-indicator');
+            timeIndicator.textContent = (timeDiff > 0) ? '+' + timeDiff + ' min' : timeDiff + ' min';
+            
+            if (timeDiff <= 0) {
+                timeIndicator.className = 'indicator good';
+            } else if (timeDiff <= 5) {
+                timeIndicator.className = 'indicator warning';
+            } else {
+                timeIndicator.className = 'indicator bad';
+            }
+            
+            document.getElementById('order-accuracy').textContent = orderAccuracy + '%';
+            const accuracyIndicator = document.getElementById('accuracy-indicator');
+            
+            if (orderAccuracy >= 95) {
+                accuracyIndicator.textContent = 'Excellent';
+                accuracyIndicator.className = 'indicator good';
+            } else if (orderAccuracy >= 90) {
+                accuracyIndicator.textContent = 'Good';
+                accuracyIndicator.className = 'indicator good';
+            } else if (orderAccuracy >= 85) {
+                accuracyIndicator.textContent = 'Average';
+                accuracyIndicator.className = 'indicator warning';
+            } else {
+                accuracyIndicator.textContent = 'Poor';
+                accuracyIndicator.className = 'indicator bad';
+            }
+            
+            document.getElementById('satisfaction').textContent = satisfaction + '/5';
+            const satIndicator = document.getElementById('satisfaction-indicator');
+            const satDiff = (satisfaction - 4).toFixed(1);
+            satIndicator.textContent = (satDiff >= 0) ? '+' + satDiff : satDiff;
+            
+            if (satisfaction >= 4.5) {
+                satIndicator.className = 'indicator good';
+            } else if (satisfaction >= 3.5) {
+                satIndicator.className = 'indicator warning';
+            } else {
+                satIndicator.className = 'indicator bad';
+            }
+            
+            document.getElementById('efficiency').textContent = efficiency + '%';
+            const effIndicator = document.getElementById('efficiency-indicator');
+            const effDiff = efficiency - 80;
+            effIndicator.textContent = (effDiff >= 0) ? '+' + effDiff + '%' : effDiff + '%';
+            
+            if (efficiency >= 85) {
+                effIndicator.className = 'indicator good';
+            } else if (efficiency >= 70) {
+                effIndicator.className = 'indicator warning';
+            } else {
+                effIndicator.className = 'indicator bad';
+            }
+            
+            // Update chart bars
+            const chartBars = document.querySelectorAll('.chart-bar');
+            const baseHeight = 40 + (efficiency - 60) * 0.8; // Scale based on efficiency
+            
+            chartBars.forEach((bar, index) => {
+                const heightVar = Math.sin(index * 0.8) * 15;
+                bar.style.height = (baseHeight + heightVar) + '%';
+            });
+            
+            // Update AI recommendations
+            const recommendations = document.getElementById('recommendations');
+            recommendations.innerHTML = '';
+            
+            if (orderTime > targetTime + 3) {
+                const li = document.createElement('li');
+                if (customers/fohStaff > 12) {
+                    li.textContent = `Add ${Math.ceil(customers/12 - fohStaff)} more front-of-house staff to handle customer volume`;
+                } else if (customers/kitchenStaff > 15) {
+                    li.textContent = `Add ${Math.ceil(customers/15 - kitchenStaff)} more kitchen staff to speed up preparation`;
+                } else if (organization < 3) {
+                    li.textContent = 'Improve kitchen organization to reduce order preparation time';
+                }
+                recommendations.appendChild(li);
+            }
+            
+            if (orderAccuracy < 90) {
+                const li = document.createElement('li');
+                if (quality < 3) {
+                    li.textContent = 'Increase quality check frequency to improve order accuracy';
+                } else if (complexity > 1) {
+                    li.textContent = 'Simplify menu items or order process to reduce errors';
+                } else if (experience < 3) {
+                    li.textContent = 'Provide additional training to staff to improve accuracy';
+                }
+                recommendations.appendChild(li);
+            }
+            
+            if (efficiency < 75) {
+                const li = document.createElement('li');
+                if (organization < 3) {
+                    li.textContent = 'Reorganize kitchen layout for better workflow efficiency';
+                } else if (Math.abs(customers/fohStaff - 10) > 5) {
+                    li.textContent = 'Adjust staffing to better match customer volume';
+                }
+                recommendations.appendChild(li);
+            }
+            
+            // Always add at least one recommendation
+            if (recommendations.children.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'Current configuration is optimal. Monitor during peak hours to maintain performance.';
+                recommendations.appendChild(li);
+            }
+        }
+
+        function updateResults() {
+            // This allows for real-time updates as sliders change
+            // but we only show them when Calculate is clicked
+        }
+
+        // Initialize with default values
+        calculateAndDisplayResults();
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_a91bc31k';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_a91bc31k" style="width: 100%; height: 640px; border: none;"></iframe>

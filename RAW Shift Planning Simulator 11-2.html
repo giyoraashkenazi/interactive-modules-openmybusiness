@@ -1,0 +1,1288 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Shift Planning Simulator</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --secondary-dark: #059669;
+            --dark: #1e1e2a;
+            --darker: #141420;
+            --light: #f9fafb;
+            --gray: #6b7280;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: var(--darker);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+        }
+        
+        header p {
+            color: var(--gray);
+            max-width: 700px;
+            margin: 0 auto;
+            font-size: 0.95rem;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            background-color: var(--dark);
+            border-radius: 0.5rem;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            padding: 0.25rem;
+        }
+        
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            border-radius: 0.35rem;
+            white-space: nowrap;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tab:not(.active):hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .dashboard {
+                grid-template-columns: 250px 1fr;
+            }
+        }
+        
+        .staff-pool {
+            background-color: var(--dark);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        
+        .staff-pool h2 {
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            color: var(--light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .staff-count {
+            background-color: var(--primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+        
+        .staff-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .staff-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.2s;
+            user-select: none;
+            position: relative;
+        }
+        
+        .staff-item:active {
+            cursor: grabbing;
+            transform: scale(0.97);
+        }
+        
+        .staff-item:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .staff-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .staff-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .staff-role {
+            font-size: 0.7rem;
+            color: var(--gray);
+            margin-top: 0.25rem;
+        }
+        
+        .staff-item .staff-cost {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--primary-dark);
+            color: white;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.35rem;
+            border-radius: 0.25rem;
+            font-weight: 600;
+        }
+        
+        .schedule-container {
+            background-color: var(--dark);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+        
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .schedule-title {
+            font-size: 1rem;
+            color: var(--light);
+        }
+        
+        .schedule-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.35rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--secondary-dark);
+        }
+        
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: 80px repeat(7, minmax(140px, 1fr));
+            gap: 1px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 0.35rem;
+            overflow: hidden;
+            min-width: 900px;
+        }
+        
+        .time-cell, .day-cell, .schedule-cell {
+            background-color: var(--darker);
+            padding: 0.75rem 0.5rem;
+            text-align: center;
+        }
+        
+        .day-cell {
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 0.75rem;
+        }
+        
+        .time-cell {
+            font-size: 0.8rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        .schedule-cell {
+            height: 70px;
+            position: relative;
+            transition: all 0.2s;
+            border: 1px dashed transparent;
+        }
+        
+        .schedule-cell.droppable {
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+        }
+        
+        .schedule-cell.droppable:hover, .schedule-cell.drag-over {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px dashed var(--primary);
+        }
+        
+        .placed-staff {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            right: 5px;
+            bottom: 5px;
+            background-color: rgba(99, 102, 241, 0.15);
+            border-radius: 0.35rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.25rem;
+            border: 1px solid var(--primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .placed-staff:hover {
+            background-color: rgba(99, 102, 241, 0.25);
+            transform: scale(1.02);
+        }
+        
+        .placed-staff-icon {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .placed-staff-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+        }
+        
+        .placed-staff-role {
+            font-size: 0.65rem;
+            color: var(--gray);
+        }
+        
+        .metrics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .metric-card {
+            background-color: var(--dark);
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            transition: all 0.2s;
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .metric-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 0.75rem;
+        }
+        
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .metric-change {
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .metric-change.positive {
+            color: var(--success);
+        }
+        
+        .metric-change.negative {
+            color: var(--danger);
+        }
+        
+        .metric-change-icon {
+            margin-right: 0.25rem;
+        }
+        
+        .chart-container {
+            background-color: var(--dark);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            height: 250px;
+        }
+        
+        .feedback-container {
+            background-color: var(--primary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-top: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .feedback-message {
+            display: flex;
+            align-items: center;
+        }
+        
+        .feedback-icon {
+            margin-right: 0.75rem;
+            font-size: 1.5rem;
+        }
+        
+        .feedback-text {
+            font-weight: 500;
+        }
+        
+        .feedback-action {
+            background-color: white;
+            color: var(--primary);
+            border: none;
+            border-radius: 0.35rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .feedback-action:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .traffic-indicator {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        
+        .traffic-high {
+            background-color: var(--danger);
+        }
+        
+        .traffic-medium {
+            background-color: var(--warning);
+        }
+        
+        .traffic-low {
+            background-color: var(--success);
+        }
+        
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal-content {
+            background-color: var(--dark);
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+            position: relative;
+            animation: modal-in 0.3s;
+        }
+        
+        @keyframes modal-in {
+            from {
+                transform: scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            cursor: pointer;
+            color: var(--gray);
+            transition: all 0.2s;
+        }
+        
+        .modal-close:hover {
+            color: var(--light);
+        }
+        
+        .modal-body {
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+        }
+        
+        .staff-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .staff-detail-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 0.35rem;
+            padding: 0.75rem;
+        }
+        
+        .staff-detail-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-bottom: 0.25rem;
+        }
+        
+        .staff-detail-value {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 0.35rem;
+            color: var(--light);
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background-color: var(--success);
+            color: white;
+            padding: 1rem 1.25rem;
+            border-radius: 0.35rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(1rem);
+            transition: all 0.3s;
+            pointer-events: none;
+        }
+        
+        .toast.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast-icon {
+            margin-right: 0.75rem;
+            font-size: 1.25rem;
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                margin: 0 -1rem 1.5rem -1rem;
+                border-radius: 0;
+                padding: 0.5rem 1rem;
+            }
+            
+            .schedule-container {
+                padding: 0.75rem;
+            }
+            
+            .staff-list {
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            }
+            
+            .staff-icon {
+                font-size: 1.25rem;
+            }
+            
+            .modal-content {
+                padding: 1rem;
+            }
+            
+            .schedule-actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn {
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+            
+            .feedback-container {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .feedback-message {
+                flex-direction: column;
+            }
+            
+            .feedback-icon {
+                margin: 0 0 0.5rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>Shift Planning Simulator</h1>
+            <p>Optimize your staff allocation based on customer traffic forecasts. Drag staff to time slots and get real-time feedback on costs and coverage.</p>
+        </header>
+        
+        <div class=&quot;tabs&quot;>
+            <div class=&quot;tab active&quot; data-tab=&quot;schedule&quot;>Schedule Planner</div>
+            <div class=&quot;tab&quot; data-tab=&quot;analysis&quot;>Coverage Analysis</div>
+            <div class=&quot;tab&quot; data-tab=&quot;costs&quot;>Labor Costs</div>
+            <div class=&quot;tab&quot; data-tab=&quot;forecast&quot;>Traffic Forecasts</div>
+            <div class=&quot;tab&quot; data-tab=&quot;team&quot;>Team Management</div>
+        </div>
+        
+        <div class=&quot;dashboard&quot;>
+            <div class=&quot;staff-pool&quot;>
+                <h2>Staff Pool <span class=&quot;staff-count&quot;>15 Available</span></h2>
+                <div class=&quot;staff-list&quot;>
+                    <div class=&quot;staff-item&quot; draggable=&quot;true&quot; data-id=&quot;1&quot; data-name=&quot;John D.&quot; data-role=&quot;Manager&quot; data-cost=&quot;25&quot;>
+                        <div class=&quot;staff-icon&quot;>👨‍💼</div>
+                        <div class=&quot;staff-name&quot;>John D.</div>
+                        <div class=&quot;staff-role&quot;>Manager</div>
+                        <div class=&quot;staff-cost&quot;>$25/h</div>
+                    </div>
+                    <div class=&quot;staff-item&quot; draggable=&quot;true&quot; data-id=&quot;2&quot; data-name=&quot;Emma S.&quot; data-role=&quot;Server&quot; data-cost=&quot;18&quot;>
+                        <div class=&quot;staff-icon&quot;>👩‍🍳</div>
+                        <div class=&quot;staff-name&quot;>Emma S.</div>
+                        <div class=&quot;staff-role&quot;>Server</div>
+                        <div class=&quot;staff-cost&quot;>$18/h</div>
+                    </div>
+                    <div class=&quot;staff-item&quot; draggable=&quot;true&quot; data-id=&quot;3&quot; data-name=&quot;Mike T.&quot; data-role=&quot;Cook&quot; data-cost=&quot;22&quot;>
+                        <div class=&quot;staff-icon&quot;>👨‍🍳</div>
+                        <div class=&quot;staff-name&quot;>Mike T.</div>
+                        <div class=&quot;staff-role&quot;>Cook</div>
+                        <div class=&quot;staff-cost&quot;>$22/h</div>
+                    </div>
+                    <div class=&quot;staff-item&quot; draggable=&quot;true&quot; data-id=&quot;4&quot; data-name=&quot;Lisa R.&quot; data-role=&quot;Hostess&quot; data-cost=&quot;17&quot;>
+                        <div class=&quot;staff-icon&quot;>👩‍💼</div>
+                        <div class=&quot;staff-name&quot;>Lisa R.</div>
+                        <div class=&quot;staff-role&quot;>Hostess</div>
+                        <div class=&quot;staff-cost&quot;>$17/h</div>
+                    </div>
+                    <div class=&quot;staff-item&quot; draggable=&quot;true&quot; data-id=&quot;5&quot; data-name=&quot;David K.&quot; data-role=&quot;Server&quot; data-cost=&quot;18&quot;>
+                        <div class=&quot;staff-icon&quot;>👨‍🔧</div>
+                        <div class=&quot;staff-name&quot;>David K.</div>
+                        <div class=&quot;staff-role&quot;>Server</div>
+                        <div class=&quot;staff-cost&quot;>$18/h</div>
+                    </div>
+                    <div class=&quot;staff-item&quot; draggable=&quot;true&quot; data-id=&quot;6&quot; data-name=&quot;Sarah L.&quot; data-role=&quot;Bartender&quot; data-cost=&quot;20&quot;>
+                        <div class=&quot;staff-icon&quot;>👩‍🔧</div>
+                        <div class=&quot;staff-name&quot;>Sarah L.</div>
+                        <div class=&quot;staff-role&quot;>Bartender</div>
+                        <div class=&quot;staff-cost&quot;>$20/h</div>
+                    </div>
+                    <div class=&quot;staff-item&quot; draggable=&quot;true&quot; data-id=&quot;7&quot; data-name=&quot;James B.&quot; data-role=&quot;Cook&quot; data-cost=&quot;22&quot;>
+                        <div class=&quot;staff-icon&quot;>👨‍🍳</div>
+                        <div class=&quot;staff-name&quot;>James B.</div>
+                        <div class=&quot;staff-role&quot;>Cook</div>
+                        <div class=&quot;staff-cost&quot;>$22/h</div>
+                    </div>
+                    <div class=&quot;staff-item&quot; draggable=&quot;true&quot; data-id=&quot;8&quot; data-name=&quot;Nina P.&quot; data-role=&quot;Server&quot; data-cost=&quot;18&quot;>
+                        <div class=&quot;staff-icon&quot;>👩‍🍳</div>
+                        <div class=&quot;staff-name&quot;>Nina P.</div>
+                        <div class=&quot;staff-role&quot;>Server</div>
+                        <div class=&quot;staff-cost&quot;>$18/h</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class=&quot;schedule-container&quot;>
+                <div class=&quot;schedule-header&quot;>
+                    <h2 class=&quot;schedule-title&quot;>Week Schedule: May 15 - May 21</h2>
+                    <div class=&quot;schedule-actions&quot;>
+                        <button class=&quot;btn btn-outline&quot; id=&quot;clear-schedule&quot;>Clear All</button>
+                        <button class=&quot;btn btn-secondary&quot; id=&quot;optimize-schedule&quot;>Auto Optimize</button>
+                        <button class=&quot;btn&quot; id=&quot;save-schedule&quot;>Save Schedule</button>
+                    </div>
+                </div>
+                
+                <div class=&quot;schedule-grid&quot;>
+                    <div class=&quot;time-cell&quot;></div>
+                    <div class=&quot;day-cell&quot;>Monday</div>
+                    <div class=&quot;day-cell&quot;>Tuesday</div>
+                    <div class=&quot;day-cell&quot;>Wednesday</div>
+                    <div class=&quot;day-cell&quot;>Thursday</div>
+                    <div class=&quot;day-cell&quot;>Friday</div>
+                    <div class=&quot;day-cell&quot;>Saturday</div>
+                    <div class=&quot;day-cell&quot;>Sunday</div>
+                    
+                    <div class=&quot;time-cell&quot;>8 AM - 10 AM</div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;1&quot; data-time=&quot;8&quot; data-traffic=&quot;low&quot;><div class=&quot;traffic-indicator traffic-low&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;2&quot; data-time=&quot;8&quot; data-traffic=&quot;low&quot;><div class=&quot;traffic-indicator traffic-low&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;3&quot; data-time=&quot;8&quot; data-traffic=&quot;low&quot;><div class=&quot;traffic-indicator traffic-low&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;4&quot; data-time=&quot;8&quot; data-traffic=&quot;low&quot;><div class=&quot;traffic-indicator traffic-low&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;5&quot; data-time=&quot;8&quot; data-traffic=&quot;low&quot;><div class=&quot;traffic-indicator traffic-low&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;6&quot; data-time=&quot;8&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;7&quot; data-time=&quot;8&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    
+                    <div class=&quot;time-cell&quot;>10 AM - 12 PM</div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;1&quot; data-time=&quot;10&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;2&quot; data-time=&quot;10&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;3&quot; data-time=&quot;10&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;4&quot; data-time=&quot;10&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;5&quot; data-time=&quot;10&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;6&quot; data-time=&quot;10&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;7&quot; data-time=&quot;10&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    
+                    <div class=&quot;time-cell&quot;>12 PM - 2 PM</div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;1&quot; data-time=&quot;12&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;2&quot; data-time=&quot;12&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;3&quot; data-time=&quot;12&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;4&quot; data-time=&quot;12&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;5&quot; data-time=&quot;12&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;6&quot; data-time=&quot;12&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;7&quot; data-time=&quot;12&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    
+                    <div class=&quot;time-cell&quot;>2 PM - 4 PM</div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;1&quot; data-time=&quot;14&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;2&quot; data-time=&quot;14&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;3&quot; data-time=&quot;14&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;4&quot; data-time=&quot;14&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;5&quot; data-time=&quot;14&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;6&quot; data-time=&quot;14&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;7&quot; data-time=&quot;14&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    
+                    <div class=&quot;time-cell&quot;>4 PM - 6 PM</div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;1&quot; data-time=&quot;16&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;2&quot; data-time=&quot;16&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;3&quot; data-time=&quot;16&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;4&quot; data-time=&quot;16&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;5&quot; data-time=&quot;16&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;6&quot; data-time=&quot;16&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;7&quot; data-time=&quot;16&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    
+                    <div class=&quot;time-cell&quot;>6 PM - 8 PM</div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;1&quot; data-time=&quot;18&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;2&quot; data-time=&quot;18&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;3&quot; data-time=&quot;18&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;4&quot; data-time=&quot;18&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;5&quot; data-time=&quot;18&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;6&quot; data-time=&quot;18&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;7&quot; data-time=&quot;18&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    
+                    <div class=&quot;time-cell&quot;>8 PM - 10 PM</div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;1&quot; data-time=&quot;20&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;2&quot; data-time=&quot;20&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;3&quot; data-time=&quot;20&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;4&quot; data-time=&quot;20&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;5&quot; data-time=&quot;20&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;6&quot; data-time=&quot;20&quot; data-traffic=&quot;high&quot;><div class=&quot;traffic-indicator traffic-high&quot;></div></div>
+                    <div class=&quot;schedule-cell droppable&quot; data-day=&quot;7&quot; data-time=&quot;20&quot; data-traffic=&quot;medium&quot;><div class=&quot;traffic-indicator traffic-medium&quot;></div></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class=&quot;metrics-container&quot;>
+            <div class=&quot;metric-card&quot;>
+                <div class=&quot;metric-title&quot;>Total Labor Cost</div>
+                <div class=&quot;metric-value&quot;>$2,480</div>
+                <div class=&quot;metric-change positive&quot;>
+                    <span class=&quot;metric-change-icon&quot;>↓</span> 5.2% from last week
+                </div>
+            </div>
+            <div class=&quot;metric-card&quot;>
+                <div class=&quot;metric-title&quot;>Staff Coverage</div>
+                <div class=&quot;metric-value&quot;>84%</div>
+                <div class=&quot;metric-change positive&quot;>
+                    <span class=&quot;metric-change-icon&quot;>↑</span> 7% improvement
+                </div>
+            </div>
+            <div class=&quot;metric-card&quot;>
+                <div class=&quot;metric-title&quot;>Traffic Match Score</div>
+                <div class=&quot;metric-value&quot;>76%</div>
+                <div class=&quot;metric-change positive&quot;>
+                    <span class=&quot;metric-change-icon&quot;>↑</span> 12% improvement
+                </div>
+            </div>
+            <div class=&quot;metric-card&quot;>
+                <div class=&quot;metric-title&quot;>Labor Hours</div>
+                <div class=&quot;metric-value&quot;>126</div>
+                <div class=&quot;metric-change negative&quot;>
+                    <span class=&quot;metric-change-icon&quot;>↓</span> 3% reduction
+                </div>
+            </div>
+        </div>
+        
+        <div class=&quot;feedback-container&quot;>
+            <div class=&quot;feedback-message&quot;>
+                <div class=&quot;feedback-icon&quot;>💡</div>
+                <div class=&quot;feedback-text&quot;>Your lunch rush on Saturday needs more coverage. Try adding 2 more servers between 12-2 PM for optimal service.</div>
+            </div>
+            <button class=&quot;feedback-action&quot;>Apply Suggestion</button>
+        </div>
+    </div>
+    
+    <div class=&quot;modal&quot; id=&quot;staff-details-modal&quot;>
+        <div class=&quot;modal-content&quot;>
+            <div class=&quot;modal-header&quot;>
+                <h3 class=&quot;modal-title&quot;>Staff Details</h3>
+                <button class=&quot;modal-close&quot;>&amp;times;</button>
+            </div>
+            <div class=&quot;modal-body&quot;>
+                <div class=&quot;staff-detail-grid&quot;>
+                    <div class=&quot;staff-detail-item&quot;>
+                        <div class=&quot;staff-detail-label&quot;>Name</div>
+                        <div class=&quot;staff-detail-value&quot; id=&quot;detail-name&quot;>John Doe</div>
+                    </div>
+                    <div class=&quot;staff-detail-item&quot;>
+                        <div class=&quot;staff-detail-label&quot;>Role</div>
+                        <div class=&quot;staff-detail-value&quot; id=&quot;detail-role&quot;>Manager</div>
+                    </div>
+                    <div class=&quot;staff-detail-item&quot;>
+                        <div class=&quot;staff-detail-label&quot;>Hourly Rate</div>
+                        <div class=&quot;staff-detail-value&quot; id=&quot;detail-cost&quot;>$25/hour</div>
+                    </div>
+                    <div class=&quot;staff-detail-item&quot;>
+                        <div class=&quot;staff-detail-label&quot;>Scheduled Hours</div>
+                        <div class=&quot;staff-detail-value&quot; id=&quot;detail-hours&quot;>16 hours</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;form-group&quot;>
+                    <label class=&quot;form-label&quot; for=&quot;shift-notes&quot;>Shift Notes</label>
+                    <textarea class=&quot;form-control&quot; id=&quot;shift-notes&quot; rows=&quot;3&quot; placeholder=&quot;Add notes for this staff member's shift...&quot;></textarea>
+                </div>
+            </div>
+            <div class=&quot;modal-footer&quot;>
+                <button class=&quot;btn btn-outline&quot; id=&quot;remove-staff&quot;>Remove from Shift</button>
+                <button class=&quot;btn&quot; id=&quot;save-details&quot;>Save Changes</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class=&quot;toast&quot; id=&quot;toast-notification&quot;>
+        <div class=&quot;toast-icon&quot;>✅</div>
+        <div class=&quot;toast-message&quot;>Schedule saved successfully!</div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Variables
+            let draggedStaff = null;
+            let totalCost = 2480;
+            let staffCount = 8;
+            let placedStaff = 0;
+            let selectedStaffId = null;
+            let selectedCell = null;
+            
+            // Elements
+            const staffItems = document.querySelectorAll('.staff-item');
+            const cells = document.querySelectorAll('.schedule-cell');
+            const clearBtn = document.getElementById('clear-schedule');
+            const optimizeBtn = document.getElementById('optimize-schedule');
+            const saveBtn = document.getElementById('save-schedule');
+            const tabs = document.querySelectorAll('.tab');
+            const modal = document.getElementById('staff-details-modal');
+            const modalClose = document.querySelector('.modal-close');
+            const removeStaffBtn = document.getElementById('remove-staff');
+            const saveDetailsBtn = document.getElementById('save-details');
+            const toast = document.getElementById('toast-notification');
+            const feedbackAction = document.querySelector('.feedback-action');
+            
+            // Initialize drag and drop for staff items
+            staffItems.forEach(staff => {
+                staff.addEventListener('dragstart', handleDragStart);
+                // Create clones for easier mobile interaction
+                staff.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        draggedStaff = this;
+                        document.body.classList.add('dragging');
+                        // Show toast with instructions
+                        showToast('Now tap on a schedule cell to place staff', 2000);
+                    }
+                });
+            });
+            
+            // Setup schedule cells for drop events
+            cells.forEach(cell => {
+                cell.addEventListener('dragover', handleDragOver);
+                cell.addEventListener('dragenter', handleDragEnter);
+                cell.addEventListener('dragleave', handleDragLeave);
+                cell.addEventListener('drop', handleDrop);
+                
+                // For mobile
+                cell.addEventListener('click', function() {
+                    if (draggedStaff &amp;&amp; window.innerWidth <= 768) {
+                        handleMobileDrop(this);
+                    }
+                });
+            });
+            
+            // Clear schedule button
+            clearBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to clear the entire schedule?')) {
+                    cells.forEach(cell => {
+                        const staffElement = cell.querySelector('.placed-staff');
+                        if (staffElement) {
+                            cell.removeChild(staffElement);
+                        }
+                    });
+                    
+                    updateMetrics(0, 0);
+                    showToast('Schedule cleared successfully', 3000);
+                }
+            });
+            
+            // Optimize schedule button
+            optimizeBtn.addEventListener('click', function() {
+                // Simulate optimization with loading state
+                this.textContent = 'Optimizing...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    autoOptimizeSchedule();
+                    this.textContent = 'Auto Optimize';
+                    this.disabled = false;
+                    showToast('Schedule optimized for maximum efficiency', 3000);
+                }, 1500);
+            });
+            
+            // Save schedule button
+            saveBtn.addEventListener('click', function() {
+                // Simulate saving with loading state
+                this.textContent = 'Saving...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    this.textContent = 'Save Schedule';
+                    this.disabled = false;
+                    showToast('Schedule saved successfully!', 3000);
+                }, 1000);
+            });
+            
+            // Tab functionality
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // In a real app, you would show/hide content based on tab
+                    showToast(`Switched to ${this.textContent} view`, 2000);
+                });
+            });
+            
+            // Modal functionality
+            modalClose.addEventListener('click', closeModal);
+            
+            // When clicking outside the modal content, close it
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Remove staff button in modal
+            removeStaffBtn.addEventListener('click', function() {
+                if (selectedCell) {
+                    const staffElement = selectedCell.querySelector('.placed-staff');
+                    if (staffElement) {
+                        selectedCell.removeChild(staffElement);
+                        placedStaff--;
+                        updateMetrics(-1, -parseInt(staffElement.dataset.cost));
+                    }
+                }
+                closeModal();
+                showToast('Staff removed from shift', 3000);
+            });
+            
+            // Save details button in modal
+            saveDetailsBtn.addEventListener('click', function() {
+                closeModal();
+                showToast('Staff details updated', 3000);
+            });
+            
+            // Apply suggestion button
+            feedbackAction.addEventListener('click', function() {
+                // Implement the suggestion
+                const saturdayLunchCell = document.querySelector('.schedule-cell[data-day=&quot;6&quot;][data-time=&quot;12&quot;]');
+                if (saturdayLunchCell) {
+                    // Add two servers automatically
+                    for (let i = 0; i < 2; i++) {
+                        if (staffCount > 0) {
+                            const staffData = {
+                                id: 100 + i,
+                                name: &quot;Server &quot; + (i + 1),
+                                role: &quot;Server&quot;,
+                                cost: 18
+                            };
+                            createPlacedStaffElement(saturdayLunchCell, staffData);
+                        }
+                    }
+                }
+                
+                showToast('Suggestion applied successfully', 3000);
+                this.parentElement.style.display = 'none';
+            });
+            
+            // Drag and drop handlers
+            function handleDragStart(e) {
+                draggedStaff = this;
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', ''); // Required for Firefox
+            }
+            
+            function handleDragOver(e) {
+                e.preventDefault();
+                return false;
+            }
+            
+            function handleDragEnter(e) {
+                this.classList.add('drag-over');
+            }
+            
+            function handleDragLeave(e) {
+                this.classList.remove('drag-over');
+            }
+            
+            function handleDrop(e) {
+                e.preventDefault();
+                this.classList.remove('drag-over');
+                
+                if (draggedStaff) {
+                    const staffData = {
+                        id: draggedStaff.dataset.id,
+                        name: draggedStaff.dataset.name,
+                        role: draggedStaff.dataset.role,
+                        cost: draggedStaff.dataset.cost
+                    };
+                    
+                    createPlacedStaffElement(this, staffData);
+                }
+                
+                return false;
+            }
+            
+            function handleMobileDrop(cell) {
+                if (draggedStaff) {
+                    const staffData = {
+                        id: draggedStaff.dataset.id,
+                        name: draggedStaff.dataset.name,
+                        role: draggedStaff.dataset.role,
+                        cost: draggedStaff.dataset.cost
+                    };
+                    
+                    createPlacedStaffElement(cell, staffData);
+                    draggedStaff = null;
+                    document.body.classList.remove('dragging');
+                }
+            }
+            
+            // Create placed staff element
+            function createPlacedStaffElement(cell, staffData) {
+                // Check if cell already has staff
+                if (cell.querySelector('.placed-staff')) {
+                    // Replace existing staff
+                    cell.innerHTML = '';
+                } else {
+                    placedStaff++;
+                }
+                
+                const staffElement = document.createElement('div');
+                staffElement.className = 'placed-staff';
+                staffElement.dataset.id = staffData.id;
+                staffElement.dataset.name = staffData.name;
+                staffElement.dataset.role = staffData.role;
+                staffElement.dataset.cost = staffData.cost;
+                
+                staffElement.innerHTML = `
+                    <div class=&quot;placed-staff-icon&quot;>${getEmojiForRole(staffData.role)}</div>
+                    <div class=&quot;placed-staff-name&quot;>${staffData.name}</div>
+                    <div class=&quot;placed-staff-role&quot;>${staffData.role}</div>
+                `;
+                
+                staffElement.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    openStaffDetails(this, cell);
+                });
+                
+                cell.appendChild(staffElement);
+                updateMetrics(1, parseInt(staffData.cost));
+            }
+            
+            // Get emoji based on role
+            function getEmojiForRole(role) {
+                const roles = {
+                    'Manager': '👨‍💼',
+                    'Server': '🧑‍🍳',
+                    'Cook': '👨‍🍳',
+                    'Hostess': '👩‍💼',
+                    'Bartender': '🍸'
+                };
+                
+                return roles[role] || '👤';
+            }
+            
+            // Update metrics when staff is added or removed
+            function updateMetrics(staffChange, costChange) {
+                const costElement = document.querySelector('.metric-value:first-child');
+                totalCost += (costChange * 2); // Assuming 2 hours per shift
+                costElement.textContent = `$${totalCost}`;
+                
+                // Update other metrics accordingly
+                const coverageElement = document.querySelectorAll('.metric-value')[1];
+                const newCoverage = Math.min(100, Math.max(0, parseInt(coverageElement.textContent) + (staffChange * 2)));
+                coverageElement.textContent = `${newCoverage}%`;
+                
+                const trafficElement = document.querySelectorAll('.metric-value')[2];
+                const newTraffic = Math.min(100, Math.max(0, parseInt(trafficElement.textContent) + (staffChange * 1.5)));
+                trafficElement.textContent = `${newTraffic}%`;
+                
+                const hoursElement = document.querySelectorAll('.metric-value')[3];
+                const newHours = Math.max(0, parseInt(hoursElement.textContent) + (staffChange * 2));
+                hoursElement.textContent = newHours;
+            }
+            
+            // Auto-optimize schedule based on traffic
+            function autoOptimizeSchedule() {
+                // Clear existing schedule
+                cells.forEach(cell => {
+                    const staffElement = cell.querySelector('.placed-staff');
+                    if (staffElement) {
+                        cell.removeChild(staffElement);
+                    }
+                });
+                
+                // Reset metrics
+                updateMetrics(0, -totalCost/2); // Reset cost
+                totalCost = 0;
+                placedStaff = 0;
+                
+                // Add staff based on traffic
+                cells.forEach(cell => {
+                    const traffic = cell.dataset.traffic;
+                    let staffToAdd = 0;
+                    
+                    if (traffic === 'high') {
+                        staffToAdd = 3;
+                    } else if (traffic === 'medium') {
+                        staffToAdd = 2;
+                    } else if (traffic === 'low') {
+                        staffToAdd = 1;
+                    }
+                    
+                    // Add appropriate staff based on traffic
+                    for (let i = 0; i < staffToAdd; i++) {
+                        const roles = ['Manager', 'Server', 'Cook', 'Hostess', 'Bartender'];
+                        const role = roles[Math.floor(Math.random() * roles.length)];
+                        const cost = role === 'Manager' ? 25 : (role === 'Cook' ? 22 : (role === 'Bartender' ? 20 : 18));
+                        
+                        const staffData = {
+                            id: Math.floor(Math.random() * 1000),
+                            name: role.charAt(0) + &quot;. Staff&quot;,
+                            role: role,
+                            cost: cost
+                        };
+                        
+                        createPlacedStaffElement(cell, staffData);
+                    }
+                });
+            }
+            
+            // Open staff details modal
+            function openStaffDetails(staffElement, cell) {
+                selectedStaffId = staffElement.dataset.id;
+                selectedCell = cell;
+                
+                // Populate modal with staff details
+                document.getElementById('detail-name').textContent = staffElement.dataset.name;
+                document.getElementById('detail-role').textContent = staffElement.dataset.role;
+                document.getElementById('detail-cost').textContent = `$${staffElement.dataset.cost}/hour`;
+                document.getElementById('detail-hours').textContent = `2 hours`;
+                
+                // Show modal
+                modal.classList.add('active');
+            }
+            
+            // Close modal
+            function closeModal() {
+                modal.classList.remove('active');
+                selectedStaffId = null;
+                selectedCell = null;
+            }
+            
+            // Show toast notification
+            function showToast(message, duration = 3000) {
+                const toastMessage = document.querySelector('.toast-message');
+                toastMessage.textContent = message;
+                toast.classList.add('active');
+                
+                setTimeout(() => {
+                    toast.classList.remove('active');
+                }, duration);
+            }
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_g1k63mt5';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_g1k63mt5" style="width: 100%; height: 1482px; border: none;"></iframe>

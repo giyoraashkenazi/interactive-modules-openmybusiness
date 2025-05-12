@@ -1,0 +1,855 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Interactive BI Dashboard Builder</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --panel-color: #1e1e1e;
+            --accent-color: #6366f1;
+            --text-color: #e0e0e0;
+            --secondary-text: #a0a0a0;
+            --border-color: #333333;
+            --success-color: #4ade80;
+            --warning-color: #facc15;
+            --danger-color: #f87171;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        
+        header {
+            background-color: var(--panel-color);
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        p.description {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: var(--panel-color);
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+        
+        .tab {
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            white-space: nowrap;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--accent-color);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 1rem;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .container {
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .panel {
+            background-color: var(--panel-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .panel-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .metrics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .metric {
+            background-color: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 6px;
+            padding: 0.75rem;
+            cursor: move;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .metric:hover {
+            background-color: rgba(99, 102, 241, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .visualization-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .visualization {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .visualization.highlight {
+            border-color: var(--accent-color);
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+        
+        .viz-placeholder {
+            color: var(--secondary-text);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .viz-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.6;
+        }
+        
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.6rem 1.2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            border: 1px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+        
+        .info-box {
+            background-color: rgba(99, 102, 241, 0.1);
+            border-left: 4px solid var(--accent-color);
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .help-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .help-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-color);
+        }
+        
+        .help-section p {
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+        
+        .help-section ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .help-section li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .chart-container {
+            width: 100%;
+            height: 100%;
+            min-height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .chart-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        
+        .kpi-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .kpi-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .kpi-label {
+            font-size: 0.9rem;
+            color: var(--secondary-text);
+        }
+        
+        .kpi-trend {
+            display: flex;
+            align-items: center;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+        }
+        
+        .kpi-trend.up {
+            color: var(--success-color);
+        }
+        
+        .kpi-trend.down {
+            color: var(--danger-color);
+        }
+        
+        .mobile-message {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+            background-color: rgba(99, 102, 241, 0.1);
+            border-radius: 8px;
+            margin: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .visualization-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-container {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .tab {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.25rem;
+            }
+            
+            .panel {
+                padding: 0.75rem;
+            }
+            
+            .btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+            }
+            
+            .metrics-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .metric {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Interactive BI Dashboard Builder</h1>
+        <p class=&quot;description&quot;>Create a simplified dashboard by selecting and arranging key restaurant KPIs</p>
+    </header>
+    
+    <div class=&quot;tabs&quot;>
+        <div class=&quot;tab active&quot; data-tab=&quot;build&quot;>Build Dashboard</div>
+        <div class=&quot;tab&quot; data-tab=&quot;preview&quot;>Preview</div>
+        <div class=&quot;tab&quot; data-tab=&quot;help&quot;>Help &amp; Guide</div>
+    </div>
+    
+    <div class=&quot;container&quot;>
+        <div id=&quot;build&quot; class=&quot;tab-content active&quot;>
+            <div class=&quot;panel&quot;>
+                <div class=&quot;panel-title&quot;>
+                    <span>Available Metrics</span>
+                    <small>Drag metrics to visualization areas</small>
+                </div>
+                <div class=&quot;metrics-container&quot;>
+                    <div class=&quot;metric&quot; draggable=&quot;true&quot; data-metric=&quot;sales&quot; data-type=&quot;line&quot;>
+                        Total Sales
+                    </div>
+                    <div class=&quot;metric&quot; draggable=&quot;true&quot; data-metric=&quot;avg_ticket&quot; data-type=&quot;number&quot;>
+                        Average Ticket Size
+                    </div>
+                    <div class=&quot;metric&quot; draggable=&quot;true&quot; data-metric=&quot;labor_hour&quot; data-type=&quot;bar&quot;>
+                        Sales per Labor Hour
+                    </div>
+                    <div class=&quot;metric&quot; draggable=&quot;true&quot; data-metric=&quot;repeat_rate&quot; data-type=&quot;donut&quot;>
+                        Repeat-Customer Rate
+                    </div>
+                    <div class=&quot;metric&quot; draggable=&quot;true&quot; data-metric=&quot;top_item&quot; data-type=&quot;bar&quot;>
+                        Top-Selling Items
+                    </div>
+                    <div class=&quot;metric&quot; draggable=&quot;true&quot; data-metric=&quot;margin&quot; data-type=&quot;number&quot;>
+                        Profit Margin %
+                    </div>
+                    <div class=&quot;metric&quot; draggable=&quot;true&quot; data-metric=&quot;table_turns&quot; data-type=&quot;line&quot;>
+                        Table Turns
+                    </div>
+                    <div class=&quot;metric&quot; draggable=&quot;true&quot; data-metric=&quot;campaign_roi&quot; data-type=&quot;bar&quot;>
+                        Campaign ROI
+                    </div>
+                </div>
+                
+                <div class=&quot;panel-title&quot;>
+                    <span>Dashboard Layout</span>
+                    <small>Drop metrics here to visualize</small>
+                </div>
+                <div class=&quot;visualization-container&quot;>
+                    <div class=&quot;visualization&quot; data-viz-type=&quot;line&quot;>
+                        <div class=&quot;viz-placeholder&quot;>
+                            <div class=&quot;viz-icon&quot;>📈</div>
+                            <div>Line Chart</div>
+                            <small>Drop a time-based metric here</small>
+                        </div>
+                    </div>
+                    <div class=&quot;visualization&quot; data-viz-type=&quot;bar&quot;>
+                        <div class=&quot;viz-placeholder&quot;>
+                            <div class=&quot;viz-icon&quot;>📊</div>
+                            <div>Bar Chart</div>
+                            <small>Drop a categorical metric here</small>
+                        </div>
+                    </div>
+                    <div class=&quot;visualization&quot; data-viz-type=&quot;number&quot;>
+                        <div class=&quot;viz-placeholder&quot;>
+                            <div class=&quot;viz-icon&quot;>🔢</div>
+                            <div>KPI Card</div>
+                            <small>Drop a key metric here</small>
+                        </div>
+                    </div>
+                    <div class=&quot;visualization&quot; data-viz-type=&quot;donut&quot;>
+                        <div class=&quot;viz-placeholder&quot;>
+                            <div class=&quot;viz-icon&quot;>🍩</div>
+                            <div>Donut Chart</div>
+                            <small>Drop a percentage metric here</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class=&quot;btn-group&quot;>
+                    <button class=&quot;btn&quot; id=&quot;previewBtn&quot;>Preview Dashboard</button>
+                    <button class=&quot;btn btn-secondary&quot; id=&quot;resetBtn&quot;>Reset</button>
+                    <button class=&quot;btn&quot; id=&quot;saveBtn&quot;>Save Dashboard</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;preview&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;panel&quot;>
+                <div class=&quot;panel-title&quot;>
+                    <span>Restaurant Performance Dashboard</span>
+                    <small id=&quot;dashboard-date&quot;>Data as of today</small>
+                </div>
+                
+                <div class=&quot;visualization-container&quot; id=&quot;preview-container&quot;>
+                    <!-- Preview content will be generated here -->
+                </div>
+                
+                <div class=&quot;btn-group&quot;>
+                    <button class=&quot;btn&quot; id=&quot;backToEditBtn&quot;>Back to Edit</button>
+                    <button class=&quot;btn btn-secondary&quot; id=&quot;exportBtn&quot;>Export (PDF)</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;help&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;panel&quot;>
+                <div class=&quot;panel-title&quot;>
+                    <span>Help &amp; Guide</span>
+                </div>
+                
+                <div class=&quot;info-box&quot;>
+                    <p>Welcome to the Interactive BI Dashboard Builder. This tool allows you to create a custom business intelligence dashboard for your restaurant by selecting key performance indicators and arranging them in different visualization formats.</p>
+                </div>
+                
+                <div class=&quot;help-section&quot;>
+                    <h3>🎯 How to Build Your Dashboard</h3>
+                    <ol>
+                        <li>From the <strong>Available Metrics</strong> section, drag KPIs to the visualization areas below</li>
+                        <li>Each visualization area accepts specific types of metrics for optimal display</li>
+                        <li>Click <strong>Preview Dashboard</strong> to see how your dashboard will look with actual data</li>
+                        <li>Use <strong>Save Dashboard</strong> to store your configuration for later use</li>
+                    </ol>
+                </div>
+                
+                <div class=&quot;help-section&quot;>
+                    <h3>🔑 Understanding Key Metrics</h3>
+                    <ul>
+                        <li><strong>Total Sales:</strong> Overall revenue generated in the selected period</li>
+                        <li><strong>Average Ticket Size:</strong> The average amount spent per transaction</li>
+                        <li><strong>Sales per Labor Hour:</strong> Revenue generated divided by staff hours worked</li>
+                        <li><strong>Repeat-Customer Rate:</strong> Percentage of customers who return within 30 days</li>
+                        <li><strong>Top-Selling Items:</strong> Menu items with the highest sales volume</li>
+                        <li><strong>Profit Margin %:</strong> Net profit as a percentage of total revenue</li>
+                        <li><strong>Table Turns:</strong> How many times a table is occupied during service</li>
+                        <li><strong>Campaign ROI:</strong> Return on investment for marketing campaigns</li>
+                    </ul>
+                </div>
+                
+                <div class=&quot;help-section&quot;>
+                    <h3>📊 Visualization Types</h3>
+                    <ul>
+                        <li><strong>Line Chart:</strong> Best for showing trends over time (sales, table turns)</li>
+                        <li><strong>Bar Chart:</strong> Ideal for comparing categories (top items, campaign ROI)</li>
+                        <li><strong>KPI Card:</strong> Shows a single important number with trend indicator</li>
+                        <li><strong>Donut Chart:</strong> Perfect for showing percentage breakdowns</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to selected tab and content
+                    tab.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Drag and drop functionality
+            const metrics = document.querySelectorAll('.metric');
+            const visualizations = document.querySelectorAll('.visualization');
+            
+            // Set current date for dashboard preview
+            const today = new Date();
+            document.getElementById('dashboard-date').textContent = `Data as of ${today.toLocaleDateString()}`;
+            
+            metrics.forEach(metric => {
+                metric.addEventListener('dragstart', function(e) {
+                    e.dataTransfer.setData('text/plain', JSON.stringify({
+                        metric: this.getAttribute('data-metric'),
+                        type: this.getAttribute('data-type'),
+                        text: this.textContent.trim()
+                    }));
+                });
+            });
+            
+            visualizations.forEach(viz => {
+                viz.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('highlight');
+                });
+                
+                viz.addEventListener('dragleave', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('highlight');
+                });
+                
+                viz.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('highlight');
+                    
+                    const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+                    const vizType = this.getAttribute('data-viz-type');
+                    
+                    // Check compatibility
+                    if (data.type === vizType) {
+                        this.innerHTML = '';
+                        this.setAttribute('data-metric', data.metric);
+                        
+                        // Generate mock visualization based on type
+                        if (vizType === 'line') {
+                            this.innerHTML = `
+                                <div class=&quot;chart-title&quot;>${data.text} Trend</div>
+                                <div class=&quot;chart-container&quot;>
+                                    <svg width=&quot;100%&quot; height=&quot;150px&quot; viewBox=&quot;0 0 300 150&quot;>
+                                        <polyline 
+                                            points=&quot;10,140 50,100 90,110 130,60 170,80 210,30 250,50 290,20&quot;
+                                            fill=&quot;none&quot; 
+                                            stroke=&quot;${getRandomColor()}&quot; 
+                                            stroke-width=&quot;3&quot;
+                                        />
+                                        <line x1=&quot;10&quot; y1=&quot;140&quot; x2=&quot;290&quot; y2=&quot;140&quot; stroke=&quot;#555555&quot; stroke-width=&quot;1&quot; />
+                                        <line x1=&quot;10&quot; y1=&quot;20&quot; x2=&quot;10&quot; y2=&quot;140&quot; stroke=&quot;#555555&quot; stroke-width=&quot;1&quot; />
+                                    </svg>
+                                </div>
+                            `;
+                        } else if (vizType === 'bar') {
+                            const barColors = Array(5).fill().map(() => getRandomColor());
+                            this.innerHTML = `
+                                <div class=&quot;chart-title&quot;>${data.text}</div>
+                                <div class=&quot;chart-container&quot;>
+                                    <svg width=&quot;100%&quot; height=&quot;150px&quot; viewBox=&quot;0 0 300 150&quot;>
+                                        <rect x=&quot;30&quot; y=&quot;40&quot; width=&quot;30&quot; height=&quot;100&quot; fill=&quot;${barColors[0]}&quot; />
+                                        <rect x=&quot;80&quot; y=&quot;70&quot; width=&quot;30&quot; height=&quot;70&quot; fill=&quot;${barColors[1]}&quot; />
+                                        <rect x=&quot;130&quot; y=&quot;90&quot; width=&quot;30&quot; height=&quot;50&quot; fill=&quot;${barColors[2]}&quot; />
+                                        <rect x=&quot;180&quot; y=&quot;60&quot; width=&quot;30&quot; height=&quot;80&quot; fill=&quot;${barColors[3]}&quot; />
+                                        <rect x=&quot;230&quot; y=&quot;50&quot; width=&quot;30&quot; height=&quot;90&quot; fill=&quot;${barColors[4]}&quot; />
+                                        <line x1=&quot;10&quot; y1=&quot;140&quot; x2=&quot;290&quot; y2=&quot;140&quot; stroke=&quot;#555555&quot; stroke-width=&quot;1&quot; />
+                                    </svg>
+                                </div>
+                            `;
+                        } else if (vizType === 'number') {
+                            const value = data.metric === 'avg_ticket' ? '$32.75' : 
+                                        data.metric === 'margin' ? '24.3%' : 
+                                        Math.floor(Math.random() * 1000).toLocaleString();
+                            const trend = Math.random() > 0.5 ? 'up' : 'down';
+                            const trendValue = (Math.random() * 10).toFixed(1);
+                            this.innerHTML = `
+                                <div class=&quot;kpi-card&quot;>
+                                    <div class=&quot;kpi-value&quot;>${value}</div>
+                                    <div class=&quot;kpi-label&quot;>${data.text}</div>
+                                    <div class=&quot;kpi-trend ${trend}&quot;>
+                                        ${trend === 'up' ? '↑' : '↓'} ${trendValue}% from last week
+                                    </div>
+                                </div>
+                            `;
+                        } else if (vizType === 'donut') {
+                            const percentage = data.metric === 'repeat_rate' ? 62 : Math.floor(Math.random() * 100);
+                            const color = getRandomColor();
+                            this.innerHTML = `
+                                <div class=&quot;chart-title&quot;>${data.text}</div>
+                                <div class=&quot;chart-container&quot;>
+                                    <svg width=&quot;120px&quot; height=&quot;120px&quot; viewBox=&quot;0 0 120 120&quot;>
+                                        <circle cx=&quot;60&quot; cy=&quot;60&quot; r=&quot;50&quot; fill=&quot;none&quot; stroke=&quot;#333333&quot; stroke-width=&quot;10&quot; />
+                                        <circle cx=&quot;60&quot; cy=&quot;60&quot; r=&quot;50&quot; fill=&quot;none&quot; stroke=&quot;${color}&quot; stroke-width=&quot;10&quot;
+                                            stroke-dasharray=&quot;${percentage * 3.14}&quot; stroke-dashoffset=&quot;0&quot; transform=&quot;rotate(-90 60 60)&quot; />
+                                        <text x=&quot;60&quot; y=&quot;65&quot; text-anchor=&quot;middle&quot; font-size=&quot;20&quot; fill=&quot;white&quot;>${percentage}%</text>
+                                    </svg>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        // Show an error or notification that the metric type doesn't match
+                        alert(`This metric works best with ${data.type} visualizations. Try another drop zone.`);
+                    }
+                });
+            });
+            
+            // Button functionality
+            document.getElementById('previewBtn').addEventListener('click', function() {
+                // Switch to preview tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                document.querySelector('[data-tab=&quot;preview&quot;]').classList.add('active');
+                document.getElementById('preview').classList.add('active');
+                
+                // Generate preview
+                generatePreview();
+            });
+            
+            document.getElementById('resetBtn').addEventListener('click', function() {
+                // Reset all visualizations
+                visualizations.forEach(viz => {
+                    viz.innerHTML = '';
+                    viz.removeAttribute('data-metric');
+                    
+                    const vizType = viz.getAttribute('data-viz-type');
+                    let icon, title, subtitle;
+                    
+                    switch(vizType) {
+                        case 'line':
+                            icon = '📈';
+                            title = 'Line Chart';
+                            subtitle = 'Drop a time-based metric here';
+                            break;
+                        case 'bar':
+                            icon = '📊';
+                            title = 'Bar Chart';
+                            subtitle = 'Drop a categorical metric here';
+                            break;
+                        case 'number':
+                            icon = '🔢';
+                            title = 'KPI Card';
+                            subtitle = 'Drop a key metric here';
+                            break;
+                        case 'donut':
+                            icon = '🍩';
+                            title = 'Donut Chart';
+                            subtitle = 'Drop a percentage metric here';
+                            break;
+                    }
+                    
+                    viz.innerHTML = `
+                        <div class=&quot;viz-placeholder&quot;>
+                            <div class=&quot;viz-icon&quot;>${icon}</div>
+                            <div>${title}</div>
+                            <small>${subtitle}</small>
+                        </div>
+                    `;
+                });
+            });
+            
+            document.getElementById('saveBtn').addEventListener('click', function() {
+                // Create configuration object from current state
+                const config = Array.from(visualizations).map(viz => {
+                    return {
+                        type: viz.getAttribute('data-viz-type'),
+                        metric: viz.getAttribute('data-metric') || null
+                    };
+                });
+                
+                // Save to localStorage
+                localStorage.setItem('dashboardConfig', JSON.stringify(config));
+                alert('Dashboard configuration saved successfully!');
+            });
+            
+            document.getElementById('backToEditBtn').addEventListener('click', function() {
+                // Switch back to build tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                document.querySelector('[data-tab=&quot;build&quot;]').classList.add('active');
+                document.getElementById('build').classList.add('active');
+            });
+            
+            document.getElementById('exportBtn').addEventListener('click', function() {
+                alert('PDF Export would be implemented here in a production environment.');
+            });
+            
+            // Load saved configuration if exists
+            if (localStorage.getItem('dashboardConfig')) {
+                try {
+                    const config = JSON.parse(localStorage.getItem('dashboardConfig'));
+                    
+                    // Apply saved configuration
+                    config.forEach((item, index) => {
+                        if (item.metric) {
+                            const viz = visualizations[index];
+                            const metricEl = document.querySelector(`[data-metric=&quot;${item.metric}&quot;]`);
+                            
+                            if (viz &amp;&amp; metricEl) {
+                                const dataToSend = {
+                                    metric: metricEl.getAttribute('data-metric'),
+                                    type: metricEl.getAttribute('data-type'),
+                                    text: metricEl.textContent.trim()
+                                };
+                                
+                                // Create a mock drop event
+                                viz.setAttribute('data-metric', dataToSend.metric);
+                                
+                                // Generate visualization based on type
+                                if (item.type === 'line') {
+                                    viz.innerHTML = `
+                                        <div class=&quot;chart-title&quot;>${dataToSend.text} Trend</div>
+                                        <div class=&quot;chart-container&quot;>
+                                            <svg width=&quot;100%&quot; height=&quot;150px&quot; viewBox=&quot;0 0 300 150&quot;>
+                                                <polyline 
+                                                    points=&quot;10,140 50,100 90,110 130,60 170,80 210,30 250,50 290,20&quot;
+                                                    fill=&quot;none&quot; 
+                                                    stroke=&quot;${getRandomColor()}&quot; 
+                                                    stroke-width=&quot;3&quot;
+                                                />
+                                                <line x1=&quot;10&quot; y1=&quot;140&quot; x2=&quot;290&quot; y2=&quot;140&quot; stroke=&quot;#555555&quot; stroke-width=&quot;1&quot; />
+                                                <line x1=&quot;10&quot; y1=&quot;20&quot; x2=&quot;10&quot; y2=&quot;140&quot; stroke=&quot;#555555&quot; stroke-width=&quot;1&quot; />
+                                            </svg>
+                                        </div>
+                                    `;
+                                } else if (item.type === 'bar') {
+                                    const barColors = Array(5).fill().map(() => getRandomColor());
+                                    viz.innerHTML = `
+                                        <div class=&quot;chart-title&quot;>${dataToSend.text}</div>
+                                        <div class=&quot;chart-container&quot;>
+                                            <svg width=&quot;100%&quot; height=&quot;150px&quot; viewBox=&quot;0 0 300 150&quot;>
+                                                <rect x=&quot;30&quot; y=&quot;40&quot; width=&quot;30&quot; height=&quot;100&quot; fill=&quot;${barColors[0]}&quot; />
+                                                <rect x=&quot;80&quot; y=&quot;70&quot; width=&quot;30&quot; height=&quot;70&quot; fill=&quot;${barColors[1]}&quot; />
+                                                <rect x=&quot;130&quot; y=&quot;90&quot; width=&quot;30&quot; height=&quot;50&quot; fill=&quot;${barColors[2]}&quot; />
+                                                <rect x=&quot;180&quot; y=&quot;60&quot; width=&quot;30&quot; height=&quot;80&quot; fill=&quot;${barColors[3]}&quot; />
+                                                <rect x=&quot;230&quot; y=&quot;50&quot; width=&quot;30&quot; height=&quot;90&quot; fill=&quot;${barColors[4]}&quot; />
+                                                <line x1=&quot;10&quot; y1=&quot;140&quot; x2=&quot;290&quot; y2=&quot;140&quot; stroke=&quot;#555555&quot; stroke-width=&quot;1&quot; />
+                                            </svg>
+                                        </div>
+                                    `;
+                                } else if (item.type === 'number') {
+                                    const value = dataToSend.metric === 'avg_ticket' ? '$32.75' : 
+                                                dataToSend.metric === 'margin' ? '24.3%' : 
+                                                Math.floor(Math.random() * 1000).toLocaleString();
+                                    const trend = Math.random() > 0.5 ? 'up' : 'down';
+                                    const trendValue = (Math.random() * 10).toFixed(1);
+                                    viz.innerHTML = `
+                                        <div class=&quot;kpi-card&quot;>
+                                            <div class=&quot;kpi-value&quot;>${value}</div>
+                                            <div class=&quot;kpi-label&quot;>${dataToSend.text}</div>
+                                            <div class=&quot;kpi-trend ${trend}&quot;>
+                                                ${trend === 'up' ? '↑' : '↓'} ${trendValue}% from last week
+                                            </div>
+                                        </div>
+                                    `;
+                                } else if (item.type === 'donut') {
+                                    const percentage = dataToSend.metric === 'repeat_rate' ? 62 : Math.floor(Math.random() * 100);
+                                    const color = getRandomColor();
+                                    viz.innerHTML = `
+                                        <div class=&quot;chart-title&quot;>${dataToSend.text}</div>
+                                        <div class=&quot;chart-container&quot;>
+                                            <svg width=&quot;120px&quot; height=&quot;120px&quot; viewBox=&quot;0 0 120 120&quot;>
+                                                <circle cx=&quot;60&quot; cy=&quot;60&quot; r=&quot;50&quot; fill=&quot;none&quot; stroke=&quot;#333333&quot; stroke-width=&quot;10&quot; />
+                                                <circle cx=&quot;60&quot; cy=&quot;60&quot; r=&quot;50&quot; fill=&quot;none&quot; stroke=&quot;${color}&quot; stroke-width=&quot;10&quot;
+                                                    stroke-dasharray=&quot;${percentage * 3.14}&quot; stroke-dashoffset=&quot;0&quot; transform=&quot;rotate(-90 60 60)&quot; />
+                                                <text x=&quot;60&quot; y=&quot;65&quot; text-anchor=&quot;middle&quot; font-size=&quot;20&quot; fill=&quot;white&quot;>${percentage}%</text>
+                                            </svg>
+                                        </div>
+                                    `;
+                                }
+                            }
+                        }
+                    });
+                } catch (e) {
+                    console.error('Error loading saved configuration', e);
+                }
+            }
+            
+            // Helper functions
+            function getRandomColor() {
+                const colors = [
+                    '#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f97316', 
+                    '#facc15', '#84cc16', '#10b981', '#06b6d4', '#0ea5e9'
+                ];
+                return colors[Math.floor(Math.random() * colors.length)];
+            }
+            
+            function generatePreview() {
+                const previewContainer = document.getElementById('preview-container');
+                previewContainer.innerHTML = '';
+                
+                // Clone populated visualizations
+                visualizations.forEach(viz => {
+                    if (viz.getAttribute('data-metric')) {
+                        const clone = viz.cloneNode(true);
+                        previewContainer.appendChild(clone);
+                    }
+                });
+                
+                // If no visualizations, show message
+                if (previewContainer.children.length === 0) {
+                    previewContainer.innerHTML = `
+                        <div class=&quot;info-box&quot;>
+                            <p>Your dashboard is empty. Go back to the Build tab and add some metrics!</p>
+                        </div>
+                    `;
+                }
+            }
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_nazlp82s';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_nazlp82s" style="width: 100%; height: 1121px; border: none;"></iframe>

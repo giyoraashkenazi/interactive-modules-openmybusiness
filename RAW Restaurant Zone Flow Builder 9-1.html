@@ -1,0 +1,980 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Restaurant Zone Flow Builder</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --dark: #1e1e2a;
+            --darker: #13131a;
+            --light: #f9fafb;
+            --gray: #6b7280;
+            --gray-light: #9ca3af;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            background-color: var(--dark);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+        
+        .description {
+            color: var(--gray-light);
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 0.95rem;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            background-color: var(--dark);
+            border-radius: 12px;
+            padding: 10px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 5px;
+            font-weight: 500;
+            background-color: transparent;
+            color: var(--gray-light);
+            border: none;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .workspace {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .workspace {
+                flex-direction: row;
+            }
+        }
+        
+        .zones-panel {
+            background-color: var(--dark);
+            border-radius: 12px;
+            padding: 15px;
+            flex: 1;
+        }
+        
+        .zone-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .zone-item {
+            background-color: var(--darker);
+            border: 2px solid var(--gray);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: grab;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .zone-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary);
+        }
+        
+        .zone-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .zone-name {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .flow-grid {
+            background-color: var(--dark);
+            border-radius: 12px;
+            padding: 15px;
+            flex: 2;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 10px;
+            flex-grow: 1;
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .grid-cell {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 2px dashed var(--gray);
+            border-radius: 8px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        
+        .grid-cell.highlight {
+            background-color: rgba(99, 102, 241, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .placed-zone {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--darker);
+            border: 2px solid var(--primary);
+            border-radius: 6px;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .flow-path {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .score-panel {
+            background-color: var(--dark);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .score-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .efficiency-meter {
+            width: 100%;
+            height: 20px;
+            background-color: var(--darker);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .efficiency-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--danger), var(--warning), var(--success));
+            transition: width 0.5s ease;
+        }
+        
+        .efficiency-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .feedback {
+            margin-top: 10px;
+            color: var(--gray-light);
+            font-size: 0.9rem;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tutorial-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .tutorial-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .tutorial-content {
+            background-color: var(--dark);
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+        }
+        
+        .close-tutorial {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--gray-light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .tutorial-steps {
+            margin-top: 20px;
+        }
+        
+        .tutorial-step {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .step-number {
+            background-color: var(--primary);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(3, 1fr);
+                grid-template-rows: repeat(5, 1fr);
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .description {
+                font-size: 0.85rem;
+            }
+            
+            .zone-items {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>Restaurant Zone Flow Builder</h1>
+            <p class=&quot;description&quot;>Create an efficient restaurant layout by arranging zones in the correct sequence from receiving to service. Drag and position restaurant areas on the grid to create logical workflows.</p>
+        </header>
+        
+        <div class=&quot;tabs&quot;>
+            <button class=&quot;tab active&quot; data-tab=&quot;builder&quot;>Zone Builder</button>
+            <button class=&quot;tab&quot; data-tab=&quot;insights&quot;>Flow Insights</button>
+            <button class=&quot;tab&quot; data-tab=&quot;help&quot;>Help &amp; Tips</button>
+        </div>
+        
+        <div class=&quot;tab-content active&quot; id=&quot;builder&quot;>
+            <div class=&quot;workspace&quot;>
+                <div class=&quot;zones-panel&quot;>
+                    <h3>Restaurant Zones</h3>
+                    <p class=&quot;description&quot;>Drag these zones to the grid to create your flow</p>
+                    <div class=&quot;zone-items&quot;>
+                        <div class=&quot;zone-item&quot; draggable=&quot;true&quot; data-zone=&quot;receiving&quot;>
+                            <div class=&quot;zone-icon&quot;>📦</div>
+                            <div class=&quot;zone-name&quot;>Receiving</div>
+                        </div>
+                        <div class=&quot;zone-item&quot; draggable=&quot;true&quot; data-zone=&quot;storage&quot;>
+                            <div class=&quot;zone-icon&quot;>🧊</div>
+                            <div class=&quot;zone-name&quot;>Cold Storage</div>
+                        </div>
+                        <div class=&quot;zone-item&quot; draggable=&quot;true&quot; data-zone=&quot;prep&quot;>
+                            <div class=&quot;zone-icon&quot;>🔪</div>
+                            <div class=&quot;zone-name&quot;>Prep Area</div>
+                        </div>
+                        <div class=&quot;zone-item&quot; draggable=&quot;true&quot; data-zone=&quot;cooking&quot;>
+                            <div class=&quot;zone-icon&quot;>🔥</div>
+                            <div class=&quot;zone-name&quot;>Cooking</div>
+                        </div>
+                        <div class=&quot;zone-item&quot; draggable=&quot;true&quot; data-zone=&quot;plating&quot;>
+                            <div class=&quot;zone-icon&quot;>🍽️</div>
+                            <div class=&quot;zone-name&quot;>Plating</div>
+                        </div>
+                        <div class=&quot;zone-item&quot; draggable=&quot;true&quot; data-zone=&quot;service&quot;>
+                            <div class=&quot;zone-icon&quot;>👨‍🍳</div>
+                            <div class=&quot;zone-name&quot;>Service</div>
+                        </div>
+                        <div class=&quot;zone-item&quot; draggable=&quot;true&quot; data-zone=&quot;disposal&quot;>
+                            <div class=&quot;zone-icon&quot;>🗑️</div>
+                            <div class=&quot;zone-name&quot;>Disposal</div>
+                        </div>
+                        <div class=&quot;zone-item&quot; draggable=&quot;true&quot; data-zone=&quot;dishwashing&quot;>
+                            <div class=&quot;zone-icon&quot;>🧼</div>
+                            <div class=&quot;zone-name&quot;>Dishwashing</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class=&quot;flow-grid&quot;>
+                    <h3>Restaurant Flow Layout</h3>
+                    <p class=&quot;description&quot;>Position zones to create an efficient workflow from receiving to service</p>
+                    <div class=&quot;grid-container&quot;>
+                        <svg class=&quot;flow-path&quot;></svg>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;0&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;1&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;2&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;3&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;4&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;5&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;6&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;7&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;8&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;9&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;10&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;11&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;12&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;13&quot;></div>
+                        <div class=&quot;grid-cell&quot; data-cell=&quot;14&quot;></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class=&quot;score-panel&quot;>
+                <div class=&quot;score-title&quot;>Workflow Efficiency Score</div>
+                <div class=&quot;efficiency-meter&quot;>
+                    <div class=&quot;efficiency-fill&quot;></div>
+                </div>
+                <div class=&quot;efficiency-value&quot;>0%</div>
+                <div class=&quot;feedback&quot;>Position zones from receiving to service to increase efficiency</div>
+                
+                <div class=&quot;action-buttons&quot;>
+                    <button class=&quot;btn&quot; id=&quot;evaluate-btn&quot;>Evaluate Flow</button>
+                    <button class=&quot;btn btn-outline&quot; id=&quot;reset-btn&quot;>Reset Layout</button>
+                    <button class=&quot;btn btn-outline&quot; id=&quot;tutorial-btn&quot;>Show Tutorial</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class=&quot;tab-content&quot; id=&quot;insights&quot;>
+            <div class=&quot;score-panel&quot;>
+                <h3>Flow Analysis</h3>
+                <p class=&quot;description&quot;>Detailed insights about your restaurant zone layout</p>
+                <div id=&quot;insights-content&quot; style=&quot;margin-top: 20px; text-align: left; width: 100%;&quot;>
+                    <p>Place zones on the grid and evaluate your flow to see detailed insights.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class=&quot;tab-content&quot; id=&quot;help&quot;>
+            <div class=&quot;score-panel&quot;>
+                <h3>Help &amp; Tips</h3>
+                <div style=&quot;text-align: left; margin-top: 20px;&quot;>
+                    <h4>Optimal Zone Sequence</h4>
+                    <p>For maximum efficiency, consider this general flow:</p>
+                    <ol style=&quot;margin-left: 20px; margin-top: 10px;&quot;>
+                        <li>Receiving (where ingredients enter)</li>
+                        <li>Cold Storage (refrigeration and freezers)</li>
+                        <li>Prep Area (initial food preparation)</li>
+                        <li>Cooking (primary cooking stations)</li>
+                        <li>Plating (final assembly and presentation)</li>
+                        <li>Service (handoff to servers/customers)</li>
+                    </ol>
+                    
+                    <h4 style=&quot;margin-top: 20px;&quot;>Efficiency Tips</h4>
+                    <ul style=&quot;margin-left: 20px; margin-top: 10px;&quot;>
+                        <li>Minimize crossing paths between zones</li>
+                        <li>Keep related zones adjacent to each other</li>
+                        <li>Position disposal and dishwashing areas for easy access</li>
+                        <li>Consider the linear path food takes from raw ingredients to finished dish</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class=&quot;tutorial-overlay&quot; id=&quot;tutorial-overlay&quot;>
+        <div class=&quot;tutorial-content&quot;>
+            <button class=&quot;close-tutorial&quot; id=&quot;close-tutorial&quot;>×</button>
+            <h3>How to Use the Zone Flow Builder</h3>
+            <div class=&quot;tutorial-steps&quot;>
+                <div class=&quot;tutorial-step&quot;>
+                    <div class=&quot;step-number&quot;>1</div>
+                    <div>Drag zones from the left panel to the grid on the right</div>
+                </div>
+                <div class=&quot;tutorial-step&quot;>
+                    <div class=&quot;step-number&quot;>2</div>
+                    <div>Arrange zones to create an efficient workflow from receiving to service</div>
+                </div>
+                <div class=&quot;tutorial-step&quot;>
+                    <div class=&quot;step-number&quot;>3</div>
+                    <div>Click &quot;Evaluate Flow&quot; to see your efficiency score and flow analysis</div>
+                </div>
+                <div class=&quot;tutorial-step&quot;>
+                    <div class=&quot;step-number&quot;>4</div>
+                    <div>Use the tabs to navigate between the builder, insights, and help sections</div>
+                </div>
+            </div>
+            <div class=&quot;action-buttons&quot; style=&quot;margin-top: 20px;&quot;>
+                <button class=&quot;btn&quot; id=&quot;start-tutorial&quot;>Got It!</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Tutorial functionality
+            const tutorialBtn = document.getElementById('tutorial-btn');
+            const tutorialOverlay = document.getElementById('tutorial-overlay');
+            const closeTutorial = document.getElementById('close-tutorial');
+            const startTutorial = document.getElementById('start-tutorial');
+            
+            tutorialBtn.addEventListener('click', () => {
+                tutorialOverlay.classList.add('active');
+            });
+            
+            closeTutorial.addEventListener('click', () => {
+                tutorialOverlay.classList.remove('active');
+            });
+            
+            startTutorial.addEventListener('click', () => {
+                tutorialOverlay.classList.remove('active');
+            });
+            
+            // Drag and drop functionality
+            const zoneItems = document.querySelectorAll('.zone-item');
+            const gridCells = document.querySelectorAll('.grid-cell');
+            const flowPath = document.querySelector('.flow-path');
+            const resetBtn = document.getElementById('reset-btn');
+            const evaluateBtn = document.getElementById('evaluate-btn');
+            const efficiencyFill = document.querySelector('.efficiency-fill');
+            const efficiencyValue = document.querySelector('.efficiency-value');
+            const feedback = document.querySelector('.feedback');
+            const insightsContent = document.getElementById('insights-content');
+            
+            let placedZones = {};
+            
+            // Optional order for ideal flow
+            const idealOrder = [
+                'receiving',
+                'storage',
+                'prep',
+                'cooking',
+                'plating',
+                'service'
+            ];
+            
+            zoneItems.forEach(item => {
+                item.addEventListener('dragstart', handleDragStart);
+            });
+            
+            gridCells.forEach(cell => {
+                cell.addEventListener('dragover', handleDragOver);
+                cell.addEventListener('dragenter', handleDragEnter);
+                cell.addEventListener('dragleave', handleDragLeave);
+                cell.addEventListener('drop', handleDrop);
+            });
+            
+            resetBtn.addEventListener('click', resetLayout);
+            evaluateBtn.addEventListener('click', evaluateFlow);
+            
+            function handleDragStart(e) {
+                e.dataTransfer.setData('text/plain', e.target.getAttribute('data-zone'));
+                e.dataTransfer.effectAllowed = 'move';
+            }
+            
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            }
+            
+            function handleDragEnter(e) {
+                e.target.classList.add('highlight');
+            }
+            
+            function handleDragLeave(e) {
+                e.target.classList.remove('highlight');
+            }
+            
+            function handleDrop(e) {
+                e.preventDefault();
+                const cell = e.target.closest('.grid-cell');
+                cell.classList.remove('highlight');
+                
+                const zoneType = e.dataTransfer.getData('text/plain');
+                const cellIndex = cell.getAttribute('data-cell');
+                
+                // Check if cell is already occupied
+                if (cell.querySelector('.placed-zone')) {
+                    return;
+                }
+                
+                // Create placed zone
+                const placedZone = document.createElement('div');
+                placedZone.classList.add('placed-zone');
+                placedZone.setAttribute('data-zone', zoneType);
+                
+                // Find the icon and name for this zone type
+                const zoneItem = document.querySelector(`.zone-item[data-zone=&quot;${zoneType}&quot;]`);
+                const zoneIcon = zoneItem.querySelector('.zone-icon').innerHTML;
+                const zoneName = zoneItem.querySelector('.zone-name').textContent;
+                
+                placedZone.innerHTML = `
+                    <div class=&quot;zone-icon&quot;>${zoneIcon}</div>
+                    <div class=&quot;zone-name&quot;>${zoneName}</div>
+                `;
+                
+                cell.appendChild(placedZone);
+                
+                // Store the placed zone
+                placedZones[cellIndex] = zoneType;
+                
+                // Update flow paths
+                drawFlowPaths();
+            }
+            
+            function drawFlowPaths() {
+                // Clear existing paths
+                flowPath.innerHTML = '';
+                
+                const placedCells = Object.keys(placedZones).map(Number);
+                placedCells.sort((a, b) => a - b);
+                
+                if (placedCells.length < 2) return;
+                
+                // Draw flow path between placed zones
+                for (let i = 0; i < placedCells.length - 1; i++) {
+                    const fromCell = placedCells[i];
+                    const toCell = placedCells[i + 1];
+                    
+                    const fromElement = document.querySelector(`.grid-cell[data-cell=&quot;${fromCell}&quot;]`);
+                    const toElement = document.querySelector(`.grid-cell[data-cell=&quot;${toCell}&quot;]`);
+                    
+                    if (fromElement &amp;&amp; toElement) {
+                        const fromRect = fromElement.getBoundingClientRect();
+                        const toRect = toElement.getBoundingClientRect();
+                        const gridRect = document.querySelector('.grid-container').getBoundingClientRect();
+                        
+                        // Calculate center points relative to grid
+                        const fromX = (fromRect.left + fromRect.width / 2) - gridRect.left;
+                        const fromY = (fromRect.top + fromRect.height / 2) - gridRect.top;
+                        const toX = (toRect.left + toRect.width / 2) - gridRect.left;
+                        const toY = (toRect.top + toRect.height / 2) - gridRect.top;
+                        
+                        // Create path
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                        path.setAttribute('d', `M${fromX},${fromY} L${toX},${toY}`);
+                        path.setAttribute('stroke', '#6366f1');
+                        path.setAttribute('stroke-width', '3');
+                        path.setAttribute('stroke-dasharray', '5,5');
+                        path.setAttribute('marker-end', 'url(#arrowhead)');
+                        
+                        // Add arrow marker if not already exists
+                        if (!document.getElementById('arrowhead')) {
+                            const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+                            const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
+                            marker.setAttribute('id', 'arrowhead');
+                            marker.setAttribute('markerWidth', '10');
+                            marker.setAttribute('markerHeight', '7');
+                            marker.setAttribute('refX', '10');
+                            marker.setAttribute('refY', '3.5');
+                            marker.setAttribute('orient', 'auto');
+                            
+                            const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                            polygon.setAttribute('points', '0 0, 10 3.5, 0 7');
+                            polygon.setAttribute('fill', '#6366f1');
+                            
+                            marker.appendChild(polygon);
+                            defs.appendChild(marker);
+                            flowPath.appendChild(defs);
+                        }
+                        
+                        flowPath.appendChild(path);
+                    }
+                }
+            }
+            
+            function resetLayout() {
+                // Clear all placed zones
+                document.querySelectorAll('.placed-zone').forEach(zone => {
+                    zone.remove();
+                });
+                
+                // Reset stored zones
+                placedZones = {};
+                
+                // Clear flow paths
+                flowPath.innerHTML = '';
+                
+                // Reset efficiency
+                efficiencyFill.style.width = '0%';
+                efficiencyValue.textContent = '0%';
+                feedback.textContent = 'Position zones from receiving to service to increase efficiency';
+                
+                // Reset insights
+                insightsContent.innerHTML = '<p>Place zones on the grid and evaluate your flow to see detailed insights.</p>';
+            }
+            
+            function evaluateFlow() {
+                const placedTypes = Object.values(placedZones);
+                
+                // If no zones placed
+                if (placedTypes.length === 0) {
+                    feedback.textContent = 'Place at least one zone to evaluate flow';
+                    return;
+                }
+                
+                // Calculate efficiency based on ideal order and adjacency
+                let score = 0;
+                let maxScore = 0;
+                let feedbackText = [];
+                let insights = '<h4>Flow Analysis Results</h4>';
+                
+                // Check for presence of key zones
+                const keyZones = ['receiving', 'storage', 'prep', 'cooking', 'plating', 'service'];
+                const missingZones = keyZones.filter(zone => !placedTypes.includes(zone));
+                
+                if (missingZones.length > 0) {
+                    feedbackText.push(`Missing critical zones: ${missingZones.join(', ')}`);
+                    insights += `<p>❌ Missing critical zones: ${missingZones.join(', ')}</p>`;
+                } else {
+                    feedbackText.push('All critical zones are present');
+                    insights += '<p>✅ All critical zones are present</p>';
+                    score += 30;
+                }
+                maxScore += 30;
+                
+                // Check correct order of key zones
+                let orderScore = 0;
+                if (placedTypes.length >= 2) {
+                    for (let i = 0; i < idealOrder.length; i++) {
+                        const currentZone = idealOrder[i];
+                        const nextZone = idealOrder[i + 1];
+                        
+                        if (nextZone &amp;&amp; placedTypes.includes(currentZone) &amp;&amp; placedTypes.includes(nextZone)) {
+                            const currentIndex = placedTypes.indexOf(currentZone);
+                            const nextIndex = placedTypes.indexOf(nextZone);
+                            
+                            if (currentIndex < nextIndex) {
+                                orderScore += 10;
+                            }
+                        }
+                    }
+                    
+                    const orderPercentage = Math.min(100, Math.round((orderScore / ((idealOrder.length - 1) * 10)) * 100));
+                    score += orderPercentage * 0.5;
+                    maxScore += 50;
+                    
+                    if (orderPercentage > 80) {
+                        feedbackText.push('Excellent zone sequence');
+                        insights += '<p>✅ Excellent zone sequence: Zones follow logical workflow</p>';
+                    } else if (orderPercentage > 50) {
+                        feedbackText.push('Good zone sequence with some inefficiencies');
+                        insights += '<p>⚠️ Good zone sequence with some inefficiencies:</p>';
+                        insights += '<ul>';
+                        for (let i = 0; i < idealOrder.length - 1; i++) {
+                            const current = idealOrder[i];
+                            const next = idealOrder[i + 1];
+                            if (placedTypes.includes(current) &amp;&amp; placedTypes.includes(next)) {
+                                const currentIndex = placedTypes.indexOf(current);
+                                const nextIndex = placedTypes.indexOf(next);
+                                if (currentIndex > nextIndex) {
+                                    insights += `<li>${current} should come before ${next}</li>`;
+                                }
+                            }
+                        }
+                        insights += '</ul>';
+                    } else {
+                        feedbackText.push('Poor zone sequence, revise your layout');
+                        insights += '<p>❌ Poor zone sequence. Consider these improvements:</p>';
+                        insights += '<ul>';
+                        for (let i = 0; i < idealOrder.length - 1; i++) {
+                            const current = idealOrder[i];
+                            const next = idealOrder[i + 1];
+                            if (placedTypes.includes(current) &amp;&amp; placedTypes.includes(next)) {
+                                const currentIndex = placedTypes.indexOf(current);
+                                const nextIndex = placedTypes.indexOf(next);
+                                if (currentIndex > nextIndex) {
+                                    insights += `<li>${current} should come before ${next}</li>`;
+                                }
+                            }
+                        }
+                        insights += '</ul>';
+                    }
+                }
+                
+                // Check adjacency of related zones
+                const relatedPairs = [
+                    ['receiving', 'storage'],
+                    ['prep', 'cooking'],
+                    ['cooking', 'plating'],
+                    ['plating', 'service']
+                ];
+                
+                let adjacencyScore = 0;
+                const maxAdjacencyScore = relatedPairs.length * 5;
+                
+                const placedPairs = Object.entries(placedZones);
+                placedPairs.sort((a, b) => parseInt(a[0]) - parseInt(b[0]));
+                
+                for (const [pair, zone] of placedPairs) {
+                    const pairIndex = parseInt(pair);
+                    for (const adjacentCell of [pairIndex - 1, pairIndex + 1, pairIndex - 5, pairIndex + 5]) {
+                        if (placedZones[adjacentCell]) {
+                            const adjacentZone = placedZones[adjacentCell];
+                            for (const relatedPair of relatedPairs) {
+                                if ((zone === relatedPair[0] &amp;&amp; adjacentZone === relatedPair[1]) || 
+                                    (zone === relatedPair[1] &amp;&amp; adjacentZone === relatedPair[0])) {
+                                    adjacencyScore += 5;
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                score += (adjacencyScore / maxAdjacencyScore) * 20;
+                maxScore += 20;
+                
+                if (adjacencyScore > 0) {
+                    feedbackText.push('Good adjacency between related zones');
+                    insights += '<p>✅ Good adjacency between related zones</p>';
+                } else {
+                    feedbackText.push('Improve adjacency between related zones');
+                    insights += '<p>⚠️ Consider placing related zones adjacent to each other:</p>';
+                    insights += '<ul>';
+                    relatedPairs.forEach(pair => {
+                        insights += `<li>${pair[0]} should be near ${pair[1]}</li>`;
+                    });
+                    insights += '</ul>';
+                }
+                
+                // Add recommendations based on common restaurant layouts
+                insights += '<h4>Layout Recommendations</h4>';
+                if (placedTypes.length >= 4) {
+                    insights += '<p>Consider these layout improvements:</p>';
+                    insights += '<ul>';
+                    if (placedTypes.includes('dishwashing') &amp;&amp; placedTypes.includes('service')) {
+                        const dishIndex = placedTypes.indexOf('dishwashing');
+                        const serviceIndex = placedTypes.indexOf('service');
+                        if (Math.abs(dishIndex - serviceIndex) <= 1) {
+                            insights += '<li>✅ Dishwashing is well-positioned near service area</li>';
+                        } else {
+                            insights += '<li>⚠️ Position dishwashing closer to service for efficient dish return</li>';
+                        }
+                    }
+                    
+                    if (placedTypes.includes('disposal')) {
+                        insights += '<li>✅ Including disposal area improves waste management workflow</li>';
+                    } else {
+                        insights += '<li>⚠️ Consider adding a disposal area for efficient waste management</li>';
+                    }
+                    insights += '</ul>';
+                }
+                
+                // Calculate final score
+                const finalScore = Math.min(100, Math.round((score / maxScore) * 100));
+                
+                // Update UI
+                efficiencyFill.style.width = `${finalScore}%`;
+                efficiencyValue.textContent = `${finalScore}%`;
+                feedback.textContent = feedbackText.join('. ');
+                
+                // Update insights tab
+                insights += `<h4>Overall Efficiency Score: ${finalScore}%</h4>`;
+                insights += '<p>Based on:</p>';
+                insights += '<ul>';
+                insights += '<li>Presence of all critical zones</li>';
+                insights += '<li>Correct sequence of workflow</li>';
+                insights += '<li>Adjacency of related areas</li>';
+                insights += '</ul>';
+                
+                insightsContent.innerHTML = insights;
+            }
+            
+            // Show tutorial on first load
+            setTimeout(() => {
+                tutorialOverlay.classList.add('active');
+            }, 500);
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_7ynydlgw';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_7ynydlgw" style="width: 100%; height: 1280px; border: none;"></iframe>

@@ -1,0 +1,687 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Kitchen Workflow Simulator</title>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #7562E0;
+            --secondary: #25CED1;
+            --success: #4CAF50;
+            --warning: #FFC107;
+            --danger: #F44336;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light-text: #f0f0f0;
+            --medium-text: #b0b0b0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: var(--dark);
+            color: var(--light-text);
+            min-height: 100vh;
+            padding: 16px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 1rem 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--light-text);
+        }
+        
+        .description {
+            color: var(--medium-text);
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: var(--darker);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--medium-text);
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .instructions {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .instructions h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--secondary);
+        }
+        
+        .instructions p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .simulator-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .stations-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 600px) {
+            .stations-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .station {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: move;
+            user-select: none;
+            touch-action: none;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        
+        .station:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .station.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+        
+        .station-icon {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        
+        .workflow-area {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 20px;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        .workflow-area h3 {
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+        
+        .workflow-drop-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            min-height: 100px;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            position: relative;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .workflow-drop-area.active {
+            border-color: var(--secondary);
+            background-color: rgba(37, 206, 209, 0.05);
+        }
+        
+        .workflow-drop-area .placeholder {
+            color: var(--medium-text);
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .workflow-station {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            position: relative;
+            margin: 4px;
+            transition: all 0.3s ease;
+            flex: 0 0 auto;
+        }
+        
+        .workflow-station.correct {
+            background-color: rgba(76, 175, 80, 0.3);
+            border: 1px solid var(--success);
+        }
+        
+        .workflow-station.incorrect {
+            background-color: rgba(244, 67, 54, 0.3);
+            border: 1px solid var(--danger);
+        }
+        
+        .completion-meter {
+            margin-top: 1.5rem;
+        }
+        
+        .completion-meter h3 {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .feedback {
+            margin-top: 1rem;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+        
+        .feedback.success {
+            background-color: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+            display: block;
+        }
+        
+        .feedback.error {
+            background-color: rgba(244, 67, 54, 0.2);
+            color: var(--danger);
+            display: block;
+        }
+        
+        .reset-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .reset-btn:hover {
+            background-color: #654cd8;
+        }
+
+        .info-section {
+            padding: 16px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-top: 1.5rem;
+        }
+        
+        .info-section h3 {
+            color: var(--secondary);
+            margin-bottom: 8px;
+        }
+        
+        .info-section p {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+        
+        .info-section ul {
+            padding-left: 20px;
+            margin-bottom: 12px;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Kitchen Workflow Simulator</h1>
+        <p class=&quot;description&quot;>Arrange kitchen stations in the correct sequence to optimize flow and avoid cross-contamination risks.</p>
+    </header>
+    
+    <main>
+        <div class=&quot;tabs&quot;>
+            <div class=&quot;tab active&quot; data-tab=&quot;simulator&quot;>Simulator</div>
+            <div class=&quot;tab&quot; data-tab=&quot;info&quot;>Principles</div>
+        </div>
+        
+        <div class=&quot;tab-content active&quot; id=&quot;simulator&quot;>
+            <div class=&quot;instructions&quot;>
+                <h3>Challenge</h3>
+                <p>Drag and arrange kitchen stations in the correct sequence below to create an efficient workflow from receiving to service. The correct arrangement follows a logical flow while preventing cross-contamination.</p>
+            </div>
+            
+            <div class=&quot;simulator-container&quot;>
+                <div class=&quot;stations-container&quot;>
+                    <div class=&quot;station&quot; draggable=&quot;true&quot; data-station=&quot;plating&quot;>
+                        <div class=&quot;station-icon&quot;>🍽️</div>
+                        <div class=&quot;station-name&quot;>Plating</div>
+                    </div>
+                    <div class=&quot;station&quot; draggable=&quot;true&quot; data-station=&quot;cleanup&quot;>
+                        <div class=&quot;station-icon&quot;>🧹</div>
+                        <div class=&quot;station-name&quot;>Cleanup</div>
+                    </div>
+                    <div class=&quot;station&quot; draggable=&quot;true&quot; data-station=&quot;receiving&quot;>
+                        <div class=&quot;station-icon&quot;>📦</div>
+                        <div class=&quot;station-name&quot;>Receiving &amp; Storage</div>
+                    </div>
+                    <div class=&quot;station&quot; draggable=&quot;true&quot; data-station=&quot;service&quot;>
+                        <div class=&quot;station-icon&quot;>🧑‍🍳</div>
+                        <div class=&quot;station-name&quot;>Service</div>
+                    </div>
+                    <div class=&quot;station&quot; draggable=&quot;true&quot; data-station=&quot;prep&quot;>
+                        <div class=&quot;station-icon&quot;>🔪</div>
+                        <div class=&quot;station-name&quot;>Prep</div>
+                    </div>
+                    <div class=&quot;station&quot; draggable=&quot;true&quot; data-station=&quot;cooking&quot;>
+                        <div class=&quot;station-icon&quot;>🍳</div>
+                        <div class=&quot;station-name&quot;>Cooking</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;workflow-area&quot;>
+                    <h3>Kitchen Workflow</h3>
+                    <div class=&quot;workflow-drop-area&quot;>
+                        <div class=&quot;placeholder&quot;>Drag stations here to create your workflow</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;completion-meter&quot;>
+                    <h3>
+                        <span>Workflow Completion</span>
+                        <span id=&quot;completion-percentage&quot;>0%</span>
+                    </h3>
+                    <div class=&quot;progress-bar&quot;>
+                        <div class=&quot;progress&quot; id=&quot;progress-bar&quot;></div>
+                    </div>
+                </div>
+                
+                <div class=&quot;feedback&quot; id=&quot;feedback&quot;></div>
+                
+                <button class=&quot;reset-btn&quot; id=&quot;reset-btn&quot;>Reset Workflow</button>
+            </div>
+        </div>
+        
+        <div class=&quot;tab-content&quot; id=&quot;info&quot;>
+            <div class=&quot;info-section&quot;>
+                <h3>Proper Kitchen Workflow</h3>
+                <p>The correct workflow follows a logical sequence from receiving to service, maintaining food safety principles:</p>
+                <ol>
+                    <li><strong>Receiving &amp; Storage</strong> - Where ingredients enter the facility, are inspected, and stored</li>
+                    <li><strong>Prep</strong> - Where ingredients are cleaned, cut, and portioned</li>
+                    <li><strong>Cooking</strong> - Where foods are transformed through heat application</li>
+                    <li><strong>Plating</strong> - Where cooked items are assembled into finished dishes</li>
+                    <li><strong>Service</strong> - Where finished dishes are delivered to customers</li>
+                    <li><strong>Cleanup</strong> - Where dishes return and sanitization occurs</li>
+                </ol>
+                
+                <h3>Benefits of Proper Layout</h3>
+                <ul>
+                    <li><strong>Regulatory Compliance:</strong> Ensures health and safety regulations are met</li>
+                    <li><strong>Operational Efficiency:</strong> Minimizes waste, reduces labor, speeds up service</li>
+                    <li><strong>Staff Safety &amp; Comfort:</strong> Reduces accident risk and improves team morale</li>
+                    <li><strong>Cross-Contamination Prevention:</strong> Separates raw from cooked foods</li>
+                </ul>
+                
+                <h3>Common Layout Mistakes</h3>
+                <ul>
+                    <li>Placing prep after cooking (cross-contamination risk)</li>
+                    <li>Having cleanup areas near food preparation</li>
+                    <li>Creating bottlenecks by poor station placement</li>
+                    <li>Insufficient separation between raw and ready-to-eat products</li>
+                </ul>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetTab = tab.dataset.tab;
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Show corresponding content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === targetTab) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Drag and drop functionality
+            const stations = document.querySelectorAll('.station');
+            const dropArea = document.querySelector('.workflow-drop-area');
+            const placeholder = document.querySelector('.placeholder');
+            const progressBar = document.getElementById('progress-bar');
+            const completionPercentage = document.getElementById('completion-percentage');
+            const feedback = document.getElementById('feedback');
+            const resetBtn = document.getElementById('reset-btn');
+            
+            // Correct sequence
+            const correctSequence = ['receiving', 'prep', 'cooking', 'plating', 'service', 'cleanup'];
+            let placedStations = [];
+            
+            // Drag event listeners
+            stations.forEach(station => {
+                station.addEventListener('dragstart', handleDragStart);
+                station.addEventListener('dragend', handleDragEnd);
+                
+                // Touch support
+                station.addEventListener('touchstart', handleTouchStart, {passive: false});
+                station.addEventListener('touchmove', handleTouchMove, {passive: false});
+                station.addEventListener('touchend', handleTouchEnd);
+            });
+            
+            // Drop area event listeners
+            dropArea.addEventListener('dragover', handleDragOver);
+            dropArea.addEventListener('dragenter', handleDragEnter);
+            dropArea.addEventListener('dragleave', handleDragLeave);
+            dropArea.addEventListener('drop', handleDrop);
+            
+            // Reset button
+            resetBtn.addEventListener('click', resetWorkflow);
+            
+            let draggingElement = null;
+            let touchOffsetX = 0;
+            let touchOffsetY = 0;
+            
+            function handleDragStart(e) {
+                this.classList.add('dragging');
+                e.dataTransfer.setData('text/plain', this.dataset.station);
+                draggingElement = this;
+            }
+            
+            function handleDragEnd() {
+                this.classList.remove('dragging');
+                draggingElement = null;
+            }
+            
+            function handleDragOver(e) {
+                e.preventDefault();
+            }
+            
+            function handleDragEnter(e) {
+                e.preventDefault();
+                this.classList.add('active');
+            }
+            
+            function handleDragLeave() {
+                this.classList.remove('active');
+            }
+            
+            function handleDrop(e) {
+                e.preventDefault();
+                this.classList.remove('active');
+                
+                const stationType = e.dataTransfer.getData('text/plain');
+                
+                // Only allow if station hasn't been placed already
+                if (!isStationPlaced(stationType)) {
+                    addStationToWorkflow(stationType);
+                }
+            }
+            
+            function handleTouchStart(e) {
+                e.preventDefault();
+                draggingElement = this;
+                this.classList.add('dragging');
+                
+                const touch = e.touches[0];
+                const rect = this.getBoundingClientRect();
+                touchOffsetX = touch.clientX - rect.left;
+                touchOffsetY = touch.clientY - rect.top;
+                
+                // Create a clone element for dragging visual
+                const clone = this.cloneNode(true);
+                clone.id = 'dragging-clone';
+                clone.style.position = 'fixed';
+                clone.style.left = (touch.clientX - touchOffsetX) + 'px';
+                clone.style.top = (touch.clientY - touchOffsetY) + 'px';
+                clone.style.opacity = '0.8';
+                clone.style.pointerEvents = 'none';
+                clone.style.zIndex = '1000';
+                document.body.appendChild(clone);
+            }
+            
+            function handleTouchMove(e) {
+                e.preventDefault();
+                if (draggingElement) {
+                    const touch = e.touches[0];
+                    const clone = document.getElementById('dragging-clone');
+                    
+                    if (clone) {
+                        clone.style.left = (touch.clientX - touchOffsetX) + 'px';
+                        clone.style.top = (touch.clientY - touchOffsetY) + 'px';
+                    }
+                    
+                    // Check if over drop area
+                    const dropRect = dropArea.getBoundingClientRect();
+                    if (touch.clientX >= dropRect.left &amp;&amp; touch.clientX <= dropRect.right &amp;&amp;
+                        touch.clientY >= dropRect.top &amp;&amp; touch.clientY <= dropRect.bottom) {
+                        dropArea.classList.add('active');
+                    } else {
+                        dropArea.classList.remove('active');
+                    }
+                }
+            }
+            
+            function handleTouchEnd(e) {
+                if (draggingElement) {
+                    const stationType = draggingElement.dataset.station;
+                    draggingElement.classList.remove('dragging');
+                    
+                    // Check if touch ended over drop area
+                    const clone = document.getElementById('dragging-clone');
+                    if (clone) {
+                        const cloneRect = clone.getBoundingClientRect();
+                        const dropRect = dropArea.getBoundingClientRect();
+                        
+                        if (!(cloneRect.right < dropRect.left || 
+                              cloneRect.left > dropRect.right || 
+                              cloneRect.bottom < dropRect.top || 
+                              cloneRect.top > dropRect.bottom)) {
+                            
+                            // Only allow if station hasn't been placed already
+                            if (!isStationPlaced(stationType)) {
+                                addStationToWorkflow(stationType);
+                            }
+                        }
+                        
+                        document.body.removeChild(clone);
+                    }
+                    
+                    dropArea.classList.remove('active');
+                    draggingElement = null;
+                }
+            }
+            
+            function isStationPlaced(stationType) {
+                return placedStations.includes(stationType);
+            }
+            
+            function addStationToWorkflow(stationType) {
+                // Hide placeholder if first element
+                if (placedStations.length === 0) {
+                    placeholder.style.display = 'none';
+                }
+                
+                // Add to placed stations
+                placedStations.push(stationType);
+                
+                // Create workflow station element
+                const stationElement = document.createElement('div');
+                stationElement.className = 'workflow-station';
+                stationElement.dataset.station = stationType;
+                
+                // Find the original station for icon and name
+                const originalStation = document.querySelector(`.station[data-station=&quot;${stationType}&quot;]`);
+                stationElement.innerHTML = originalStation.innerHTML;
+                
+                // Add to workflow
+                dropArea.appendChild(stationElement);
+                
+                // Check position correctness
+                const position = placedStations.length - 1;
+                const isCorrectPosition = correctSequence[position] === stationType;
+                
+                if (isCorrectPosition) {
+                    stationElement.classList.add('correct');
+                } else {
+                    stationElement.classList.add('incorrect');
+                }
+                
+                // Update progress
+                updateProgress();
+                
+                // Check if workflow is complete
+                if (placedStations.length === correctSequence.length) {
+                    checkWorkflowCompletion();
+                }
+            }
+            
+            function updateProgress() {
+                const progress = (placedStations.length / correctSequence.length) * 100;
+                progressBar.style.width = `${progress}%`;
+                completionPercentage.textContent = `${Math.round(progress)}%`;
+            }
+            
+            function checkWorkflowCompletion() {
+                const isCorrect = placedStations.every((station, index) => {
+                    return station === correctSequence[index];
+                });
+                
+                if (isCorrect) {
+                    feedback.classList.add('success');
+                    feedback.classList.remove('error');
+                    feedback.textContent = &quot;Perfect! You've created an optimal kitchen workflow that ensures food safety and efficiency.&quot;;
+                } else {
+                    feedback.classList.add('error');
+                    feedback.classList.remove('success');
+                    feedback.textContent = &quot;The workflow has issues. Check the sequence to ensure it follows food safety principles and efficient flow.&quot;;
+                }
+            }
+            
+            function resetWorkflow() {
+                // Clear placed stations
+                placedStations = [];
+                
+                // Clear drop area
+                while (dropArea.children.length > 0) {
+                    if (dropArea.children[0].classList.contains('placeholder')) {
+                        dropArea.children[0].style.display = 'block';
+                        break;
+                    } else {
+                        dropArea.removeChild(dropArea.children[0]);
+                    }
+                }
+                
+                // Reset progress
+                progressBar.style.width = '0%';
+                completionPercentage.textContent = '0%';
+                
+                // Clear feedback
+                feedback.className = 'feedback';
+                feedback.textContent = '';
+            }
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_eezoke4s';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_eezoke4s" style="width: 100%; height: 1087px; border: none;"></iframe>

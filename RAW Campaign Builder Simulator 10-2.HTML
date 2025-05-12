@@ -1,0 +1,1223 @@
+<iframe srcdoc="```html
+<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Campaign Builder Simulator</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #10b981;
+            --dark: #1e1e2d;
+            --darker: #141421;
+            --light: #f3f4f6;
+            --gray: #4b5563;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 100%;
+            padding: 1rem;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background-color: var(--dark);
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        p {
+            font-size: 0.95rem;
+            opacity: 0.85;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: var(--dark);
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .progress-bar {
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 3px;
+            background-color: var(--gray);
+            width: 100%;
+            z-index: 1;
+        }
+        
+        .progress-line-filled {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            height: 3px;
+            background-color: var(--primary);
+            width: 0%;
+            z-index: 2;
+            transition: width 0.3s ease-in-out;
+        }
+        
+        .step {
+            width: 30px;
+            height: 30px;
+            background-color: var(--dark);
+            border: 3px solid var(--gray);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--gray);
+            position: relative;
+            z-index: 3;
+            transition: all 0.3s ease-in-out;
+        }
+        
+        .step.active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        .step.completed {
+            background-color: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+        
+        .step-label {
+            position: absolute;
+            top: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            white-space: nowrap;
+            text-align: center;
+        }
+        
+        .tabs {
+            display: flex;
+            background-color: var(--dark);
+            border-radius: 8px 8px 0 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        
+        .tabs::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .tab {
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: var(--gray);
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: var(--dark);
+            padding: 1.5rem;
+            border-radius: 0 0 8px 8px;
+            min-height: 300px;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .option-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .option-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        
+        .option-btn {
+            background-color: var(--darker);
+            border: 1px solid var(--gray);
+            border-radius: 6px;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+            text-align: center;
+            color: var(--light);
+        }
+        
+        .option-btn:hover {
+            border-color: var(--primary-light);
+        }
+        
+        .option-btn.selected {
+            background-color: rgba(99, 102, 241, 0.2);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+        
+        .dropdown-select {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--darker);
+            border: 1px solid var(--gray);
+            border-radius: 6px;
+            color: var(--light);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            appearance: none;
+            background-image: url(&quot;data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f3f4f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e&quot;);
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1em;
+        }
+        
+        .feedback-container {
+            background-color: rgba(30, 30, 45, 0.7);
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .feedback-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feedback-icon {
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+        
+        .feedback-text {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .feedback-good .feedback-title {
+            color: var(--success);
+        }
+        
+        .feedback-warning .feedback-title {
+            color: var(--warning);
+        }
+        
+        .feedback-bad .feedback-title {
+            color: var(--error);
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+        
+        .btn {
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.9rem;
+            padding: 0.75rem 1.25rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--light);
+            border: 1px solid var(--gray);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--light);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .completion-container {
+            text-align: center;
+            padding: 2rem 1rem;
+            background-color: var(--dark);
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .completion-icon {
+            font-size: 3.5rem;
+            color: var(--success);
+            margin-bottom: 1rem;
+        }
+        
+        .completion-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .result-item {
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            margin-right: 0.25rem;
+        }
+        
+        .rating-container {
+            margin: 1.5rem 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .rating-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stars {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .star {
+            font-size: 2rem;
+            color: var(--gray);
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        
+        .star:hover, .star.active {
+            color: var(--warning);
+        }
+        
+        .restart-btn {
+            margin-top: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                max-width: 720px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            p {
+                font-size: 1rem;
+            }
+            
+            .options {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>Campaign Builder Simulator</h1>
+            <p>Design your restaurant marketing campaign by making choices at each step. Get instant feedback and optimization tips.</p>
+        </header>
+        
+        <div class=&quot;progress-container&quot;>
+            <div class=&quot;progress-bar&quot;>
+                <div class=&quot;progress-line&quot;></div>
+                <div class=&quot;progress-line-filled&quot; id=&quot;progressLine&quot;></div>
+                <div class=&quot;step active&quot; id=&quot;step1&quot;>
+                    1
+                    <div class=&quot;step-label&quot;>Objective</div>
+                </div>
+                <div class=&quot;step&quot; id=&quot;step2&quot;>
+                    2
+                    <div class=&quot;step-label&quot;>Audience</div>
+                </div>
+                <div class=&quot;step&quot; id=&quot;step3&quot;>
+                    3
+                    <div class=&quot;step-label&quot;>Creative</div>
+                </div>
+                <div class=&quot;step&quot; id=&quot;step4&quot;>
+                    4
+                    <div class=&quot;step-label&quot;>CTA</div>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;tabsContainer&quot;>
+            <div class=&quot;tabs&quot;>
+                <div class=&quot;tab active&quot; data-tab=&quot;tab1&quot;>Campaign Objective</div>
+                <div class=&quot;tab&quot; data-tab=&quot;tab2&quot;>Audience Targeting</div>
+                <div class=&quot;tab&quot; data-tab=&quot;tab3&quot;>Creative Format</div>
+                <div class=&quot;tab&quot; data-tab=&quot;tab4&quot;>Call to Action</div>
+            </div>
+            
+            <div id=&quot;tab1&quot; class=&quot;tab-content active&quot;>
+                <div class=&quot;option-group&quot;>
+                    <div class=&quot;option-title&quot;>What is your primary campaign objective?</div>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option-btn&quot; data-value=&quot;awareness&quot;>Brand Awareness</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;traffic&quot;>Website Traffic</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;leads&quot;>Reservation Leads</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;email&quot;>Email Sign-ups</div>
+                    </div>
+                    
+                    <div id=&quot;objectiveFeedback&quot; class=&quot;feedback-container&quot; style=&quot;display: none;&quot;>
+                        <div class=&quot;feedback-title&quot;>
+                            <span class=&quot;feedback-icon&quot;>💡</span>
+                            <span>Objective Insight</span>
+                        </div>
+                        <div class=&quot;feedback-text&quot;></div>
+                    </div>
+                </div>
+                
+                <div class=&quot;option-group&quot;>
+                    <div class=&quot;option-title&quot;>What is your campaign budget range?</div>
+                    <select class=&quot;dropdown-select&quot; id=&quot;budgetSelect&quot;>
+                        <option value=&quot;&quot; disabled selected>Select your budget range</option>
+                        <option value=&quot;small&quot;>Small ($250-$500)</option>
+                        <option value=&quot;medium&quot;>Medium ($500-$1500)</option>
+                        <option value=&quot;large&quot;>Large ($1500-$5000)</option>
+                        <option value=&quot;enterprise&quot;>Enterprise ($5000+)</option>
+                    </select>
+                </div>
+                
+                <div class=&quot;option-group&quot;>
+                    <div class=&quot;option-title&quot;>Campaign duration</div>
+                    <select class=&quot;dropdown-select&quot; id=&quot;durationSelect&quot;>
+                        <option value=&quot;&quot; disabled selected>Select campaign duration</option>
+                        <option value=&quot;short&quot;>Short (1-2 weeks)</option>
+                        <option value=&quot;medium&quot;>Medium (3-4 weeks)</option>
+                        <option value=&quot;long&quot;>Long (1-3 months)</option>
+                        <option value=&quot;ongoing&quot;>Ongoing campaign</option>
+                    </select>
+                </div>
+                
+                <div class=&quot;navigation&quot;>
+                    <button id=&quot;nextBtn1&quot; class=&quot;btn btn-primary&quot; disabled>Next: Audience Targeting</button>
+                </div>
+            </div>
+            
+            <div id=&quot;tab2&quot; class=&quot;tab-content&quot;>
+                <div class=&quot;option-group&quot;>
+                    <div class=&quot;option-title&quot;>Target audience demographics</div>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option-btn&quot; data-value=&quot;young&quot;>Young Adults (18-25)</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;professionals&quot;>Professionals (26-40)</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;mature&quot;>Mature Adults (41-60)</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;seniors&quot;>Seniors (60+)</div>
+                    </div>
+                    
+                    <div id=&quot;demographicsFeedback&quot; class=&quot;feedback-container&quot; style=&quot;display: none;&quot;>
+                        <div class=&quot;feedback-title&quot;>
+                            <span class=&quot;feedback-icon&quot;>💡</span>
+                            <span>Demographics Insight</span>
+                        </div>
+                        <div class=&quot;feedback-text&quot;></div>
+                    </div>
+                </div>
+                
+                <div class=&quot;option-group&quot;>
+                    <div class=&quot;option-title&quot;>Audience interests</div>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option-btn&quot; data-value=&quot;foodies&quot;>Foodies</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;health&quot;>Health-conscious</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;luxury&quot;>Luxury experiences</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;social&quot;>Social gatherings</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;culture&quot;>Cultural experiences</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;deals&quot;>Deal seekers</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;option-group&quot;>
+                    <div class=&quot;option-title&quot;>Geographic targeting</div>
+                    <select class=&quot;dropdown-select&quot; id=&quot;geoSelect&quot;>
+                        <option value=&quot;&quot; disabled selected>Select targeting range</option>
+                        <option value=&quot;micro&quot;>Micro-local (1 mile radius)</option>
+                        <option value=&quot;local&quot;>Local (3-5 mile radius)</option>
+                        <option value=&quot;city&quot;>City-wide</option>
+                        <option value=&quot;regional&quot;>Regional</option>
+                    </select>
+                </div>
+                
+                <div class=&quot;navigation&quot;>
+                    <button id=&quot;prevBtn2&quot; class=&quot;btn btn-secondary&quot;>Previous</button>
+                    <button id=&quot;nextBtn2&quot; class=&quot;btn btn-primary&quot; disabled>Next: Creative Format</button>
+                </div>
+            </div>
+            
+            <div id=&quot;tab3&quot; class=&quot;tab-content&quot;>
+                <div class=&quot;option-group&quot;>
+                    <div class=&quot;option-title&quot;>Primary creative format</div>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option-btn&quot; data-value=&quot;reels&quot;>Social Reels/Stories</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;photos&quot;>Photo Carousels</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;interactive&quot;>Interactive Polls</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;text&quot;>Text Ads</div>
+                    </div>
+                    
+                    <div id=&quot;creativeFeedback&quot; class=&quot;feedback-container&quot; style=&quot;display: none;&quot;>
+                        <div class=&quot;feedback-title&quot;>
+                            <span class=&quot;feedback-icon&quot;>💡</span>
+                            <span>Creative Format Insight</span>
+                        </div>
+                        <div class=&quot;feedback-text&quot;></div>
+                    </div>
+                </div>
+                
+                <div class=&quot;option-group&quot;>
+                    <div class=&quot;option-title&quot;>Content theme</div>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option-btn&quot; data-value=&quot;behind&quot;>Behind-the-scenes</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;menu&quot;>Signature dishes</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;ambiance&quot;>Restaurant ambiance</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;chef&quot;>Chef's story</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;guests&quot;>Guest experiences</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;option-group&quot;>
+                    <div class=&quot;option-title&quot;>Main platforms</div>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option-btn&quot; data-value=&quot;instagram&quot;>Instagram</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;facebook&quot;>Facebook</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;tiktok&quot;>TikTok</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;google&quot;>Google Ads</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;email&quot;>Email</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;navigation&quot;>
+                    <button id=&quot;prevBtn3&quot; class=&quot;btn btn-secondary&quot;>Previous</button>
+                    <button id=&quot;nextBtn3&quot; class=&quot;btn btn-primary&quot; disabled>Next: Call to Action</button>
+                </div>
+            </div>
+            
+            <div id=&quot;tab4&quot; class=&quot;tab-content&quot;>
+                <div class=&quot;option-group&quot;>
+                    <div class=&quot;option-title&quot;>Primary call-to-action</div>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option-btn&quot; data-value=&quot;reserve&quot;>Reserve Now</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;menu&quot;>View Menu</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;signup&quot;>Sign Up for VIP Access</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;learn&quot;>Learn More</div>
+                    </div>
+                    
+                    <div id=&quot;ctaFeedback&quot; class=&quot;feedback-container&quot; style=&quot;display: none;&quot;>
+                        <div class=&quot;feedback-title&quot;>
+                            <span class=&quot;feedback-icon&quot;>💡</span>
+                            <span>CTA Insight</span>
+                        </div>
+                        <div class=&quot;feedback-text&quot;></div>
+                    </div>
+                </div>
+                
+                <div class=&quot;option-group&quot;>
+                    <div class=&quot;option-title&quot;>Special offer/incentive</div>
+                    <div class=&quot;options&quot;>
+                        <div class=&quot;option-btn&quot; data-value=&quot;discount&quot;>First-time discount</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;special&quot;>Complimentary item</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;vip&quot;>VIP seating</div>
+                        <div class=&quot;option-btn&quot; data-value=&quot;none&quot;>No offer (value-based)</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;option-group&quot;>
+                    <div class=&quot;option-title&quot;>Landing page experience</div>
+                    <select class=&quot;dropdown-select&quot; id=&quot;landingSelect&quot;>
+                        <option value=&quot;&quot; disabled selected>Select landing destination</option>
+                        <option value=&quot;reservation&quot;>Direct to reservation system</option>
+                        <option value=&quot;menu&quot;>Menu page with reservation CTA</option>
+                        <option value=&quot;special&quot;>Special landing page for campaign</option>
+                        <option value=&quot;story&quot;>Story-focused page with offer</option>
+                    </select>
+                </div>
+                
+                <div class=&quot;navigation&quot;>
+                    <button id=&quot;prevBtn4&quot; class=&quot;btn btn-secondary&quot;>Previous</button>
+                    <button id=&quot;completeBtn&quot; class=&quot;btn btn-primary&quot; disabled>Complete Campaign</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;completionContainer&quot; class=&quot;completion-container&quot;>
+            <div class=&quot;completion-icon&quot;>🎉</div>
+            <h2 class=&quot;completion-title&quot;>Campaign Built Successfully!</h2>
+            <p>Your campaign has been designed based on marketing best practices.</p>
+            
+            <div id=&quot;campaignSummary&quot; class=&quot;summary-container&quot;>
+                <h3 style=&quot;margin: 1.5rem 0 1rem;&quot;>Campaign Summary</h3>
+                <div class=&quot;result-item&quot;>
+                    <span class=&quot;result-label&quot;>Objective:</span>
+                    <span id=&quot;objectiveResult&quot;></span>
+                </div>
+                <div class=&quot;result-item&quot;>
+                    <span class=&quot;result-label&quot;>Target Audience:</span>
+                    <span id=&quot;audienceResult&quot;></span>
+                </div>
+                <div class=&quot;result-item&quot;>
+                    <span class=&quot;result-label&quot;>Creative Format:</span>
+                    <span id=&quot;creativeResult&quot;></span>
+                </div>
+                <div class=&quot;result-item&quot;>
+                    <span class=&quot;result-label&quot;>Call to Action:</span>
+                    <span id=&quot;ctaResult&quot;></span>
+                </div>
+                
+                <div class=&quot;feedback-container feedback-good&quot; style=&quot;margin-top: 1.5rem;&quot;>
+                    <div class=&quot;feedback-title&quot;>
+                        <span class=&quot;feedback-icon&quot;>⭐</span>
+                        <span>Campaign Strength</span>
+                    </div>
+                    <div class=&quot;feedback-text&quot; id=&quot;strengthFeedback&quot;></div>
+                </div>
+                
+                <div class=&quot;feedback-container feedback-warning&quot;>
+                    <div class=&quot;feedback-title&quot;>
+                        <span class=&quot;feedback-icon&quot;>💡</span>
+                        <span>Optimization Tip</span>
+                    </div>
+                    <div class=&quot;feedback-text&quot; id=&quot;tipFeedback&quot;></div>
+                </div>
+            </div>
+            
+            <div class=&quot;rating-container&quot;>
+                <div class=&quot;rating-label&quot;>How helpful was this simulator?</div>
+                <div class=&quot;stars&quot;>
+                    <div class=&quot;star&quot; data-value=&quot;1&quot;>★</div>
+                    <div class=&quot;star&quot; data-value=&quot;2&quot;>★</div>
+                    <div class=&quot;star&quot; data-value=&quot;3&quot;>★</div>
+                    <div class=&quot;star&quot; data-value=&quot;4&quot;>★</div>
+                    <div class=&quot;star&quot; data-value=&quot;5&quot;>★</div>
+                </div>
+            </div>
+            
+            <button id=&quot;restartBtn&quot; class=&quot;btn btn-primary restart-btn&quot;>Build Another Campaign</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize state
+            const state = {
+                currentTab: 1,
+                objective: '',
+                budget: '',
+                duration: '',
+                demographics: '',
+                interests: [],
+                geo: '',
+                creativeFormat: '',
+                contentTheme: '',
+                platforms: [],
+                cta: '',
+                offer: '',
+                landing: ''
+            };
+            
+            // Tab switching
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    const tabNumber = parseInt(tabId.replace('tab', ''));
+                    
+                    // Only allow navigating to unlocked tabs
+                    if (tabNumber <= state.currentTab) {
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tabContents.forEach(c => c.classList.remove('active'));
+                        
+                        this.classList.add('active');
+                        document.getElementById(tabId).classList.add('active');
+                        
+                        // Update progress
+                        updateProgress(tabNumber);
+                    }
+                });
+            });
+            
+            // Option selection
+            const optionBtns = document.querySelectorAll('.option-btn');
+            
+            optionBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const value = this.getAttribute('data-value');
+                    const parent = this.parentElement;
+                    
+                    // For single selection options
+                    if (!this.parentElement.classList.contains('multiple-select')) {
+                        const siblings = parent.querySelectorAll('.option-btn');
+                        siblings.forEach(sibling => {
+                            sibling.classList.remove('selected');
+                        });
+                        this.classList.add('selected');
+                    } else {
+                        // For multiple selection options
+                        this.classList.toggle('selected');
+                    }
+                    
+                    // Update state based on the selection
+                    updateState(this);
+                    
+                    // Check if current tab is complete
+                    checkTabCompletion();
+                    
+                    // Update feedback
+                    updateFeedback(this);
+                });
+            });
+            
+            // Dropdown selections
+            const dropdowns = document.querySelectorAll('.dropdown-select');
+            
+            dropdowns.forEach(dropdown => {
+                dropdown.addEventListener('change', function() {
+                    // Update state based on the dropdown
+                    if (this.id === 'budgetSelect') state.budget = this.value;
+                    if (this.id === 'durationSelect') state.duration = this.value;
+                    if (this.id === 'geoSelect') state.geo = this.value;
+                    if (this.id === 'landingSelect') state.landing = this.value;
+                    
+                    // Check if current tab is complete
+                    checkTabCompletion();
+                });
+            });
+            
+            // Navigation buttons
+            const nextBtn1 = document.getElementById('nextBtn1');
+            const nextBtn2 = document.getElementById('nextBtn2');
+            const nextBtn3 = document.getElementById('nextBtn3');
+            const prevBtn2 = document.getElementById('prevBtn2');
+            const prevBtn3 = document.getElementById('prevBtn3');
+            const prevBtn4 = document.getElementById('prevBtn4');
+            const completeBtn = document.getElementById('completeBtn');
+            const restartBtn = document.getElementById('restartBtn');
+            
+            nextBtn1.addEventListener('click', () => navigateTab(2));
+            nextBtn2.addEventListener('click', () => navigateTab(3));
+            nextBtn3.addEventListener('click', () => navigateTab(4));
+            prevBtn2.addEventListener('click', () => navigateTab(1));
+            prevBtn3.addEventListener('click', () => navigateTab(2));
+            prevBtn4.addEventListener('click', () => navigateTab(3));
+            
+            completeBtn.addEventListener('click', completeCampaign);
+            restartBtn.addEventListener('click', resetSimulator);
+            
+            // Star rating
+            const stars = document.querySelectorAll('.star');
+            stars.forEach(star => {
+                star.addEventListener('click', function() {
+                    const value = parseInt(this.getAttribute('data-value'));
+                    stars.forEach(s => {
+                        const starValue = parseInt(s.getAttribute('data-value'));
+                        if (starValue <= value) {
+                            s.classList.add('active');
+                        } else {
+                            s.classList.remove('active');
+                        }
+                    });
+                });
+            });
+            
+            // Helper functions
+            function updateState(element) {
+                const value = element.getAttribute('data-value');
+                const parent = element.parentElement;
+                
+                if (parent.querySelector('.option-btn[data-value=&quot;awareness&quot;]')) {
+                    state.objective = element.classList.contains('selected') ? value : '';
+                }
+                else if (parent.querySelector('.option-btn[data-value=&quot;young&quot;]')) {
+                    state.demographics = element.classList.contains('selected') ? value : '';
+                }
+                else if (parent.querySelector('.option-btn[data-value=&quot;foodies&quot;]')) {
+                    // For interests (multiple selection)
+                    if (element.classList.contains('selected')) {
+                        if (!state.interests.includes(value)) state.interests.push(value);
+                    } else {
+                        state.interests = state.interests.filter(i => i !== value);
+                    }
+                }
+                else if (parent.querySelector('.option-btn[data-value=&quot;reels&quot;]')) {
+                    state.creativeFormat = element.classList.contains('selected') ? value : '';
+                }
+                else if (parent.querySelector('.option-btn[data-value=&quot;behind&quot;]')) {
+                    state.contentTheme = element.classList.contains('selected') ? value : '';
+                }
+                else if (parent.querySelector('.option-btn[data-value=&quot;instagram&quot;]')) {
+                    // For platforms (multiple selection)
+                    if (element.classList.contains('selected')) {
+                        if (!state.platforms.includes(value)) state.platforms.push(value);
+                    } else {
+                        state.platforms = state.platforms.filter(p => p !== value);
+                    }
+                }
+                else if (parent.querySelector('.option-btn[data-value=&quot;reserve&quot;]')) {
+                    state.cta = element.classList.contains('selected') ? value : '';
+                }
+                else if (parent.querySelector('.option-btn[data-value=&quot;discount&quot;]')) {
+                    state.offer = element.classList.contains('selected') ? value : '';
+                }
+            }
+            
+            function updateFeedback(element) {
+                const value = element.getAttribute('data-value');
+                
+                // Objective feedback
+                if (element.parentElement.querySelector('.option-btn[data-value=&quot;awareness&quot;]')) {
+                    const feedbackContainer = document.getElementById('objectiveFeedback');
+                    const feedbackText = feedbackContainer.querySelector('.feedback-text');
+                    
+                    feedbackContainer.style.display = 'block';
+                    
+                    if (value === 'awareness') {
+                        feedbackText.textContent = 'Brand awareness is ideal for new restaurants or those launching new concepts. Focus on eye-catching visuals that showcase your restaurant's unique atmosphere.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    } else if (value === 'traffic') {
+                        feedbackText.textContent = 'Website traffic campaigns work well when your site has strong visuals and easy navigation. Ensure your landing page loads fast and looks great on mobile.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    } else if (value === 'leads') {
+                        feedbackText.textContent = 'Reservation leads are a direct conversion goal. This works best when you have a streamlined reservation system that's mobile-friendly and requires minimal steps.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    } else if (value === 'email') {
+                        feedbackText.textContent = 'Email sign-ups are effective for long-term engagement. Consider what value you'll offer subscribers (exclusive offers, early access to events) to encourage sign-ups.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    }
+                }
+                
+                // Demographics feedback
+                if (element.parentElement.querySelector('.option-btn[data-value=&quot;young&quot;]')) {
+                    const feedbackContainer = document.getElementById('demographicsFeedback');
+                    const feedbackText = feedbackContainer.querySelector('.feedback-text');
+                    
+                    feedbackContainer.style.display = 'block';
+                    
+                    if (value === 'young') {
+                        feedbackText.textContent = 'Young adults respond well to trend-focused content and social proof. Consider TikTok and Instagram as primary platforms with energetic, fast-paced content.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    } else if (value === 'professionals') {
+                        feedbackText.textContent = 'Professionals often seek quality experiences that align with their lifestyle. Focus on quality, convenience, and unique experiences in your messaging.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    } else if (value === 'mature') {
+                        feedbackText.textContent = 'Mature adults typically value quality, service, and ambiance. Facebook and email tend to perform well with detailed content about the experience.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    } else if (value === 'seniors') {
+                        feedbackText.textContent = 'Seniors appreciate clear messaging, accessibility information, and traditional values. Facebook and email are generally effective channels.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    }
+                }
+                
+                // Creative format feedback
+                if (element.parentElement.querySelector('.option-btn[data-value=&quot;reels&quot;]')) {
+                    const feedbackContainer = document.getElementById('creativeFeedback');
+                    const feedbackText = feedbackContainer.querySelector('.feedback-text');
+                    
+                    feedbackContainer.style.display = 'block';
+                    
+                    if (value === 'reels') {
+                        feedbackText.textContent = 'Social Reels/Stories are highly engaging for showcasing food preparation, restaurant ambiance or behind-the-scenes content. Keep videos under 15 seconds for maximum impact.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    } else if (value === 'photos') {
+                        feedbackText.textContent = 'Photo carousels allow you to tell a visual story and showcase multiple dishes or aspects of your restaurant. Ensure high-quality, well-lit photography.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    } else if (value === 'interactive') {
+                        feedbackText.textContent = 'Interactive polls boost engagement and provide valuable customer insights. Consider &quot;Which dish should we feature next?&quot; or &quot;What's your favorite menu item?&quot;';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    } else if (value === 'text') {
+                        feedbackText.textContent = 'Text ads work well for search campaigns targeting high-intent keywords like &quot;best restaurants near me.&quot; Focus on clear, benefit-driven copy.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    }
+                }
+                
+                // CTA feedback
+                if (element.parentElement.querySelector('.option-btn[data-value=&quot;reserve&quot;]')) {
+                    const feedbackContainer = document.getElementById('ctaFeedback');
+                    const feedbackText = feedbackContainer.querySelector('.feedback-text');
+                    
+                    feedbackContainer.style.display = 'block';
+                    
+                    if (value === 'reserve') {
+                        feedbackText.textContent = '&quot;Reserve Now&quot; is a strong direct-response CTA. It works best when your reservation process is simple and mobile-friendly. Include urgency like &quot;Limited seating available.&quot;';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    } else if (value === 'menu') {
+                        feedbackText.textContent = '&quot;View Menu&quot; is effective for audiences earlier in the decision process. Ensure your online menu is visually appealing, and include a reservation option on that page.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    } else if (value === 'signup') {
+                        feedbackText.textContent = '&quot;Sign Up for VIP Access&quot; creates exclusivity. Be clear about the specific benefits subscribers will receive, such as early reservations or chef's special notifications.';
+                        feedbackContainer.className = 'feedback-container feedback-good';
+                    } else if (value === 'learn') {
+                        feedbackText.textContent = '&quot;Learn More&quot; is a softer CTA that works for awareness campaigns. Use it when telling your restaurant's story or highlighting unique aspects of your concept.';
+                        feedbackContainer.className = 'feedback-container feedback-warning';
+                    }
+                }
+            }
+            
+            function checkTabCompletion() {
+                // Check if current tab has all required selections
+                switch(state.currentTab) {
+                    case 1:
+                        nextBtn1.disabled = !(state.objective &amp;&amp; state.budget &amp;&amp; state.duration);
+                        break;
+                    case 2:
+                        nextBtn2.disabled = !(state.demographics &amp;&amp; state.interests.length > 0 &amp;&amp; state.geo);
+                        break;
+                    case 3:
+                        nextBtn3.disabled = !(state.creativeFormat &amp;&amp; state.contentTheme &amp;&amp; state.platforms.length > 0);
+                        break;
+                    case 4:
+                        completeBtn.disabled = !(state.cta &amp;&amp; state.offer &amp;&amp; state.landing);
+                        break;
+                }
+            }
+            
+            function navigateTab(tabNumber) {
+                // Update current tab
+                state.currentTab = tabNumber;
+                
+                // Switch to the correct tab
+                tabs.forEach(tab => tab.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                document.querySelector(`.tab[data-tab=&quot;tab${tabNumber}&quot;]`).classList.add('active');
+                document.getElementById(`tab${tabNumber}`).classList.add('active');
+                
+                // Update progress
+                updateProgress(tabNumber);
+                
+                // Check if the tab has required selections
+                checkTabCompletion();
+            }
+            
+            function updateProgress(tabNumber) {
+                // Update steps
+                const steps = document.querySelectorAll('.step');
+                steps.forEach((step, index) => {
+                    const stepNum = index + 1;
+                    step.classList.remove('active', 'completed');
+                    
+                    if (stepNum < tabNumber) {
+                        step.classList.add('completed');
+                    } else if (stepNum === tabNumber) {
+                        step.classList.add('active');
+                    }
+                });
+                
+                // Update progress line
+                const progressLine = document.getElementById('progressLine');
+                const progress = (tabNumber - 1) / 3 * 100;
+                progressLine.style.width = `${progress}%`;
+            }
+            
+            function completeCampaign() {
+                // Hide tabs and show completion screen
+                document.getElementById('tabsContainer').style.display = 'none';
+                document.getElementById('completionContainer').style.display = 'block';
+                
+                // Fill in the campaign summary
+                document.getElementById('objectiveResult').textContent = getObjectiveText();
+                document.getElementById('audienceResult').textContent = getAudienceText();
+                document.getElementById('creativeResult').textContent = getCreativeText();
+                document.getElementById('ctaResult').textContent = getCTAText();
+                
+                // Generate feedback
+                generateCampaignFeedback();
+            }
+            
+            function getObjectiveText() {
+                const objectives = {
+                    'awareness': 'Brand Awareness',
+                    'traffic': 'Website Traffic',
+                    'leads': 'Reservation Leads',
+                    'email': 'Email Sign-ups'
+                };
+                
+                return `${objectives[state.objective]} with a ${state.budget} budget for a ${state.duration} duration`;
+            }
+            
+            function getAudienceText() {
+                const demographics = {
+                    'young': 'Young Adults (18-25)',
+                    'professionals': 'Professionals (26-40)',
+                    'mature': 'Mature Adults (41-60)',
+                    'seniors': 'Seniors (60+)'
+                };
+                
+                return `${demographics[state.demographics]} interested in ${state.interests.join(', ')} within a ${state.geo} area`;
+            }
+            
+            function getCreativeText() {
+                const formats = {
+                    'reels': 'Social Reels/Stories',
+                    'photos': 'Photo Carousels',
+                    'interactive': 'Interactive Polls',
+                    'text': 'Text Ads'
+                };
+                
+                const themes = {
+                    'behind': 'Behind-the-scenes',
+                    'menu': 'Signature dishes',
+                    'ambiance': 'Restaurant ambiance',
+                    'chef': 'Chef\'s story',
+                    'guests': 'Guest experiences'
+                };
+                
+                return `${formats[state.creativeFormat]} featuring ${themes[state.contentTheme]} on ${state.platforms.join(', ')}`;
+            }
+            
+            function getCTAText() {
+                const ctas = {
+                    'reserve': 'Reserve Now',
+                    'menu': 'View Menu',
+                    'signup': 'Sign Up for VIP Access',
+                    'learn': 'Learn More'
+                };
+                
+                const offers = {
+                    'discount': 'First-time discount',
+                    'special': 'Complimentary item',
+                    'vip': 'VIP seating',
+                    'none': 'No offer (value-based)'
+                };
+                
+                const landings = {
+                    'reservation': 'Direct to reservation system',
+                    'menu': 'Menu page with reservation CTA',
+                    'special': 'Special landing page for campaign',
+                    'story': 'Story-focused page with offer'
+                };
+                
+                return `&quot;${ctas[state.cta]}&quot; with a ${offers[state.offer]} incentive leading to a ${landings[state.landing]}`;
+            }
+            
+            function generateCampaignFeedback() {
+                let strengths = [];
+                let tips = [];
+                
+                // Check for good alignments and improvement areas
+                
+                // Budget alignment with objective
+                if (state.objective === 'awareness' &amp;&amp; state.budget === 'small') {
+                    tips.push('Small budgets for awareness campaigns can limit reach. Consider focusing on a narrower geographic area or extending the campaign duration to maximize impact.');
+                }
+                
+                // Demographics and platform alignment
+                if (state.demographics === 'young' &amp;&amp; state.platforms.includes('tiktok')) {
+                    strengths.push('Excellent alignment between your young adult demographic and TikTok platform choice. Short-form video is highly effective with this audience.');
+                }
+                if (state.demographics === 'mature' &amp;&amp; !state.platforms.includes('facebook')) {
+                    tips.push('Consider adding Facebook to your platform mix, as it tends to have strong engagement with mature adults and seniors.');
+                }
+                
+                // Creative format alignment
+                if (state.objective === 'leads' &amp;&amp; state.creativeFormat === 'interactive') {
+                    tips.push('Interactive polls are excellent for engagement but may not directly drive reservations. Consider complementing with direct response formats that showcase your dining experience.');
+                }
+                
+                // CTA alignment
+                if (state.objective === 'leads' &amp;&amp; state.cta === 'reserve') {
+                    strengths.push('Your &quot;Reserve Now&quot; CTA directly supports your reservation leads objective, creating a clear path to conversion.');
+                }
+                if (state.objective === 'email' &amp;&amp; state.cta !== 'signup') {
+                    tips.push('Your primary objective is email sign-ups, but your CTA doesn\'t directly support this. Consider adjusting to &quot;Sign Up&quot; for better alignment.');
+                }
+                
+                // Geographic targeting
+                if ((state.geo === 'city' || state.geo === 'regional') &amp;&amp; state.budget === 'small') {
+                    tips.push('Your geographic targeting is quite broad for your budget size. Consider narrowing to a more local radius to increase frequency and impact.');
+                }
+                
+                // Default strengths and tips if none were triggered
+                if (strengths.length === 0) {
+                    strengths.push('Your campaign elements work well together, especially your choice of creative format and content theme, which should resonate with your target audience.');
+                }
+                
+                if (tips.length === 0) {
+                    tips.push('Consider implementing A/B testing on your creative elements to refine your approach. Test different images or copy variations to see what resonates best with your audience.');
+                }
+                
+                // Update the feedback sections
+                document.getElementById('strengthFeedback').textContent = strengths[0];
+                document.getElementById('tipFeedback').textContent = tips[0];
+            }
+            
+            function resetSimulator() {
+                // Reset state
+                state.currentTab = 1;
+                state.objective = '';
+                state.budget = '';
+                state.duration = '';
+                state.demographics = '';
+                state.interests = [];
+                state.geo = '';
+                state.creativeFormat = '';
+                state.contentTheme = '';
+                state.platforms = [];
+                state.cta = '';
+                state.offer = '';
+                state.landing = '';
+                
+                // Reset selections
+                document.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.classList.remove('selected');
+                });
+                
+                document.querySelectorAll('.dropdown-select').forEach(select => {
+                    select.selectedIndex = 0;
+                });
+                
+                // Hide feedback containers
+                document.querySelectorAll('.feedback-container').forEach(container => {
+                    container.style.display = 'none';
+                });
+                
+                // Reset navigation buttons
+                nextBtn1.disabled = true;
+                nextBtn2.disabled = true;
+                nextBtn3.disabled = true;
+                completeBtn.disabled = true;
+                
+                // Reset tabs and progress
+                navigateTab(1);
+                
+                // Reset star rating
+                document.querySelectorAll('.star').forEach(star => {
+                    star.classList.remove('active');
+                });
+                
+                // Show tabs and hide completion
+                document.getElementById('tabsContainer').style.display = 'block';
+                document.getElementById('completionContainer').style.display = 'none';
+            }
+            
+            // Multiple select options for interests and platforms
+            const interestOptions = document.querySelector('.options:has([data-value=&quot;foodies&quot;])');
+            const platformOptions = document.querySelector('.options:has([data-value=&quot;instagram&quot;])');
+            
+            if (interestOptions) interestOptions.classList.add('multiple-select');
+            if (platformOptions) platformOptions.classList.add('multiple-select');
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_k8mv6870';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>
+```" data-interaction-code="math_eq_k8mv6870" style="width: 100%; height: 1076px; border: none;"></iframe>

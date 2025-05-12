@@ -1,0 +1,770 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Restaurant Project Phase Sequencer</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --primary-color: #6a5acd;
+            --secondary-color: #4a148c;
+            --success-color: #2e7d32;
+            --error-color: #c62828;
+            --text-color: #e0e0e0;
+            --border-color: #333;
+            --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            --drop-shadow: 0 0 10px rgba(106, 90, 205, 0.5);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 1rem;
+            overflow-x: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+        
+        p {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            max-width: 800px;
+            margin: 0 auto 1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tab {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .tab.active {
+            background-color: var(--primary-color);
+            box-shadow: var(--drop-shadow);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            margin: 1rem 0;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background-color: var(--card-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0 1rem;
+        }
+        
+        .progress-filled {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .activity-bank {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .activity-card {
+            background-color: var(--card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            cursor: grab;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            height: 100%;
+            display: flex;
+            align-items: center;
+        }
+        
+        .activity-card:active {
+            cursor: grabbing;
+            transform: scale(1.02);
+        }
+        
+        .activity-card.dragging {
+            opacity: 0.7;
+        }
+        
+        .activity-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+        
+        .activity-desc {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        .phases-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .phase {
+            background-color: rgba(30, 30, 30, 0.8);
+            border-radius: 12px;
+            padding: 1.25rem;
+            box-shadow: var(--card-shadow);
+            border: 2px solid var(--border-color);
+        }
+        
+        .phase-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .phase-title {
+            font-weight: 600;
+        }
+        
+        .phase-number {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        
+        .phase-items {
+            min-height: 100px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .dropzone-hint {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            opacity: 0.5;
+            font-size: 0.9rem;
+            grid-column: 1 / -1;
+        }
+
+        .phase-items .activity-card.correct {
+            border-color: var(--success-color);
+            background-color: rgba(46, 125, 50, 0.1);
+            animation: pulse-success 1.5s ease;
+        }
+        
+        .phase-items .activity-card.incorrect {
+            border-color: var(--error-color);
+            background-color: rgba(198, 40, 40, 0.1);
+            animation: pulse-error 1.5s ease;
+        }
+        
+        @keyframes pulse-success {
+            0% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(46, 125, 50, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 125, 50, 0); }
+        }
+        
+        @keyframes pulse-error {
+            0% { box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.6); }
+            70% { box-shadow: 0 0 0 10px rgba(198, 40, 40, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(198, 40, 40, 0); }
+        }
+        
+        .result-message {
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 2rem;
+            display: none;
+            background-color: rgba(106, 90, 205, 0.1);
+            border: 2px solid var(--primary-color);
+        }
+        
+        .result-message h3 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .reset-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            display: inline-block;
+        }
+        
+        .reset-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .feedback {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            height: 24px;
+        }
+        
+        .feedback.correct {
+            color: var(--success-color);
+        }
+        
+        .feedback.incorrect {
+            color: var(--error-color);
+        }
+        
+        @media (max-width: 768px) {
+            .activity-bank {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            .phase-items {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+            
+            h1 {
+                font-size: 1.3rem;
+            }
+            
+            .tab {
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+            }
+            
+            .activity-card {
+                padding: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .activity-bank {
+                grid-template-columns: 1fr;
+            }
+            
+            .phase-items {
+                grid-template-columns: 1fr;
+            }
+            
+            body {
+                padding: 0.5rem;
+            }
+            
+            .tabs {
+                gap: 0.3rem;
+            }
+            
+            .tab {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Restaurant Project Phase Sequencer</h1>
+        <p>Drag and drop key restaurant establishment activities into their correct project phases to master the sequence from concept to grand opening.</p>
+    </header>
+    
+    <div class=&quot;container&quot;>
+        <div class=&quot;tabs&quot;>
+            <button class=&quot;tab active&quot; data-tab=&quot;dragdrop&quot;>Drag &amp; Drop Exercise</button>
+            <button class=&quot;tab&quot; data-tab=&quot;reference&quot;>Phase Reference</button>
+            <button class=&quot;tab&quot; data-tab=&quot;info&quot;>About</button>
+        </div>
+        
+        <div class=&quot;progress-container&quot;>
+            <div class=&quot;progress-text&quot;>Progress: <span id=&quot;progress-value&quot;>0%</span></div>
+            <div class=&quot;progress-bar&quot;>
+                <div class=&quot;progress-filled&quot;></div>
+            </div>
+        </div>
+        
+        <div class=&quot;tab-content active&quot; id=&quot;dragdrop&quot;>
+            <div class=&quot;feedback&quot; id=&quot;feedback-message&quot;></div>
+            
+            <h2 style=&quot;margin-bottom: 1rem;&quot;>Activities to Organize</h2>
+            <div class=&quot;activity-bank&quot; id=&quot;activity-bank&quot;>
+                <!-- Activities will be added via JavaScript -->
+            </div>
+            
+            <h2 style=&quot;margin-bottom: 1rem;&quot;>Project Phases</h2>
+            <div class=&quot;phases-container&quot;>
+                <div class=&quot;phase&quot; data-phase=&quot;1&quot;>
+                    <div class=&quot;phase-header&quot;>
+                        <div class=&quot;phase-title&quot;>Starter</div>
+                        <div class=&quot;phase-number&quot;>1</div>
+                    </div>
+                    <div class=&quot;phase-items&quot; data-phase=&quot;1&quot;>
+                        <div class=&quot;dropzone-hint&quot;>Drop activities here</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;phase&quot; data-phase=&quot;2&quot;>
+                    <div class=&quot;phase-header&quot;>
+                        <div class=&quot;phase-title&quot;>Detailed Design</div>
+                        <div class=&quot;phase-number&quot;>2</div>
+                    </div>
+                    <div class=&quot;phase-items&quot; data-phase=&quot;2&quot;>
+                        <div class=&quot;dropzone-hint&quot;>Drop activities here</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;phase&quot; data-phase=&quot;3&quot;>
+                    <div class=&quot;phase-header&quot;>
+                        <div class=&quot;phase-title&quot;>Construction &amp; Fit-Out</div>
+                        <div class=&quot;phase-number&quot;>3</div>
+                    </div>
+                    <div class=&quot;phase-items&quot; data-phase=&quot;3&quot;>
+                        <div class=&quot;dropzone-hint&quot;>Drop activities here</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;phase&quot; data-phase=&quot;4&quot;>
+                    <div class=&quot;phase-header&quot;>
+                        <div class=&quot;phase-title&quot;>Pre-Opening Preparation</div>
+                        <div class=&quot;phase-number&quot;>4</div>
+                    </div>
+                    <div class=&quot;phase-items&quot; data-phase=&quot;4&quot;>
+                        <div class=&quot;dropzone-hint&quot;>Drop activities here</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;phase&quot; data-phase=&quot;5&quot;>
+                    <div class=&quot;phase-header&quot;>
+                        <div class=&quot;phase-title&quot;>Grand Opening</div>
+                        <div class=&quot;phase-number&quot;>5</div>
+                    </div>
+                    <div class=&quot;phase-items&quot; data-phase=&quot;5&quot;>
+                        <div class=&quot;dropzone-hint&quot;>Drop activities here</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class=&quot;result-message&quot; id=&quot;result-message&quot;>
+                <h3>🎉 Congratulations!</h3>
+                <p>You've successfully organized all activities into their correct project phases.</p>
+                <button class=&quot;reset-btn&quot; id=&quot;reset-btn&quot;>Try Again</button>
+            </div>
+        </div>
+        
+        <div class=&quot;tab-content&quot; id=&quot;reference&quot;>
+            <h2 style=&quot;margin-bottom: 1rem;&quot;>Restaurant Project Phases Reference</h2>
+            
+            <div class=&quot;phases-container&quot;>
+                <div class=&quot;phase&quot;>
+                    <div class=&quot;phase-header&quot;>
+                        <div class=&quot;phase-title&quot;>1. Starter</div>
+                    </div>
+                    <ul style=&quot;padding-left: 1.5rem; margin: 1rem 0;&quot;>
+                        <li>Scope &amp; Funding: Finalize concept brief, secure capital and sign the lease.</li>
+                        <li>Core Team: Assemble owner, executive chef, design consultant and project manager.</li>
+                    </ul>
+                </div>
+                
+                <div class=&quot;phase&quot;>
+                    <div class=&quot;phase-header&quot;>
+                        <div class=&quot;phase-title&quot;>2. Detailed Design</div>
+                    </div>
+                    <ul style=&quot;padding-left: 1.5rem; margin: 1rem 0;&quot;>
+                        <li>Floor Plans &amp; Specs: Lock in kitchen/dining layouts, equipment schedules and finish materials.</li>
+                        <li>Permits &amp; Drawings: Submit health-department, fire-marshal and building permits; engage architect and engineer.</li>
+                        <li>Architect &amp; Engineer: Finalize permit-ready drawings and MEP plans.</li>
+                    </ul>
+                </div>
+                
+                <div class=&quot;phase&quot;>
+                    <div class=&quot;phase-header&quot;>
+                        <div class=&quot;phase-title&quot;>3. Construction &amp; Fit-Out</div>
+                    </div>
+                    <ul style=&quot;padding-left: 1.5rem; margin: 1rem 0;&quot;>
+                        <li>Site Prep: Demolition, rough-in for plumbing, electrical and ventilation.</li>
+                        <li>Equipment Installation: Set hoods, ranges, refrigeration and fixtures; complete interior finishes.</li>
+                        <li>Inspections: Coordinate periodic checks for compliance and safety.</li>
+                        <li>General Contractor &amp; Sub-contractors: Sequence work to avoid rework; maintain clear daily schedules.</li>
+                        <li>Equipment Vendors: Deliver, install and certify all kitchen appliances and front-of-house fixtures.</li>
+                    </ul>
+                </div>
+                
+                <div class=&quot;phase&quot;>
+                    <div class=&quot;phase-header&quot;>
+                        <div class=&quot;phase-title&quot;>4. Pre-Opening Preparation</div>
+                    </div>
+                    <ul style=&quot;padding-left: 1.5rem; margin: 1rem 0;&quot;>
+                        <li>Staffing &amp; Training: Recruit, onboard and certify team members; conduct kitchen and service drills.</li>
+                        <li>Systems Go-Live: Install and configure POS, inventory and scheduling software; run trial transactions.</li>
+                        <li>Soft Opening: Invite small audiences, collect feedback and fine-tune operations.</li>
+                        <li>Inspectors &amp; Regulators: Schedule each inspection in advance to prevent hold-ups.</li>
+                        <li>HR &amp; Training Partners: Align recruitment timelines and build training curricula for each role.</li>
+                    </ul>
+                </div>
+                
+                <div class=&quot;phase&quot;>
+                    <div class=&quot;phase-header&quot;>
+                        <div class=&quot;phase-title&quot;>5. Grand Opening</div>
+                    </div>
+                    <ul style=&quot;padding-left: 1.5rem; margin: 1rem 0;&quot;>
+                        <li>Marketing Roll-Out: Launch promotions, press releases and social-media campaigns.</li>
+                        <li>Performance Monitoring: Track first-week sales, table turns, labor efficiency and guest feedback; adjust staffing and menu based on real-data insights.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class=&quot;tab-content&quot; id=&quot;info&quot;>
+            <h2 style=&quot;margin-bottom: 1rem;&quot;>About This Exercise</h2>
+            
+            <div class=&quot;phase&quot; style=&quot;margin-bottom: 1.5rem;&quot;>
+                <h3 style=&quot;margin-bottom: 0.5rem;&quot;>Learning Goals</h3>
+                <ul style=&quot;padding-left: 1.5rem; margin: 1rem 0;&quot;>
+                    <li><strong>Phase the Project:</strong> Understand the five key stages from concept to grand opening.</li>
+                    <li><strong>Align Your Team:</strong> Define roles and communication channels for every professional involved.</li>
+                    <li><strong>Control Time &amp; Money:</strong> Establish real-time mechanisms to track schedule slippages and budget variances.</li>
+                    <li><strong>Leverage AI:</strong> Use AI tools to automate schedule updates, budget monitoring and risk identification.</li>
+                </ul>
+            </div>
+            
+            <div class=&quot;phase&quot;>
+                <h3 style=&quot;margin-bottom: 0.5rem;&quot;>Key Takeaways</h3>
+                <ul style=&quot;padding-left: 1.5rem; margin: 1rem 0;&quot;>
+                    <li>A clear, phased project model prevents confusion and keeps everyone accountable.</li>
+                    <li>Real-time AI-driven schedule and budget monitoring turns surprises into manageable alerts.</li>
+                    <li>Defining precise roles and communication flows ensures smooth hand-offs between architects, builders, vendors and staff.</li>
+                    <li>Leveraging AI for scheduling, cost control and risk alerts frees you to focus on delivering an exceptional opening day.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tabs functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    tab.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Activities data with correct phases
+            const activities = [
+                { id: 1, title: &quot;Scope &amp; Funding&quot;, description: &quot;Finalize concept brief, secure capital and sign the lease.&quot;, correctPhase: 1 },
+                { id: 2, title: &quot;Core Team&quot;, description: &quot;Assemble owner, executive chef, design consultant and project manager.&quot;, correctPhase: 1 },
+                { id: 3, title: &quot;Floor Plans &amp; Specs&quot;, description: &quot;Lock in kitchen/dining layouts, equipment schedules and finish materials.&quot;, correctPhase: 2 },
+                { id: 4, title: &quot;Permits &amp; Drawings&quot;, description: &quot;Submit health-department, fire-marshal and building permits.&quot;, correctPhase: 2 },
+                { id: 5, title: &quot;Architect &amp; Engineer&quot;, description: &quot;Finalize permit-ready drawings and MEP plans.&quot;, correctPhase: 2 },
+                { id: 6, title: &quot;Site Prep&quot;, description: &quot;Demolition, rough-in for plumbing, electrical and ventilation.&quot;, correctPhase: 3 },
+                { id: 7, title: &quot;Equipment Installation&quot;, description: &quot;Set hoods, ranges, refrigeration and fixtures; complete interior finishes.&quot;, correctPhase: 3 },
+                { id: 8, title: &quot;Inspections&quot;, description: &quot;Coordinate periodic checks for compliance and safety.&quot;, correctPhase: 3 },
+                { id: 9, title: &quot;General Contractor&quot;, description: &quot;Sequence work to avoid rework; maintain clear daily schedules.&quot;, correctPhase: 3 },
+                { id: 10, title: &quot;Equipment Vendors&quot;, description: &quot;Deliver, install and certify all kitchen appliances and fixtures.&quot;, correctPhase: 3 },
+                { id: 11, title: &quot;Staffing &amp; Training&quot;, description: &quot;Recruit, onboard and certify team members; conduct kitchen and service drills.&quot;, correctPhase: 4 },
+                { id: 12, title: &quot;Systems Go-Live&quot;, description: &quot;Install and configure POS, inventory and scheduling software.&quot;, correctPhase: 4 },
+                { id: 13, title: &quot;Soft Opening&quot;, description: &quot;Invite small audiences, collect feedback and fine-tune operations.&quot;, correctPhase: 4 },
+                { id: 14, title: &quot;Marketing Roll-Out&quot;, description: &quot;Launch promotions, press releases and social-media campaigns.&quot;, correctPhase: 5 },
+                { id: 15, title: &quot;Performance Monitoring&quot;, description: &quot;Track first-week sales, table turns, labor efficiency and guest feedback.&quot;, correctPhase: 5 }
+            ];
+            
+            // Shuffle activities for the bank
+            const shuffledActivities = [...activities].sort(() => Math.random() - 0.5);
+            
+            // Add activities to the bank
+            const activityBank = document.getElementById('activity-bank');
+            shuffledActivities.forEach(activity => {
+                const activityCard = createActivityCard(activity);
+                activityBank.appendChild(activityCard);
+            });
+            
+            // Drag and drop functionality
+            let draggedItem = null;
+            let correctPlacements = 0;
+            const totalActivities = activities.length;
+            const progressFilled = document.querySelector('.progress-filled');
+            const progressValue = document.getElementById('progress-value');
+            const feedbackMessage = document.getElementById('feedback-message');
+            const resultMessage = document.getElementById('result-message');
+            
+            // Create activity card
+            function createActivityCard(activity) {
+                const card = document.createElement('div');
+                card.className = 'activity-card';
+                card.setAttribute('draggable', 'true');
+                card.setAttribute('data-id', activity.id);
+                card.setAttribute('data-correct-phase', activity.correctPhase);
+                
+                const title = document.createElement('div');
+                title.className = 'activity-title';
+                title.textContent = activity.title;
+                
+                const desc = document.createElement('div');
+                desc.className = 'activity-desc';
+                desc.textContent = activity.description;
+                
+                card.appendChild(title);
+                card.appendChild(desc);
+                
+                // Drag events
+                card.addEventListener('dragstart', function(e) {
+                    draggedItem = this;
+                    setTimeout(() => {
+                        this.classList.add('dragging');
+                    }, 0);
+                });
+                
+                card.addEventListener('dragend', function() {
+                    this.classList.remove('dragging');
+                    draggedItem = null;
+                });
+                
+                return card;
+            }
+            
+            // Handle phase dropzones
+            const phaseItems = document.querySelectorAll('.phase-items');
+            
+            phaseItems.forEach(phase => {
+                // When a card is dragged over a phase
+                phase.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.style.background = 'rgba(106, 90, 205, 0.1)';
+                });
+                
+                // When a card leaves a phase
+                phase.addEventListener('dragleave', function() {
+                    this.style.background = '';
+                });
+                
+                // When a card is dropped in a phase
+                phase.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.style.background = '';
+                    
+                    if (draggedItem) {
+                        const activityId = draggedItem.getAttribute('data-id');
+                        const correctPhase = Number(draggedItem.getAttribute('data-correct-phase'));
+                        const droppedPhase = Number(this.getAttribute('data-phase'));
+                        
+                        // Check if this is a valid drop
+                        if (draggedItem.parentElement.classList.contains('phase-items')) {
+                            // If already in a phase, check if it's correct first
+                            const previousClasses = draggedItem.className;
+                            if (previousClasses.includes('correct') || previousClasses.includes('incorrect')) {
+                                // Don't allow moving already verified items
+                                return;
+                            }
+                        }
+                        
+                        // Check if placement is correct
+                        const isCorrect = correctPhase === droppedPhase;
+                        
+                        // Remove the dropzone hint if it exists
+                        const dropzoneHint = this.querySelector('.dropzone-hint');
+                        if (dropzoneHint) {
+                            dropzoneHint.remove();
+                        }
+                        
+                        // Add the card to the phase
+                        this.appendChild(draggedItem);
+                        
+                        // Add appropriate class based on correctness
+                        if (isCorrect) {
+                            draggedItem.classList.add('correct');
+                            feedbackMessage.textContent = '✅ Correct placement!';
+                            feedbackMessage.className = 'feedback correct';
+                            correctPlacements++;
+                        } else {
+                            draggedItem.classList.add('incorrect');
+                            feedbackMessage.textContent = '❌ Try again! This activity belongs to a different phase.';
+                            feedbackMessage.className = 'feedback incorrect';
+                            
+                            // Auto-return to bank after a delay if incorrect
+                            setTimeout(() => {
+                                draggedItem.classList.remove('incorrect');
+                                activityBank.appendChild(draggedItem);
+                                feedbackMessage.textContent = '';
+                                feedbackMessage.className = 'feedback';
+                            }, 1500);
+                        }
+                        
+                        // Update progress
+                        updateProgress();
+                    }
+                });
+            });
+            
+            // Update progress bar
+            function updateProgress() {
+                const progress = (correctPlacements / totalActivities) * 100;
+                progressFilled.style.width = `${progress}%`;
+                progressValue.textContent = `${Math.round(progress)}%`;
+                
+                // Check if all activities are placed correctly
+                if (correctPlacements === totalActivities) {
+                    resultMessage.style.display = 'block';
+                    // Scroll to result message
+                    setTimeout(() => {
+                        resultMessage.scrollIntoView({ behavior: 'smooth' });
+                    }, 500);
+                }
+            }
+            
+            // Reset button
+            const resetBtn = document.getElementById('reset-btn');
+            resetBtn.addEventListener('click', function() {
+                // Reset counters
+                correctPlacements = 0;
+                updateProgress();
+                
+                // Clear feedback
+                feedbackMessage.textContent = '';
+                feedbackMessage.className = 'feedback';
+                
+                // Hide result message
+                resultMessage.style.display = 'none';
+                
+                // Move all cards back to the bank and remove classes
+                document.querySelectorAll('.activity-card').forEach(card => {
+                    card.classList.remove('correct', 'incorrect');
+                    activityBank.appendChild(card);
+                });
+                
+                // Add dropzone hints back
+                document.querySelectorAll('.phase-items').forEach(phase => {
+                    if (!phase.querySelector('.dropzone-hint')) {
+                        const hint = document.createElement('div');
+                        hint.className = 'dropzone-hint';
+                        hint.textContent = 'Drop activities here';
+                        phase.appendChild(hint);
+                    }
+                });
+                
+                // Reshuffle cards in the bank
+                const cards = Array.from(activityBank.children);
+                cards.sort(() => Math.random() - 0.5);
+                cards.forEach(card => activityBank.appendChild(card));
+            });
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_3ybtyd31';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_3ybtyd31" style="width: 100%; height: 1767px; border: none;"></iframe>

@@ -1,0 +1,910 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Guest Journey Mapper</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #7c4dff;
+            --secondary: #03dac6;
+            --background: #121212;
+            --surface: #1e1e1e;
+            --surface-light: #2d2d2d;
+            --on-background: #ffffff;
+            --on-surface: #e0e0e0;
+            --error: #cf6679;
+            --success: #4caf50;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--on-background);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 16px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 24px 0;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            color: var(--on-background);
+            font-weight: 700;
+        }
+        
+        .description {
+            font-size: 1rem;
+            color: var(--on-surface);
+            line-height: 1.5;
+            margin-bottom: 24px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            background-color: var(--surface);
+            border-radius: 8px 8px 0 0;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .tab {
+            padding: 16px 24px;
+            color: var(--on-surface);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            background-color: var(--surface);
+            border-radius: 0 0 8px 8px;
+            padding: 24px;
+            margin-bottom: 24px;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background-color: var(--surface-light);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .touchpoint-library {
+            margin-bottom: 24px;
+        }
+        
+        .touchpoint-category {
+            margin-bottom: 16px;
+        }
+        
+        .touchpoint-category h3 {
+            margin-bottom: 8px;
+            color: var(--secondary);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .touchpoints {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .touchpoint {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 80px;
+            height: 80px;
+            background-color: var(--surface);
+            border-radius: 8px;
+            padding: 8px;
+            cursor: move;
+            transition: transform 0.2s, box-shadow 0.2s;
+            user-select: none;
+            touch-action: none;
+        }
+        
+        .touchpoint:active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .touchpoint i {
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+        
+        .touchpoint span {
+            font-size: 10px;
+            text-align: center;
+            line-height: 1.2;
+        }
+        
+        .timeline-container {
+            position: relative;
+            padding: 20px 0;
+            margin-bottom: 24px;
+        }
+        
+        .timeline-stages {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .stage {
+            flex: 1;
+            text-align: center;
+            font-size: 12px;
+            color: var(--on-surface);
+            position: relative;
+        }
+        
+        .stage::after {
+            content: '';
+            position: absolute;
+            width: 1px;
+            height: 8px;
+            background-color: var(--on-surface);
+            bottom: -12px;
+            left: 50%;
+        }
+        
+        .timeline-track {
+            height: 150px;
+            background-color: var(--surface);
+            border-radius: 8px;
+            position: relative;
+            margin-top: 12px;
+            border: 1px dashed var(--on-surface);
+            display: flex;
+            align-items: center;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            height: 2px;
+            background-color: var(--primary);
+            width: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .feedback-panel {
+            background-color: var(--surface-light);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .feedback-panel h3 {
+            margin-bottom: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .feedback-panel h3 i {
+            margin-right: 8px;
+        }
+        
+        .feedback-content {
+            color: var(--on-surface);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .journey-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background-color: var(--surface-light);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: var(--secondary);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--on-surface);
+        }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 24px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn:hover {
+            background-color: #6b42e0;
+        }
+        
+        .btn i {
+            margin-right: 8px;
+        }
+        
+        .placed-touchpoint {
+            position: absolute;
+            transform: translateY(-50%);
+            z-index: 2;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--surface-light);
+            border: 2px solid var(--primary);
+            font-size: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            touch-action: none;
+        }
+        
+        .placed-touchpoint i {
+            font-size: 20px;
+            margin-bottom: 2px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: var(--surface);
+            border-radius: 8px;
+            margin-bottom: 24px;
+            height: 8px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--secondary);
+            width: 0;
+            transition: width 0.3s ease;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+        
+        .guidelines {
+            background-color: var(--surface-light);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .guidelines h3 {
+            margin-bottom: 12px;
+        }
+        
+        .guidelines ul {
+            padding-left: 24px;
+            color: var(--on-surface);
+        }
+        
+        .guidelines li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .tabs {
+                flex-wrap: nowrap;
+            }
+            
+            .journey-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+        
+        .ghost-touchpoint {
+            opacity: 0.5;
+            position: absolute;
+            pointer-events: none;
+        }
+        
+        .success-message {
+            color: var(--success);
+            margin-top: 8px;
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .error-message {
+            color: var(--error);
+            margin-top: 8px;
+            display: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+    </style>
+    <link href=&quot;https://fonts.googleapis.com/icon?family=Material+Icons&quot; rel=&quot;stylesheet&quot;>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>Guest Journey Mapper</h1>
+            <p class=&quot;description&quot;>Build a restaurant guest journey by placing touchpoints along a timeline from awareness to advocacy. Add digital teasers, in-venue delights, and post-visit follow-ups to create a compelling guest experience.</p>
+        </header>
+        
+        <div class=&quot;tabs&quot;>
+            <div class=&quot;tab active&quot; data-tab=&quot;journey&quot;>Journey Map</div>
+            <div class=&quot;tab&quot; data-tab=&quot;insights&quot;>Insights</div>
+            <div class=&quot;tab&quot; data-tab=&quot;learn&quot;>Learning Resources</div>
+        </div>
+        
+        <div id=&quot;journey&quot; class=&quot;tab-content active&quot;>
+            <div class=&quot;progress-container&quot;>
+                <div class=&quot;progress-bar&quot; style=&quot;width: 10%;&quot;></div>
+            </div>
+            
+            <div class=&quot;card&quot;>
+                <h2>Design Your Guest Journey</h2>
+                <p style=&quot;margin-bottom: 16px; color: var(--on-surface);&quot;>Drag touchpoints from the library and place them along the journey timeline to create a comprehensive guest experience.</p>
+                
+                <div class=&quot;touchpoint-library&quot;>
+                    <div class=&quot;touchpoint-category&quot;>
+                        <h3>Digital Teasers</h3>
+                        <div class=&quot;touchpoints&quot;>
+                            <div class=&quot;touchpoint&quot; data-type=&quot;digital&quot; data-name=&quot;Social Media Ad&quot;>
+                                <i class=&quot;material-icons&quot;>share</i>
+                                <span>Social Media Ad</span>
+                            </div>
+                            <div class=&quot;touchpoint&quot; data-type=&quot;digital&quot; data-name=&quot;Email Campaign&quot;>
+                                <i class=&quot;material-icons&quot;>email</i>
+                                <span>Email Campaign</span>
+                            </div>
+                            <div class=&quot;touchpoint&quot; data-type=&quot;digital&quot; data-name=&quot;Influencer Post&quot;>
+                                <i class=&quot;material-icons&quot;>thumb_up</i>
+                                <span>Influencer Post</span>
+                            </div>
+                            <div class=&quot;touchpoint&quot; data-type=&quot;digital&quot; data-name=&quot;Food Blog Feature&quot;>
+                                <i class=&quot;material-icons&quot;>public</i>
+                                <span>Food Blog</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class=&quot;touchpoint-category&quot;>
+                        <h3>In-Venue Delights</h3>
+                        <div class=&quot;touchpoints&quot;>
+                            <div class=&quot;touchpoint&quot; data-type=&quot;venue&quot; data-name=&quot;Welcome Ritual&quot;>
+                                <i class=&quot;material-icons&quot;>emoji_people</i>
+                                <span>Welcome Ritual</span>
+                            </div>
+                            <div class=&quot;touchpoint&quot; data-type=&quot;venue&quot; data-name=&quot;Surprise Tasting&quot;>
+                                <i class=&quot;material-icons&quot;>restaurant</i>
+                                <span>Surprise Tasting</span>
+                            </div>
+                            <div class=&quot;touchpoint&quot; data-type=&quot;venue&quot; data-name=&quot;Photo Moment&quot;>
+                                <i class=&quot;material-icons&quot;>photo_camera</i>
+                                <span>Photo Moment</span>
+                            </div>
+                            <div class=&quot;touchpoint&quot; data-type=&quot;venue&quot; data-name=&quot;Chef Interaction&quot;>
+                                <i class=&quot;material-icons&quot;>person</i>
+                                <span>Chef Interaction</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class=&quot;touchpoint-category&quot;>
+                        <h3>Post-Visit Follow-ups</h3>
+                        <div class=&quot;touchpoints&quot;>
+                            <div class=&quot;touchpoint&quot; data-type=&quot;post&quot; data-name=&quot;Thank You Note&quot;>
+                                <i class=&quot;material-icons&quot;>mail</i>
+                                <span>Thank You Note</span>
+                            </div>
+                            <div class=&quot;touchpoint&quot; data-type=&quot;post&quot; data-name=&quot;Review Request&quot;>
+                                <i class=&quot;material-icons&quot;>star</i>
+                                <span>Review Request</span>
+                            </div>
+                            <div class=&quot;touchpoint&quot; data-type=&quot;post&quot; data-name=&quot;Special Offer&quot;>
+                                <i class=&quot;material-icons&quot;>local_offer</i>
+                                <span>Special Offer</span>
+                            </div>
+                            <div class=&quot;touchpoint&quot; data-type=&quot;post&quot; data-name=&quot;Loyalty Program&quot;>
+                                <i class=&quot;material-icons&quot;>card_membership</i>
+                                <span>Loyalty Program</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class=&quot;timeline-container&quot;>
+                    <div class=&quot;timeline-stages&quot;>
+                        <div class=&quot;stage&quot;>Awareness</div>
+                        <div class=&quot;stage&quot;>Interest</div>
+                        <div class=&quot;stage&quot;>Visit</div>
+                        <div class=&quot;stage&quot;>Checkout</div>
+                        <div class=&quot;stage&quot;>Advocacy</div>
+                    </div>
+                    
+                    <div class=&quot;timeline-track&quot; id=&quot;timeline&quot;>
+                        <div class=&quot;timeline-line&quot;></div>
+                    </div>
+                </div>
+                
+                <div class=&quot;feedback-panel&quot;>
+                    <h3><i class=&quot;material-icons&quot;>insights</i> Journey Feedback</h3>
+                    <div class=&quot;feedback-content&quot;>
+                        Start building your guest journey by placing touchpoints on the timeline above. You'll receive feedback as you design your experience.
+                    </div>
+                </div>
+                
+                <div class=&quot;journey-stats&quot;>
+                    <div class=&quot;stat-card&quot;>
+                        <div class=&quot;stat-value&quot;>0%</div>
+                        <div class=&quot;stat-label&quot;>Share Rate</div>
+                    </div>
+                    <div class=&quot;stat-card&quot;>
+                        <div class=&quot;stat-value&quot;>0%</div>
+                        <div class=&quot;stat-label&quot;>Referral Ratio</div>
+                    </div>
+                    <div class=&quot;stat-card&quot;>
+                        <div class=&quot;stat-value&quot;>0</div>
+                        <div class=&quot;stat-label&quot;>Sentiment Score</div>
+                    </div>
+                </div>
+                
+                <div class=&quot;actions&quot;>
+                    <button class=&quot;btn&quot; id=&quot;reset-btn&quot;><i class=&quot;material-icons&quot;>refresh</i> Reset Journey</button>
+                    <button class=&quot;btn&quot; id=&quot;analyze-btn&quot;><i class=&quot;material-icons&quot;>analytics</i> Analyze Journey</button>
+                </div>
+                
+                <div class=&quot;success-message&quot; id=&quot;success-message&quot;>
+                    Journey saved successfully!
+                </div>
+                <div class=&quot;error-message&quot; id=&quot;error-message&quot;>
+                    Please add at least one touchpoint in each stage of the journey.
+                </div>
+            </div>
+        </div>
+        
+        <div id=&quot;insights&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <h2>Journey Insights</h2>
+                <p style=&quot;margin-bottom: 16px; color: var(--on-surface);&quot;>Get AI-powered insights on your guest journey design and see how it ranks against industry benchmarks.</p>
+                
+                <div class=&quot;guidelines&quot;>
+                    <h3>Key Experience-First Strategies</h3>
+                    <ul>
+                        <li><strong>Emotional Connection:</strong> Crafting shareable &quot;wow&quot; moments builds deep bonds beyond the plate.</li>
+                        <li><strong>Distinctive Differentiation:</strong> Unique rituals and surprises set your concept apart in a sea of competitors.</li>
+                        <li><strong>Organic Amplification:</strong> Word-of-mouth referrals multiply your reach at no extra ad cost.</li>
+                        <li><strong>Budget Efficiency:</strong> Targeted touchpoints focus limited resources where they spark the most excitement.</li>
+                    </ul>
+                </div>
+                
+                <p style=&quot;margin: 16px 0; color: var(--on-surface);&quot;>Design your journey in the Journey Map tab first to see your insights here.</p>
+                
+                <button class=&quot;btn&quot; id=&quot;generate-insights-btn&quot;><i class=&quot;material-icons&quot;>smart_toy</i> Generate AI Insights</button>
+            </div>
+        </div>
+        
+        <div id=&quot;learn&quot; class=&quot;tab-content&quot;>
+            <div class=&quot;card&quot;>
+                <h2>🧠 Building an Experience-First Strategy</h2>
+                <p style=&quot;margin-bottom: 16px; color: var(--on-surface);&quot;>Orchestrating Every Guest Touchpoint to Create Buzz and Loyalty</p>
+                
+                <div class=&quot;guidelines&quot;>
+                    <h3>Core Components of an Experience-First Strategy</h3>
+                    <ul>
+                        <li><strong>Guest Journey Mapping</strong><br>
+                            - Chart every stage: Awareness → Interest → Visit → Checkout → Advocacy<br>
+                            - Identify emotional peaks (first impression, surprise tasting) and valleys (waiting gaps).</li>
+                        <li><strong>Persona &amp; Trigger Definition</strong><br>
+                            - Build a one-paragraph profile: demographics, motivations and social-sharing habits.<br>
+                            - Pinpoint the &quot;wow&quot; triggers that compel guests to post or refer.</li>
+                        <li><strong>Channel &amp; Touchpoint Blend</strong><br>
+                            - <strong>Digital Teasers:</strong> Instagram/TikTok reels, micro-influencer sneak peeks, VIP email invites<br>
+                            - <strong>In-Venue Rituals:</strong> Signature greeting, complimentary palate-cleanser, personalized thank-you note<br>
+                            - <strong>Community Hooks:</strong> Pop-up experiences, local event partnerships, neighborhood press features</li>
+                        <li><strong>Experience KPIs</strong><br>
+                            - <strong>Share Rate:</strong> % of guests posting about their visit<br>
+                            - <strong>Referral Ratio:</strong> % of new guests arriving via recommendation<br>
+                            - <strong>Sentiment Score:</strong> AI-computed mood index from reviews and social comments</li>
+                    </ul>
+                </div>
+                
+                <button class=&quot;btn&quot; id=&quot;back-to-journey-btn&quot;><i class=&quot;material-icons&quot;>arrow_back</i> Back to Journey Map</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Remove active class from all tabs and contents
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    tab.classList.add('active');
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // Back to Journey button
+            document.getElementById('back-to-journey-btn').addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                document.querySelector('[data-tab=&quot;journey&quot;]').classList.add('active');
+                document.getElementById('journey').classList.add('active');
+            });
+            
+            // Drag and drop functionality
+            const touchpoints = document.querySelectorAll('.touchpoint');
+            const timeline = document.getElementById('timeline');
+            let draggedTouchpoint = null;
+            let ghostTouchpoint = null;
+            let touchpointCount = 0;
+            
+            // Touch and mouse events for touchpoints
+            touchpoints.forEach(touchpoint => {
+                touchpoint.addEventListener('mousedown', handleTouchpointDragStart);
+                touchpoint.addEventListener('touchstart', handleTouchpointDragStart, { passive: false });
+                
+                // Prevent default drag behavior
+                touchpoint.addEventListener('dragstart', (e) => e.preventDefault());
+            });
+            
+            // Timeline events
+            timeline.addEventListener('mousemove', handleTimelineDragOver);
+            timeline.addEventListener('touchmove', handleTimelineDragOver, { passive: false });
+            timeline.addEventListener('mouseup', handleTimelineDrop);
+            timeline.addEventListener('touchend', handleTimelineDrop);
+            
+            // Document events to handle drag ending outside timeline
+            document.addEventListener('mouseup', handleDragEnd);
+            document.addEventListener('touchend', handleDragEnd);
+            document.addEventListener('mousemove', handleDocumentDragMove);
+            document.addEventListener('touchmove', handleDocumentDragMove, { passive: false });
+            
+            function handleTouchpointDragStart(e) {
+                e.preventDefault();
+                
+                // Get the original touchpoint
+                draggedTouchpoint = this;
+                
+                // Create ghost touchpoint for visual feedback
+                ghostTouchpoint = this.cloneNode(true);
+                ghostTouchpoint.classList.add('ghost-touchpoint');
+                document.body.appendChild(ghostTouchpoint);
+                
+                // Set initial position for the ghost
+                updateGhostPosition(e);
+            }
+            
+            function handleDocumentDragMove(e) {
+                if (ghostTouchpoint) {
+                    e.preventDefault();
+                    updateGhostPosition(e);
+                }
+            }
+            
+            function updateGhostPosition(e) {
+                if (!ghostTouchpoint) return;
+                
+                const clientX = e.clientX || (e.touches &amp;&amp; e.touches[0].clientX);
+                const clientY = e.clientY || (e.touches &amp;&amp; e.touches[0].clientY);
+                
+                if (clientX &amp;&amp; clientY) {
+                    ghostTouchpoint.style.position = 'fixed';
+                    ghostTouchpoint.style.top = `${clientY - 40}px`;
+                    ghostTouchpoint.style.left = `${clientX - 40}px`;
+                    ghostTouchpoint.style.pointerEvents = 'none';
+                    ghostTouchpoint.style.zIndex = '1000';
+                }
+            }
+            
+            function handleTimelineDragOver(e) {
+                if (draggedTouchpoint) {
+                    e.preventDefault();
+                }
+            }
+            
+            function handleTimelineDrop(e) {
+                if (draggedTouchpoint &amp;&amp; ghostTouchpoint) {
+                    e.preventDefault();
+                    
+                    const timelineRect = timeline.getBoundingClientRect();
+                    const clientX = e.clientX || (e.changedTouches &amp;&amp; e.changedTouches[0].clientX);
+                    
+                    if (clientX) {
+                        const offsetX = clientX - timelineRect.left;
+                        const percentage = (offsetX / timelineRect.width) * 100;
+                        
+                        if (percentage >= 0 &amp;&amp; percentage <= 100) {
+                            const touchpointType = draggedTouchpoint.getAttribute('data-type');
+                            const touchpointName = draggedTouchpoint.getAttribute('data-name');
+                            
+                            createPlacedTouchpoint(percentage, touchpointType, touchpointName);
+                            updateFeedback();
+                            updateProgress();
+                        }
+                    }
+                }
+                
+                cleanupDrag();
+            }
+            
+            function handleDragEnd() {
+                cleanupDrag();
+            }
+            
+            function cleanupDrag() {
+                if (ghostTouchpoint &amp;&amp; ghostTouchpoint.parentNode) {
+                    ghostTouchpoint.parentNode.removeChild(ghostTouchpoint);
+                }
+                draggedTouchpoint = null;
+                ghostTouchpoint = null;
+            }
+            
+            function createPlacedTouchpoint(percentage, type, name) {
+                const placedTouchpoint = document.createElement('div');
+                placedTouchpoint.className = 'placed-touchpoint';
+                placedTouchpoint.style.left = `${percentage}%`;
+                
+                // Different colors based on touchpoint type
+                if (type === 'digital') {
+                    placedTouchpoint.style.backgroundColor = '#4b41e6';
+                } else if (type === 'venue') {
+                    placedTouchpoint.style.backgroundColor = '#03dac6';
+                } else if (type === 'post') {
+                    placedTouchpoint.style.backgroundColor = '#ff7043';
+                }
+                
+                // Icon based on type
+                let icon = 'touch_app';
+                if (type === 'digital') icon = 'language';
+                if (type === 'venue') icon = 'restaurant';
+                if (type === 'post') icon = 'mail';
+                
+                placedTouchpoint.innerHTML = `
+                    <i class=&quot;material-icons&quot;>${icon}</i>
+                    <span>${name}</span>
+                `;
+                
+                // Make placed touchpoints movable
+                placedTouchpoint.setAttribute('data-id', touchpointCount++);
+                placedTouchpoint.setAttribute('data-type', type);
+                placedTouchpoint.setAttribute('data-name', name);
+                
+                // Double tap/click to remove
+                placedTouchpoint.addEventListener('dblclick', function() {
+                    this.remove();
+                    updateFeedback();
+                    updateProgress();
+                });
+                
+                // Add to timeline
+                timeline.appendChild(placedTouchpoint);
+            }
+            
+            function updateFeedback() {
+                const placedTouchpoints = document.querySelectorAll('.placed-touchpoint');
+                const feedbackContent = document.querySelector('.feedback-content');
+                const shareRateStat = document.querySelector('.journey-stats .stat-card:nth-child(1) .stat-value');
+                const referralRatioStat = document.querySelector('.journey-stats .stat-card:nth-child(2) .stat-value');
+                const sentimentScoreStat = document.querySelector('.journey-stats .stat-card:nth-child(3) .stat-value');
+                
+                if (placedTouchpoints.length === 0) {
+                    feedbackContent.textContent = 'Start building your guest journey by placing touchpoints on the timeline above. You\'ll receive feedback as you design your experience.';
+                    shareRateStat.textContent = '0%';
+                    referralRatioStat.textContent = '0%';
+                    sentimentScoreStat.textContent = '0';
+                    return;
+                }
+                
+                // Count touchpoint types
+                let digitalCount = 0;
+                let venueCount = 0;
+                let postCount = 0;
+                
+                placedTouchpoints.forEach(tp => {
+                    const type = tp.getAttribute('data-type');
+                    if (type === 'digital') digitalCount++;
+                    if (type === 'venue') venueCount++;
+                    if (type === 'post') postCount++;
+                });
+                
+                // Calculate stats based on placed touchpoints
+                const shareRate = Math.min(100, digitalCount * 10 + venueCount * 15 + postCount * 5);
+                const referralRatio = Math.min(100, digitalCount * 5 + venueCount * 20 + postCount * 15);
+                const sentimentScore = Math.min(10, (digitalCount + venueCount * 2 + postCount) / 2).toFixed(1);
+                
+                // Update stats
+                shareRateStat.textContent = `${shareRate}%`;
+                referralRatioStat.textContent = `${referralRatio}%`;
+                sentimentScoreStat.textContent = sentimentScore;
+                
+                // Generate feedback
+                let feedback = '';
+                
+                if (placedTouchpoints.length < 3) {
+                    feedback = 'Your journey is just beginning. Add more touchpoints to create a comprehensive experience.';
+                } else if (digitalCount === 0) {
+                    feedback = 'Your journey lacks digital teasers. Add social media or email campaigns to build awareness.';
+                } else if (venueCount === 0) {
+                    feedback = 'You haven\'t included any in-venue experiences. These are crucial for creating memorable moments.';
+                } else if (postCount === 0) {
+                    feedback = 'Consider adding post-visit follow-ups to turn one-time guests into loyal customers.';
+                } else if (placedTouchpoints.length >= 8) {
+                    feedback = 'Excellent journey design! You\'ve created a comprehensive experience that will delight guests at every stage.';
+                } else {
+                    feedback = 'Your journey is taking shape nicely. Consider adding more touchpoints to create a seamless experience.';
+                }
+                
+                feedbackContent.textContent = feedback;
+            }
+            
+            function updateProgress() {
+                const placedTouchpoints = document.querySelectorAll('.placed-touchpoint');
+                const progressBar = document.querySelector('.progress-bar');
+                const maxTouchpoints = 10;
+                
+                const progress = Math.min(100, (placedTouchpoints.length / maxTouchpoints) * 100);
+                progressBar.style.width = `${progress}%`;
+            }
+            
+            // Reset button
+            document.getElementById('reset-btn').addEventListener('click', function() {
+                const placedTouchpoints = document.querySelectorAll('.placed-touchpoint');
+                placedTouchpoints.forEach(tp => tp.remove());
+                
+                updateFeedback();
+                updateProgress();
+            });
+            
+            // Analyze button
+            document.getElementById('analyze-btn').addEventListener('click', function() {
+                const placedTouchpoints = document.querySelectorAll('.placed-touchpoint');
+                const errorMessage = document.getElementById('error-message');
+                const successMessage = document.getElementById('success-message');
+                
+                errorMessage.style.display = 'none';
+                successMessage.style.display = 'none';
+                
+                if (placedTouchpoints.length < 5) {
+                    errorMessage.style.display = 'block';
+                    setTimeout(() => {
+                        errorMessage.style.display = 'none';
+                    }, 3000);
+                } else {
+                    successMessage.style.display = 'block';
+                    setTimeout(() => {
+                        successMessage.style.display = 'none';
+                        
+                        // Switch to insights tab
+                        tabs.forEach(t => t.classList.remove('active'));
+                        tabContents.forEach(content => content.classList.remove('active'));
+                        
+                        document.querySelector('[data-tab=&quot;insights&quot;]').classList.add('active');
+                        document.getElementById('insights').classList.add('active');
+                    }, 1500);
+                }
+            });
+            
+            // Generate AI Insights button
+            document.getElementById('generate-insights-btn').addEventListener('click', function() {
+                // Would connect to AI backend in production
+                this.textContent = 'Generating insights...';
+                setTimeout(() => {
+                    this.innerHTML = '<i class=&quot;material-icons&quot;>smart_toy</i> Generate AI Insights';
+                    alert('In a full implementation, this would generate AI-powered insights based on your journey design.');
+                }, 1500);
+            });
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_z69q0mtr';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_z69q0mtr" style="width: 100%; height: 1642px; border: none;"></iframe>

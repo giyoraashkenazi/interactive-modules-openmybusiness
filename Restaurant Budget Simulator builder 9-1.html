@@ -1,0 +1,810 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Budget Allocation Simulator</title>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --background: #121212;
+            --surface: #1e1e1e;
+            --surface-variant: #2d2d2d;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-disabled: rgba(255, 255, 255, 0.5);
+            --error: #cf6679;
+            --warning: #ffb74d;
+            --success: #81c784;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+        
+        .budget-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .budget-total {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--surface-variant);
+            border-radius: 8px;
+        }
+        
+        .budget-total h2 {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .budget-amount {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--surface-variant);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .tab.active {
+            color: var(--primary);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--primary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .slider-container {
+            margin-bottom: 25px;
+        }
+        
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .slider-label {
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .slider-value {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--primary);
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 5px;
+            background: var(--surface-variant);
+            outline: none;
+        }
+        
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            background: var(--primary-dark);
+        }
+        
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
+            transition: all 0.15s ease;
+        }
+        
+        .slider::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            background: var(--primary-dark);
+        }
+        
+        .feedback-container {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .feedback-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .metrics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .metric-card {
+            background: var(--surface-variant);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .metric-value {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin: 5px 0;
+        }
+        
+        .metric-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .compliance-indicator {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 6px;
+            background: var(--surface-variant);
+        }
+        
+        .indicator-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .status-success {
+            background-color: var(--success);
+        }
+        
+        .status-warning {
+            background-color: var(--warning);
+        }
+        
+        .status-error {
+            background-color: var(--error);
+        }
+        
+        .indicator-text {
+            font-size: 0.9rem;
+        }
+        
+        .chart-container {
+            margin: 30px 0;
+            height: 300px;
+        }
+        
+        .reset-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .reset-button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 1.5rem;
+            }
+            
+            .budget-amount {
+                font-size: 1.3rem;
+            }
+            
+            .metrics-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .tab {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .budget-total {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .budget-amount {
+                margin-top: 5px;
+            }
+            
+            .metrics-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>Restaurant Budget Allocation Simulator</h1>
+            <p class=&quot;subtitle&quot;>Distribute your fixed budget across different areas to see real-time impacts on compliance and operational efficiency.</p>
+        </header>
+        
+        <div class=&quot;budget-card&quot;>
+            <div class=&quot;budget-total&quot;>
+                <h2>Total Budget</h2>
+                <div class=&quot;budget-amount&quot;>$500,000</div>
+            </div>
+            
+            <div class=&quot;budget-total&quot;>
+                <h2>Remaining Budget</h2>
+                <div class=&quot;budget-amount&quot; id=&quot;remaining-budget&quot;>$500,000</div>
+            </div>
+            
+            <div class=&quot;tabs&quot;>
+                <button class=&quot;tab active&quot; data-tab=&quot;kitchen&quot;>Kitchen</button>
+                <button class=&quot;tab&quot; data-tab=&quot;dining&quot;>Dining Area</button>
+                <button class=&quot;tab&quot; data-tab=&quot;refrigeration&quot;>Refrigeration</button>
+                <button class=&quot;tab&quot; data-tab=&quot;ventilation&quot;>Ventilation</button>
+                <button class=&quot;tab&quot; data-tab=&quot;utilities&quot;>Utilities</button>
+            </div>
+            
+            <div id=&quot;kitchen&quot; class=&quot;tab-content active&quot;>
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Cooking Equipment</span>
+                        <span class=&quot;slider-value&quot; id=&quot;cooking-equipment-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;200000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;cooking-equipment&quot; data-category=&quot;kitchen&quot;>
+                </div>
+                
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Preparation Stations</span>
+                        <span class=&quot;slider-value&quot; id=&quot;prep-stations-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;100000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;prep-stations&quot; data-category=&quot;kitchen&quot;>
+                </div>
+                
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Plating Area</span>
+                        <span class=&quot;slider-value&quot; id=&quot;plating-area-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;50000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;plating-area&quot; data-category=&quot;kitchen&quot;>
+                </div>
+            </div>
+            
+            <div id=&quot;dining&quot; class=&quot;tab-content&quot;>
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Furniture</span>
+                        <span class=&quot;slider-value&quot; id=&quot;furniture-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;150000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;furniture&quot; data-category=&quot;dining&quot;>
+                </div>
+                
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Lighting</span>
+                        <span class=&quot;slider-value&quot; id=&quot;lighting-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;50000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;lighting&quot; data-category=&quot;dining&quot;>
+                </div>
+                
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Decor</span>
+                        <span class=&quot;slider-value&quot; id=&quot;decor-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;70000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;decor&quot; data-category=&quot;dining&quot;>
+                </div>
+            </div>
+            
+            <div id=&quot;refrigeration&quot; class=&quot;tab-content&quot;>
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Walk-in Refrigerators</span>
+                        <span class=&quot;slider-value&quot; id=&quot;walkin-refrigerators-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;100000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;walkin-refrigerators&quot; data-category=&quot;refrigeration&quot;>
+                </div>
+                
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Freezers</span>
+                        <span class=&quot;slider-value&quot; id=&quot;freezers-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;80000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;freezers&quot; data-category=&quot;refrigeration&quot;>
+                </div>
+                
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Cold Storage</span>
+                        <span class=&quot;slider-value&quot; id=&quot;cold-storage-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;70000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;cold-storage&quot; data-category=&quot;refrigeration&quot;>
+                </div>
+            </div>
+            
+            <div id=&quot;ventilation&quot; class=&quot;tab-content&quot;>
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Hood Systems</span>
+                        <span class=&quot;slider-value&quot; id=&quot;hood-systems-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;120000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;hood-systems&quot; data-category=&quot;ventilation&quot;>
+                </div>
+                
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Air Filtration</span>
+                        <span class=&quot;slider-value&quot; id=&quot;air-filtration-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;60000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;air-filtration&quot; data-category=&quot;ventilation&quot;>
+                </div>
+            </div>
+            
+            <div id=&quot;utilities&quot; class=&quot;tab-content&quot;>
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Plumbing</span>
+                        <span class=&quot;slider-value&quot; id=&quot;plumbing-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;90000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;plumbing&quot; data-category=&quot;utilities&quot;>
+                </div>
+                
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Electrical</span>
+                        <span class=&quot;slider-value&quot; id=&quot;electrical-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;100000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;electrical&quot; data-category=&quot;utilities&quot;>
+                </div>
+                
+                <div class=&quot;slider-container&quot;>
+                    <div class=&quot;slider-header&quot;>
+                        <span class=&quot;slider-label&quot;>Gas Lines</span>
+                        <span class=&quot;slider-value&quot; id=&quot;gas-lines-value&quot;>$0</span>
+                    </div>
+                    <input type=&quot;range&quot; min=&quot;0&quot; max=&quot;70000&quot; value=&quot;0&quot; class=&quot;slider&quot; id=&quot;gas-lines&quot; data-category=&quot;utilities&quot;>
+                </div>
+            </div>
+        </div>
+        
+        <div class=&quot;chart-container&quot;>
+            <canvas id=&quot;budgetChart&quot;></canvas>
+        </div>
+        
+        <div class=&quot;feedback-container&quot;>
+            <h3 class=&quot;feedback-header&quot;>Operational Impact Analysis</h3>
+            
+            <div id=&quot;compliance-indicators&quot;>
+                <div class=&quot;compliance-indicator&quot;>
+                    <div class=&quot;indicator-status status-error&quot; id=&quot;kitchen-status&quot;></div>
+                    <div class=&quot;indicator-text&quot;>Kitchen equipment budget is below recommended levels</div>
+                </div>
+                <div class=&quot;compliance-indicator&quot;>
+                    <div class=&quot;indicator-status status-error&quot; id=&quot;ventilation-status&quot;></div>
+                    <div class=&quot;indicator-text&quot;>Ventilation systems don't meet regulatory requirements</div>
+                </div>
+                <div class=&quot;compliance-indicator&quot;>
+                    <div class=&quot;indicator-status status-error&quot; id=&quot;refrigeration-status&quot;></div>
+                    <div class=&quot;indicator-text&quot;>Refrigeration capacity is insufficient for intended menu</div>
+                </div>
+            </div>
+            
+            <div class=&quot;metrics-container&quot;>
+                <div class=&quot;metric-card&quot;>
+                    <div class=&quot;metric-value&quot; id=&quot;capacity-metric&quot;>0</div>
+                    <div class=&quot;metric-label&quot;>Customer Capacity</div>
+                </div>
+                <div class=&quot;metric-card&quot;>
+                    <div class=&quot;metric-value&quot; id=&quot;efficiency-metric&quot;>0%</div>
+                    <div class=&quot;metric-label&quot;>Operational Efficiency</div>
+                </div>
+                <div class=&quot;metric-card&quot;>
+                    <div class=&quot;metric-value&quot; id=&quot;compliance-metric&quot;>0%</div>
+                    <div class=&quot;metric-label&quot;>Regulatory Compliance</div>
+                </div>
+                <div class=&quot;metric-card&quot;>
+                    <div class=&quot;metric-value&quot; id=&quot;roi-metric&quot;>0x</div>
+                    <div class=&quot;metric-label&quot;>Projected ROI</div>
+                </div>
+            </div>
+        </div>
+        
+        <button class=&quot;reset-button&quot; id=&quot;reset-button&quot;>Reset Budget Allocation</button>
+    </div>
+    
+    <script src=&quot;https://cdn.jsdelivr.net/npm/chart.js&quot;></script>
+    <script>
+        // Budget variables
+        const totalBudget = 500000;
+        let remainingBudget = totalBudget;
+        let allocatedBudgets = {
+            kitchen: 0,
+            dining: 0,
+            refrigeration: 0,
+            ventilation: 0,
+            utilities: 0
+        };
+        
+        // DOM elements
+        const remainingBudgetElement = document.getElementById('remaining-budget');
+        const sliders = document.querySelectorAll('.slider');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const resetButton = document.getElementById('reset-button');
+        
+        // Metrics elements
+        const capacityMetric = document.getElementById('capacity-metric');
+        const efficiencyMetric = document.getElementById('efficiency-metric');
+        const complianceMetric = document.getElementById('compliance-metric');
+        const roiMetric = document.getElementById('roi-metric');
+        
+        // Status indicators
+        const kitchenStatus = document.getElementById('kitchen-status');
+        const ventilationStatus = document.getElementById('ventilation-status');
+        const refrigerationStatus = document.getElementById('refrigeration-status');
+        
+        // Initialize chart
+        const ctx = document.getElementById('budgetChart').getContext('2d');
+        const budgetChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Kitchen', 'Dining Area', 'Refrigeration', 'Ventilation', 'Utilities', 'Unallocated'],
+                datasets: [{
+                    data: [0, 0, 0, 0, 0, totalBudget],
+                    backgroundColor: [
+                        '#FF6384',
+                        '#36A2EB',
+                        '#FFCE56',
+                        '#4BC0C0',
+                        '#9966FF',
+                        '#C9C9C9'
+                    ],
+                    borderColor: 'rgba(0, 0, 0, 0)',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            font: {
+                                family: 'Inter'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const value = tooltipItem.parsed;
+                                return `$${value.toLocaleString()}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Tab handling
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                tab.classList.add('active');
+                const tabContent = document.getElementById(tab.dataset.tab);
+                tabContent.classList.add('active');
+            });
+        });
+        
+        // Slider event listeners
+        sliders.forEach(slider => {
+            const valueElement = document.getElementById(`${slider.id}-value`);
+            
+            slider.addEventListener('input', function() {
+                updateSliderValue(this, valueElement);
+            });
+            
+            slider.addEventListener('change', function() {
+                updateBudgetAllocation();
+                updateMetrics();
+            });
+        });
+        
+        // Reset button
+        resetButton.addEventListener('click', resetBudget);
+        
+        // Update slider value display
+        function updateSliderValue(slider, valueElement) {
+            const value = parseInt(slider.value);
+            valueElement.textContent = `$${value.toLocaleString()}`;
+        }
+        
+        // Update budget allocation
+        function updateBudgetAllocation() {
+            // Reset category totals
+            for (const category in allocatedBudgets) {
+                allocatedBudgets[category] = 0;
+            }
+            
+            // Calculate new totals
+            sliders.forEach(slider => {
+                const value = parseInt(slider.value);
+                const category = slider.dataset.category;
+                allocatedBudgets[category] += value;
+            });
+            
+            // Calculate remaining budget
+            const totalAllocated = Object.values(allocatedBudgets).reduce((sum, val) => sum + val, 0);
+            remainingBudget = totalBudget - totalAllocated;
+            
+            // Update UI
+            remainingBudgetElement.textContent = `$${remainingBudget.toLocaleString()}`;
+            
+            // Check if over budget
+            if (remainingBudget < 0) {
+                remainingBudgetElement.style.color = 'var(--error)';
+            } else {
+                remainingBudgetElement.style.color = 'var(--primary)';
+            }
+            
+            // Update chart
+            updateChart();
+        }
+        
+        // Update chart data
+        function updateChart() {
+            budgetChart.data.datasets[0].data = [
+                allocatedBudgets.kitchen,
+                allocatedBudgets.dining,
+                allocatedBudgets.refrigeration,
+                allocatedBudgets.ventilation,
+                allocatedBudgets.utilities,
+                Math.max(0, remainingBudget)
+            ];
+            budgetChart.update();
+        }
+        
+        // Update metrics based on allocations
+        function updateMetrics() {
+            // Kitchen Compliance
+            if (allocatedBudgets.kitchen >= 150000) {
+                kitchenStatus.className = 'indicator-status status-success';
+            } else if (allocatedBudgets.kitchen >= 80000) {
+                kitchenStatus.className = 'indicator-status status-warning';
+            } else {
+                kitchenStatus.className = 'indicator-status status-error';
+            }
+            
+            // Ventilation Compliance
+            if (allocatedBudgets.ventilation >= 100000) {
+                ventilationStatus.className = 'indicator-status status-success';
+            } else if (allocatedBudgets.ventilation >= 60000) {
+                ventilationStatus.className = 'indicator-status status-warning';
+            } else {
+                ventilationStatus.className = 'indicator-status status-error';
+            }
+            
+            // Refrigeration Compliance
+            if (allocatedBudgets.refrigeration >= 120000) {
+                refrigerationStatus.className = 'indicator-status status-success';
+            } else if (allocatedBudgets.refrigeration >= 70000) {
+                refrigerationStatus.className = 'indicator-status status-warning';
+            } else {
+                refrigerationStatus.className = 'indicator-status status-error';
+            }
+            
+            // Calculate overall metrics
+            const kitchenRatio = Math.min(1, allocatedBudgets.kitchen / 200000);
+            const diningRatio = Math.min(1, allocatedBudgets.dining / 150000);
+            const refrigerationRatio = Math.min(1, allocatedBudgets.refrigeration / 150000);
+            const ventilationRatio = Math.min(1, allocatedBudgets.ventilation / 120000);
+            const utilitiesRatio = Math.min(1, allocatedBudgets.utilities / 150000);
+            
+            // Calculate capacity
+            const capacityValue = Math.round((diningRatio * 0.5 + kitchenRatio * 0.3 + refrigerationRatio * 0.2) * 200);
+            capacityMetric.textContent = capacityValue;
+            
+            // Calculate efficiency
+            const efficiencyValue = Math.round((kitchenRatio * 0.4 + diningRatio * 0.2 + refrigerationRatio * 0.2 + ventilationRatio * 0.1 + utilitiesRatio * 0.1) * 100);
+            efficiencyMetric.textContent = `${efficiencyValue}%`;
+            
+            // Calculate compliance
+            const complianceValue = Math.round((kitchenRatio * 0.3 + refrigerationRatio * 0.2 + ventilationRatio * 0.3 + utilitiesRatio * 0.2) * 100);
+            complianceMetric.textContent = `${complianceValue}%`;
+            
+            // Calculate ROI
+            const roiValue = ((efficiencyValue / 100) * (capacityValue / 100) * 2.5).toFixed(1);
+            roiMetric.textContent = `${roiValue}x`;
+            
+            // Update status colors based on metrics
+            if (efficiencyValue >= 80) {
+                efficiencyMetric.style.color = 'var(--success)';
+            } else if (efficiencyValue >= 50) {
+                efficiencyMetric.style.color = 'var(--warning)';
+            } else {
+                efficiencyMetric.style.color = 'var(--error)';
+            }
+            
+            if (complianceValue >= 80) {
+                complianceMetric.style.color = 'var(--success)';
+            } else if (complianceValue >= 50) {
+                complianceMetric.style.color = 'var(--warning)';
+            } else {
+                complianceMetric.style.color = 'var(--error)';
+            }
+            
+            if (parseFloat(roiValue) >= 2.0) {
+                roiMetric.style.color = 'var(--success)';
+            } else if (parseFloat(roiValue) >= 1.0) {
+                roiMetric.style.color = 'var(--warning)';
+            } else {
+                roiMetric.style.color = 'var(--error)';
+            }
+        }
+        
+        // Reset budget allocation
+        function resetBudget() {
+            sliders.forEach(slider => {
+                slider.value = 0;
+                const valueElement = document.getElementById(`${slider.id}-value`);
+                valueElement.textContent = '$0';
+            });
+            
+            remainingBudget = totalBudget;
+            
+            for (const category in allocatedBudgets) {
+                allocatedBudgets[category] = 0;
+            }
+            
+            remainingBudgetElement.textContent = `$${remainingBudget.toLocaleString()}`;
+            remainingBudgetElement.style.color = 'var(--primary)';
+            
+            updateChart();
+            updateMetrics();
+        }
+        
+        // Initialize application
+        updateBudgetAllocation();
+        updateMetrics();
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_f4fjh9em';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_f4fjh9em" style="width: 100%; height: 1625px; border: none;"></iframe>

@@ -1,0 +1,901 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Role Designer: Build Your Dream Team</title>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;>
+    <link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-light: #a29bfe;
+            --secondary: #00cec9;
+            --dark: #1e1e2e;
+            --darker: #13131f;
+            --light: #f5f6fa;
+            --grey: #2d3436;
+            --grey-light: #636e72;
+            --success: #00b894;
+            --danger: #d63031;
+            --warning: #fdcb6e;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background-color: var(--darker);
+            color: var(--light);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            margin-bottom: 20px;
+            background-color: var(--dark);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        header p {
+            color: var(--grey-light);
+            max-width: 800px;
+            margin: 0 auto;
+            font-size: 16px;
+        }
+        
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            background-color: var(--grey);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 100px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .tab:hover {
+            background-color: var(--grey-light);
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .workspace {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .card-container {
+            background-color: var(--dark);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--grey);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .section-title button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .section-title button:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .category {
+            margin-bottom: 20px;
+        }
+        
+        .category-title {
+            font-size: 16px;
+            color: var(--primary-light);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .card {
+            background-color: var(--grey);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: move;
+            transition: all 0.3s ease;
+            user-select: none;
+            position: relative;
+            max-width: 100%;
+            font-size: 14px;
+        }
+        
+        .card:hover {
+            background-color: var(--grey-light);
+        }
+        
+        .card.dragging {
+            opacity: 0.5;
+        }
+        
+        .card.responsibilities {
+            border-left: 3px solid var(--primary);
+        }
+        
+        .card.skills {
+            border-left: 3px solid var(--success);
+        }
+        
+        .card.qualifications {
+            border-left: 3px solid var(--warning);
+        }
+        
+        .dropzone {
+            min-height: 100px;
+            background-color: var(--grey);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .dropzone.highlight {
+            background-color: var(--primary-light);
+            opacity: 0.7;
+        }
+        
+        .preview {
+            background-color: var(--dark);
+            border-radius: 12px;
+            padding: 20px;
+            height: 100%;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .preview-content {
+            margin-top: 15px;
+        }
+        
+        .preview-job-title {
+            font-size: 24px;
+            margin-bottom: 15px;
+            color: var(--light);
+        }
+        
+        .preview-section {
+            margin-bottom: 20px;
+        }
+        
+        .preview-section-title {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: var(--primary-light);
+            font-weight: 600;
+        }
+        
+        .preview-item {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .preview-item::before {
+            content: &quot;•&quot;;
+            margin-right: 8px;
+        }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+        }
+        
+        .button:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .button-secondary {
+            background-color: var(--grey);
+        }
+        
+        .button-secondary:hover {
+            background-color: var(--grey-light);
+        }
+        
+        .button-success {
+            background-color: var(--success);
+        }
+        
+        .button-success:hover {
+            background-color: #00d1a0;
+        }
+        
+        .draggable-clone {
+            position: absolute;
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .empty-message {
+            color: var(--grey-light);
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .delete-btn {
+            background-color: transparent;
+            color: var(--danger);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 5px;
+            display: none;
+        }
+
+        .preview-item:hover .delete-btn {
+            display: inline;
+        }
+
+        @media (max-width: 768px) {
+            .workspace {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                padding-bottom: 5px;
+            }
+            
+            .tab {
+                flex: 0 0 auto;
+            }
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            background-color: var(--success);
+            color: white;
+            border-radius: 5px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class=&quot;container&quot;>
+        <header>
+            <h1>Role Designer: Build Your Dream Team</h1>
+            <p>Drag and drop responsibilities, skills, and qualifications to design comprehensive job descriptions for your restaurant staff</p>
+        </header>
+        
+        <div class=&quot;tabs&quot; id=&quot;job-tabs&quot;>
+            <div class=&quot;tab active&quot; data-job=&quot;chef&quot;>Chef</div>
+            <div class=&quot;tab&quot; data-job=&quot;line-cook&quot;>Line Cook</div>
+            <div class=&quot;tab&quot; data-job=&quot;server&quot;>Server</div>
+            <div class=&quot;tab&quot; data-job=&quot;host&quot;>Host</div>
+            <div class=&quot;tab&quot; data-job=&quot;manager&quot;>Manager</div>
+        </div>
+        
+        <div class=&quot;workspace&quot;>
+            <div class=&quot;card-container&quot;>
+                <div class=&quot;section-title&quot;>
+                    <span>Drag Items</span>
+                    <button id=&quot;reset-cards&quot;>Reset</button>
+                </div>
+                
+                <div class=&quot;category&quot;>
+                    <div class=&quot;category-title&quot;>Responsibilities</div>
+                    <div class=&quot;cards&quot; id=&quot;responsibilities-cards&quot;></div>
+                </div>
+                
+                <div class=&quot;category&quot;>
+                    <div class=&quot;category-title&quot;>Skills</div>
+                    <div class=&quot;cards&quot; id=&quot;skills-cards&quot;></div>
+                </div>
+                
+                <div class=&quot;category&quot;>
+                    <div class=&quot;category-title&quot;>Qualifications</div>
+                    <div class=&quot;cards&quot; id=&quot;qualifications-cards&quot;></div>
+                </div>
+            </div>
+            
+            <div class=&quot;preview&quot;>
+                <div class=&quot;section-title&quot;>
+                    <span>Job Description Preview</span>
+                </div>
+                
+                <div class=&quot;preview-content&quot;>
+                    <h2 class=&quot;preview-job-title&quot; id=&quot;preview-title&quot;>Chef</h2>
+                    
+                    <div class=&quot;preview-section&quot;>
+                        <h3 class=&quot;preview-section-title&quot;>Responsibilities</h3>
+                        <div class=&quot;dropzone&quot; id=&quot;responsibilities-dropzone&quot; data-type=&quot;responsibilities&quot;>
+                            <div class=&quot;empty-message&quot;>Drag responsibilities here</div>
+                        </div>
+                    </div>
+                    
+                    <div class=&quot;preview-section&quot;>
+                        <h3 class=&quot;preview-section-title&quot;>Skills</h3>
+                        <div class=&quot;dropzone&quot; id=&quot;skills-dropzone&quot; data-type=&quot;skills&quot;>
+                            <div class=&quot;empty-message&quot;>Drag skills here</div>
+                        </div>
+                    </div>
+                    
+                    <div class=&quot;preview-section&quot;>
+                        <h3 class=&quot;preview-section-title&quot;>Qualifications</h3>
+                        <div class=&quot;dropzone&quot; id=&quot;qualifications-dropzone&quot; data-type=&quot;qualifications&quot;>
+                            <div class=&quot;empty-message&quot;>Drag qualifications here</div>
+                        </div>
+                    </div>
+                    
+                    <div class=&quot;actions&quot;>
+                        <button class=&quot;button button-success&quot; id=&quot;save-button&quot;>
+                            <svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;16&quot; height=&quot;16&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 16 16&quot;>
+                                <path d=&quot;M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z&quot;/>
+                            </svg>
+                            Save Job Description
+                        </button>
+                        <button class=&quot;button button-secondary&quot; id=&quot;print-button&quot;>
+                            <svg xmlns=&quot;http://www.w3.org/2000/svg&quot; width=&quot;16&quot; height=&quot;16&quot; fill=&quot;currentColor&quot; viewBox=&quot;0 0 16 16&quot;>
+                                <path d=&quot;M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z&quot;/>
+                                <path d=&quot;M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z&quot;/>
+                            </svg>
+                            Print
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class=&quot;toast&quot; id=&quot;toast&quot;>Job description saved!</div>
+
+    <script>
+        // Data structure for different job roles
+        const jobData = {
+            chef: {
+                title: 'Chef',
+                responsibilities: [
+                    'Create and update menu items based on seasonality and customer preferences',
+                    'Oversee kitchen operations and manage kitchen staff',
+                    'Ensure adherence to food safety and sanitation standards',
+                    'Monitor and control food costs and inventory levels',
+                    'Develop and standardize recipes for consistency',
+                    'Train and mentor kitchen team members',
+                    'Coordinate with service staff to ensure timely food delivery',
+                    'Plan and execute special menus for events',
+                    'Perform quality checks on ingredients and final dishes'
+                ],
+                skills: [
+                    'Advanced culinary techniques and food preparation',
+                    'Menu planning and development expertise',
+                    'Kitchen equipment operation and maintenance',
+                    'Food costing and inventory management',
+                    'Strong leadership and team management',
+                    'Excellent time management and organization',
+                    'Creative problem-solving under pressure',
+                    'Effective communication across departments',
+                    'Knowledge of food trends and innovations'
+                ],
+                qualifications: [
+                    'Culinary degree or professional certification',
+                    '3-5 years experience in professional kitchens',
+                    'ServSafe certification or equivalent',
+                    'Previous leadership experience in a kitchen setting',
+                    'Knowledge of diverse cuisines and cooking methods',
+                    'Experience with inventory management systems',
+                    'Understanding of allergens and dietary restrictions',
+                    'Excellent palate and taste development abilities'
+                ]
+            },
+            'line-cook': {
+                title: 'Line Cook',
+                responsibilities: [
+                    'Prepare and cook menu items according to established recipes',
+                    'Set up and maintain station during service',
+                    'Follow food safety and sanitation procedures',
+                    'Assist with inventory and stock rotation',
+                    'Clean and maintain kitchen equipment',
+                    'Support other stations during peak periods',
+                    'Ensure accurate portioning and presentation of dishes',
+                    'Communicate effectively with kitchen and service staff'
+                ],
+                skills: [
+                    'Proficient cooking techniques (grilling, sautéing, etc.)',
+                    'Speed and efficiency in food preparation',
+                    'Ability to work multiple orders simultaneously',
+                    'Basic knife skills and food preparation',
+                    'Understanding of kitchen terminology',
+                    'Ability to follow recipes accurately',
+                    'Time management and organization',
+                    'Teamwork and communication under pressure'
+                ],
+                qualifications: [
+                    '1-2 years culinary experience',
+                    'High school diploma or equivalent',
+                    'Food handler's certification',
+                    'Basic knowledge of kitchen equipment',
+                    'Ability to stand for long periods in hot environments',
+                    'Availability to work nights, weekends, and holidays',
+                    'Basic understanding of food costs and waste prevention'
+                ]
+            },
+            server: {
+                title: 'Server',
+                responsibilities: [
+                    'Greet guests and provide exceptional service throughout their visit',
+                    'Take accurate food and beverage orders',
+                    'Communicate special requests to kitchen staff',
+                    'Knowledge of menu items, ingredients, and preparation methods',
+                    'Process payments and handle cash accurately',
+                    'Maintain cleanliness of dining area and service stations',
+                    'Upsell menu items and promote daily specials',
+                    'Anticipate guest needs and respond promptly',
+                    'Resolve guest concerns promptly and professionally'
+                ],
+                skills: [
+                    'Strong interpersonal and communication abilities',
+                    'Sales techniques and suggestive selling',
+                    'Active listening and problem-solving',
+                    'Multitasking in a fast-paced environment',
+                    'Point of sale system operation',
+                    'Food and wine pairing knowledge',
+                    'Attention to detail and accuracy',
+                    'Ability to memorize menu information',
+                    'Team coordination with kitchen and bar staff'
+                ],
+                qualifications: [
+                    'Previous serving experience preferred',
+                    'Alcohol service certification (if applicable)',
+                    'Food handler's certification',
+                    'High school diploma or equivalent',
+                    'Excellent communication skills',
+                    'Professional appearance and demeanor',
+                    'Availability for flexible scheduling including evenings and weekends'
+                ]
+            },
+            host: {
+                title: 'Host',
+                responsibilities: [
+                    'Welcome guests and manage the waiting list',
+                    'Manage reservations and seating arrangements',
+                    'Answer phones and take reservations accurately',
+                    'Coordinate with servers on table availability',
+                    'Ensure menus are clean and available',
+                    'Maintain cleanliness of entrance and waiting areas',
+                    'Address initial guest questions and concerns',
+                    'Assist with coat check and special accommodations'
+                ],
+                skills: [
+                    'Excellent first impression and hospitality skills',
+                    'Organization and attention to detail',
+                    'Professional phone etiquette',
+                    'Multitasking in a busy environment',
+                    'Problem-solving and conflict management',
+                    'Knowledge of reservation systems',
+                    'Basic understanding of restaurant operations',
+                    'Ability to remain calm during busy periods'
+                ],
+                qualifications: [
+                    'High school diploma or equivalent',
+                    'Previous customer service experience preferred',
+                    'Professional appearance and friendly demeanor',
+                    'Basic computer skills',
+                    'Ability to stand for extended periods',
+                    'Strong verbal communication skills',
+                    'Availability to work evenings and weekends'
+                ]
+            },
+            manager: {
+                title: 'Restaurant Manager',
+                responsibilities: [
+                    'Oversee daily operations of the restaurant',
+                    'Recruit, train, and supervise staff members',
+                    'Monitor and control labor costs and scheduling',
+                    'Ensure compliance with health, safety, and liquor regulations',
+                    'Manage inventory, purchasing, and cost controls',
+                    'Handle guest complaints and ensure satisfaction',
+                    'Analyze sales data and implement improvement strategies',
+                    'Maintain quality standards for food and service',
+                    'Develop marketing initiatives and promotions',
+                    'Coordinate with chefs on menu development and pricing'
+                ],
+                skills: [
+                    'Leadership and team management',
+                    'Financial analysis and budgeting',
+                    'Conflict resolution and problem-solving',
+                    'Strategic planning and operational oversight',
+                    'Customer service excellence',
+                    'Industry knowledge and trend awareness',
+                    'Effective communication across departments',
+                    'Time management and prioritization',
+                    'Inventory and supply chain management',
+                    'POS and restaurant management software proficiency'
+                ],
+                qualifications: [
+                    'Bachelor's degree in hospitality or related field (preferred)',
+                    '3-5 years restaurant management experience',
+                    'ServSafe Manager and alcohol service certification',
+                    'Proven leadership and staff development record',
+                    'Strong financial and business acumen',
+                    'Experience with scheduling and labor management',
+                    'Computer literacy and POS system knowledge',
+                    'Availability for flexible hours including nights and weekends'
+                ]
+            }
+        };
+
+        // Store current job selections
+        let savedJobs = {};
+        let currentJob = 'chef';
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentJob = tab.dataset.job;
+                    loadJobData(currentJob);
+                });
+            });
+
+            // Initialize drag and drop
+            initDragAndDrop();
+
+            // Load initial job data
+            loadJobData('chef');
+
+            // Set up button actions
+            document.getElementById('reset-cards').addEventListener('click', () => resetJobData());
+            document.getElementById('save-button').addEventListener('click', () => saveJobDescription());
+            document.getElementById('print-button').addEventListener('click', () => printJobDescription());
+        });
+
+        function loadJobData(jobType) {
+            const job = jobData[jobType];
+            document.getElementById('preview-title').textContent = job.title;
+            
+            // Load cards
+            loadCards('responsibilities', job.responsibilities);
+            loadCards('skills', job.skills);
+            loadCards('qualifications', job.qualifications);
+            
+            // Load any saved dropzone items
+            if (savedJobs[jobType]) {
+                loadDropzoneItems('responsibilities', savedJobs[jobType].responsibilities || []);
+                loadDropzoneItems('skills', savedJobs[jobType].skills || []);
+                loadDropzoneItems('qualifications', savedJobs[jobType].qualifications || []);
+            } else {
+                clearDropzones();
+            }
+        }
+
+        function loadCards(type, items) {
+            const container = document.getElementById(`${type}-cards`);
+            container.innerHTML = '';
+            
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `card ${type}`;
+                card.textContent = item;
+                card.draggable = true;
+                card.dataset.content = item;
+                
+                card.addEventListener('dragstart', dragStart);
+                container.appendChild(card);
+            });
+        }
+
+        function loadDropzoneItems(type, items) {
+            const dropzone = document.getElementById(`${type}-dropzone`);
+            dropzone.innerHTML = '';
+            
+            if (items.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.className = 'empty-message';
+                emptyMessage.textContent = `Drag ${type} here`;
+                dropzone.appendChild(emptyMessage);
+                return;
+            }
+            
+            items.forEach(item => {
+                const previewItem = document.createElement('div');
+                previewItem.className = 'preview-item';
+                previewItem.textContent = item;
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-btn';
+                deleteBtn.innerHTML = '×';
+                deleteBtn.addEventListener('click', () => {
+                    previewItem.remove();
+                    checkEmptyDropzone(dropzone, type);
+                    updateSavedItems();
+                });
+                
+                previewItem.appendChild(deleteBtn);
+                dropzone.appendChild(previewItem);
+            });
+        }
+
+        function clearDropzones() {
+            ['responsibilities', 'skills', 'qualifications'].forEach(type => {
+                const dropzone = document.getElementById(`${type}-dropzone`);
+                dropzone.innerHTML = '';
+                const emptyMessage = document.createElement('div');
+                emptyMessage.className = 'empty-message';
+                emptyMessage.textContent = `Drag ${type} here`;
+                dropzone.appendChild(emptyMessage);
+            });
+        }
+
+        function checkEmptyDropzone(dropzone, type) {
+            if (dropzone.querySelectorAll('.preview-item').length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.className = 'empty-message';
+                emptyMessage.textContent = `Drag ${type} here`;
+                dropzone.appendChild(emptyMessage);
+            }
+        }
+
+        function initDragAndDrop() {
+            const dropzones = document.querySelectorAll('.dropzone');
+            
+            dropzones.forEach(dropzone => {
+                dropzone.addEventListener('dragover', e => {
+                    e.preventDefault();
+                    dropzone.classList.add('highlight');
+                });
+                
+                dropzone.addEventListener('dragleave', () => {
+                    dropzone.classList.remove('highlight');
+                });
+                
+                dropzone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    dropzone.classList.remove('highlight');
+                    
+                    const data = e.dataTransfer.getData('text/plain');
+                    
+                    // Remove empty message if it exists
+                    const emptyMessage = dropzone.querySelector('.empty-message');
+                    if (emptyMessage) {
+                        emptyMessage.remove();
+                    }
+                    
+                    // Add item to dropzone
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'preview-item';
+                    previewItem.textContent = data;
+                    
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'delete-btn';
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.addEventListener('click', () => {
+                        previewItem.remove();
+                        checkEmptyDropzone(dropzone, dropzone.dataset.type);
+                        updateSavedItems();
+                    });
+                    
+                    previewItem.appendChild(deleteBtn);
+                    dropzone.appendChild(previewItem);
+                    
+                    // Update saved items
+                    updateSavedItems();
+                });
+            });
+        }
+
+        function dragStart(e) {
+            e.dataTransfer.setData('text/plain', e.target.dataset.content);
+            e.target.classList.add('dragging');
+            
+            // Add class after drag ends
+            setTimeout(() => {
+                e.target.classList.remove('dragging');
+            }, 0);
+        }
+
+        function updateSavedItems() {
+            if (!savedJobs[currentJob]) {
+                savedJobs[currentJob] = {};
+            }
+            
+            ['responsibilities', 'skills', 'qualifications'].forEach(type => {
+                const dropzone = document.getElementById(`${type}-dropzone`);
+                const items = Array.from(dropzone.querySelectorAll('.preview-item')).map(item => {
+                    // Get text content but exclude the × button text
+                    return item.childNodes[0].textContent.trim();
+                });
+                
+                savedJobs[currentJob][type] = items;
+            });
+        }
+
+        function resetJobData() {
+            delete savedJobs[currentJob];
+            loadJobData(currentJob);
+        }
+
+        function saveJobDescription() {
+            updateSavedItems();
+            showToast('Job description saved!');
+        }
+
+        function printJobDescription() {
+            const printWindow = window.open('', '_blank');
+            const jobTitle = document.getElementById('preview-title').textContent;
+            
+            let printContent = `
+                <html>
+                <head>
+                    <title>${jobTitle} Job Description</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto; padding: 20px; }
+                        h1 { color: #333; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+                        h2 { color: #444; margin-top: 20px; }
+                        ul { margin-bottom: 30px; }
+                        li { margin-bottom: 8px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>${jobTitle} Job Description</h1>
+            `;
+            
+            ['responsibilities', 'skills', 'qualifications'].forEach(type => {
+                const sectionTitle = type.charAt(0).toUpperCase() + type.slice(1);
+                const items = savedJobs[currentJob]?.[type] || [];
+                
+                printContent += `<h2>${sectionTitle}</h2>`;
+                
+                if (items.length > 0) {
+                    printContent += '<ul>';
+                    items.forEach(item => {
+                        printContent += `<li>${item}</li>`;
+                    });
+                    printContent += '</ul>';
+                } else {
+                    printContent += '<p>No items specified.</p>';
+                }
+            });
+            
+            printContent += `
+                
+        
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_tc7we73a';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+                </html>
+            `;
+            
+            printWindow.document.open();
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            printWindow.onload = function() {
+                printWindow.print();
+            };
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>" data-interaction-code="math_eq_tc7we73a" style="width: 100%; height: 1094px; border: none;"></iframe>

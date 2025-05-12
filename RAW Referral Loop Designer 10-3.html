@@ -1,0 +1,800 @@
+<iframe srcdoc="<!DOCTYPE html>
+<html lang=&quot;en&quot;>
+<head>
+    <meta charset=&quot;UTF-8&quot;>
+    <meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot;>
+    <title>Referral Loop Designer</title>
+    <link href=&quot;https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap&quot; rel=&quot;stylesheet&quot;>
+    <style>
+        :root {
+            --primary: #6C63FF;
+            --secondary: #FF6B6B;
+            --success: #28a745;
+            --dark: #121212;
+            --darker: #0a0a0a;
+            --light-dark: #1e1e1e;
+            --text: #E0E0E0;
+            --text-muted: #9E9E9E;
+            --border: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--dark);
+            color: var(--text);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        header {
+            padding: 1.5rem 0;
+            text-align: center;
+            background-color: var(--darker);
+            border-bottom: 1px solid var(--border);
+        }
+
+        h1 {
+            color: white;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        p.description {
+            color: var(--text-muted);
+            font-size: 1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+            border-bottom: 1px solid var(--border);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+            padding: 1rem 0;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--light-dark);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-title svg {
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .component-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .component {
+            background-color: var(--darker);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: grab;
+        }
+
+        .component:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .component-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .component-description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .workflow-canvas {
+            background-color: var(--light-dark);
+            border-radius: 8px;
+            min-height: 300px;
+            padding: 1.5rem;
+            border: 2px dashed var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .workflow-item {
+            background-color: var(--darker);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .workflow-connector {
+            display: flex;
+            justify-content: center;
+            margin: 0.5rem 0;
+        }
+
+        .connector-line {
+            width: 2px;
+            height: 20px;
+            background-color: var(--primary);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            border: none;
+            outline: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #5952d4;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn svg {
+            margin-right: 0.5rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .checklist {
+            list-style: none;
+        }
+
+        .checklist-item {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .checklist-item input[type=&quot;checkbox&quot;] {
+            margin-right: 0.75rem;
+            margin-top: 0.25rem;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background-color: var(--darker);
+            cursor: pointer;
+            flex-shrink: 0;
+            position: relative;
+        }
+
+        .checklist-item input[type=&quot;checkbox&quot;]:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .checklist-item input[type=&quot;checkbox&quot;]:checked::after {
+            content: &quot;&quot;;
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .checklist-item-content {
+            flex: 1;
+        }
+
+        .checklist-item-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .checklist-item-description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .resource-link {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .resource-link:hover {
+            text-decoration: underline;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 2rem 0 1rem;
+            color: white;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            background-color: var(--darker);
+            margin-left: 0.5rem;
+        }
+
+        .badge-primary {
+            background-color: rgba(108, 99, 255, 0.2);
+            color: var(--primary);
+        }
+
+        .badge-secondary {
+            background-color: rgba(255, 107, 107, 0.2);
+            color: var(--secondary);
+        }
+
+        .dragging {
+            opacity: 0.5;
+        }
+
+        .placeholder {
+            border: 2px dashed var(--primary);
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: rgba(108, 99, 255, 0.1);
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .tabs {
+                justify-content: flex-start;
+            }
+            
+            .component-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class=&quot;container&quot;>
+            <h1>Referral Loop Designer</h1>
+            <p class=&quot;description&quot;>Build a complete referral system by assembling trigger points, incentives, and follow-up mechanics that turn satisfied guests into advocates.</p>
+        </div>
+    </header>
+
+    <main class=&quot;container&quot;>
+        <div class=&quot;tabs&quot;>
+            <div class=&quot;tab active&quot; data-tab=&quot;overview&quot;>Overview</div>
+            <div class=&quot;tab&quot; data-tab=&quot;components&quot;>Loop Components</div>
+            <div class=&quot;tab&quot; data-tab=&quot;builder&quot;>Builder</div>
+            <div class=&quot;tab&quot; data-tab=&quot;implementation&quot;>Implementation</div>
+            <div class=&quot;tab&quot; data-tab=&quot;ai-enhancements&quot;>AI Enhancements</div>
+        </div>
+
+        <div id=&quot;overview&quot; class=&quot;tab-content active&quot;>
+            <div class=&quot;card&quot;>
+                <h2 class=&quot;card-title&quot;>
+                    <svg width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;>
+                        <path d=&quot;M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM11 16H13V18H11V16ZM11 6H13V14H11V6Z&quot; fill=&quot;#6C63FF&quot;/>
+                    </svg>
+                    Why Service &amp; Referral Systems Matter
+                </h2>
+                <ul>
+                    <li><strong>Experience as Marketing:</strong> Every smile, surprise or personal touch creates stories that guests tell friends.</li>
+                    <li><strong>Cost-Effective Growth:</strong> Referrals from delighted guests drive new visits at no additional ad spend.</li>
+                    <li><strong>Consistency &amp; Quality:</strong> Service scripts and training ensure every guest receives the same &quot;wow&quot; moment.</li>
+                    <li><strong>Data-Driven Personalization:</strong> Capturing guest preferences fuels tailored experiences that feel bespoke.</li>
+                </ul>
+            </div>
+
+            <div class=&quot;card&quot;>
+                <h2 class=&quot;card-title&quot;>
+                    <svg width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;>
+                        <path d=&quot;M16 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V8L16 3ZM19 19H5V5H15V9H19V19ZM7 13H17V15H7V13ZM7 16H14V18H7V16ZM7 10H17V12H7V10Z&quot; fill=&quot;#6C63FF&quot;/>
+                    </svg>
+                    Core Components of Service &amp; Referral Mechanics
+                </h2>
+                <ul>
+                    <li>
+                        <strong>Signature Service Rituals:</strong><br>
+                        • <strong>Welcome Moment:</strong> A branded greeting drink or chef's preview bite.<br>
+                        • <strong>Table Touches:</strong> Mid-meal check-ins and surprise palate-cleansers.<br>
+                        • <strong>Exit Delight:</strong> A thank-you note or complimentary mini-treat.
+                    </li>
+                    <li>
+                        <strong>Staff Training &amp; Scripts:</strong><br>
+                        • Short, friendly prompts for greetings, upsells and handling special requests.<br>
+                        • Role-play scenarios to rehearse rush-hour service and complaint recovery.
+                    </li>
+                    <li>
+                        <strong>Referral Incentives:</strong><br>
+                        • <strong>Post-Visit Offers:</strong> &quot;Bring a friend and get 10% off your next meal.&quot;<br>
+                        • <strong>Table QR Codes:</strong> Instant social-share links or review invitations at checkout.
+                    </li>
+                    <li>
+                        <strong>Data Capture &amp; CRM Basics:</strong><br>
+                        • Collect guest name, contact info and visit details at reservation or POS.<br>
+                        • Simple segmentation (e.g., first-timers, VIP repeaters) for targeted follow-ups.
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div id=&quot;components&quot; class=&quot;tab-content&quot;>
+            <h2 class=&quot;section-title&quot;>Choose Your Referral Loop Components</h2>
+            
+            <div class=&quot;component-list&quot;>
+                <div class=&quot;component&quot; draggable=&quot;true&quot; data-type=&quot;trigger&quot;>
+                    <h3 class=&quot;component-title&quot;>Welcome Ritual <span class=&quot;badge badge-primary&quot;>Trigger</span></h3>
+                    <p class=&quot;component-description&quot;>Branded greeting with a complimentary welcome item that makes guests feel special from the start.</p>
+                </div>
+                
+                <div class=&quot;component&quot; draggable=&quot;true&quot; data-type=&quot;trigger&quot;>
+                    <h3 class=&quot;component-title&quot;>Exit Delight <span class=&quot;badge badge-primary&quot;>Trigger</span></h3>
+                    <p class=&quot;component-description&quot;>Thank-you note or complimentary treat as guests leave, creating a memorable final impression.</p>
+                </div>
+                
+                <div class=&quot;component&quot; draggable=&quot;true&quot; data-type=&quot;trigger&quot;>
+                    <h3 class=&quot;component-title&quot;>Special Occasion <span class=&quot;badge badge-primary&quot;>Trigger</span></h3>
+                    <p class=&quot;component-description&quot;>Celebration package for birthdays, anniversaries or other milestones that guests document and share.</p>
+                </div>
+                
+                <div class=&quot;component&quot; draggable=&quot;true&quot; data-type=&quot;incentive&quot;>
+                    <h3 class=&quot;component-title&quot;>Bring-a-Friend Offer <span class=&quot;badge badge-secondary&quot;>Incentive</span></h3>
+                    <p class=&quot;component-description&quot;>Discount or special offering when a guest returns with new customers.</p>
+                </div>
+                
+                <div class=&quot;component&quot; draggable=&quot;true&quot; data-type=&quot;incentive&quot;>
+                    <h3 class=&quot;component-title&quot;>Social Media Promotion <span class=&quot;badge badge-secondary&quot;>Incentive</span></h3>
+                    <p class=&quot;component-description&quot;>Reward for guests who post about their experience with your venue's hashtag.</p>
+                </div>
+                
+                <div class=&quot;component&quot; draggable=&quot;true&quot; data-type=&quot;incentive&quot;>
+                    <h3 class=&quot;component-title&quot;>Review Rewards <span class=&quot;badge badge-secondary&quot;>Incentive</span></h3>
+                    <p class=&quot;component-description&quot;>Special offer for guests who leave honest reviews on key platforms.</p>
+                </div>
+                
+                <div class=&quot;component&quot; draggable=&quot;true&quot; data-type=&quot;followup&quot;>
+                    <h3 class=&quot;component-title&quot;>Thank You Message <span class=&quot;badge badge-primary&quot;>Follow-up</span></h3>
+                    <p class=&quot;component-description&quot;>Automated but personalized message sent after visit to express gratitude.</p>
+                </div>
+                
+                <div class=&quot;component&quot; draggable=&quot;true&quot; data-type=&quot;followup&quot;>
+                    <h3 class=&quot;component-title&quot;>Feedback Request <span class=&quot;badge badge-primary&quot;>Follow-up</span></h3>
+                    <p class=&quot;component-description&quot;>Short survey to capture experiences and identify happy guests for referral opportunities.</p>
+                </div>
+                
+                <div class=&quot;component&quot; draggable=&quot;true&quot; data-type=&quot;followup&quot;>
+                    <h3 class=&quot;component-title&quot;>Special Event Invitation <span class=&quot;badge badge-primary&quot;>Follow-up</span></h3>
+                    <p class=&quot;component-description&quot;>Invite previous guests to upcoming events with option to bring friends at a discount.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id=&quot;builder&quot; class=&quot;tab-content&quot;>
+            <h2 class=&quot;section-title&quot;>Design Your Referral Loop</h2>
+            <p>Drag components from the Components tab and arrange them in sequence below to build your referral system.</p>
+            
+            <div class=&quot;workflow-canvas&quot; id=&quot;workflow-canvas&quot;>
+                <div class=&quot;placeholder&quot;>Drag and drop components here to build your referral loop</div>
+            </div>
+            
+            <div class=&quot;actions&quot;>
+                <button class=&quot;btn btn-primary&quot; id=&quot;save-workflow&quot;>
+                    <svg width=&quot;20&quot; height=&quot;20&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;>
+                        <path d=&quot;M17 3H5C3.89 3 3 3.9 3 5V19C3 20.1 3.89 21 5 21H19C20.1 21 21 20.1 21 19V7L17 3ZM19 19H5V5H16.17L19 7.83V19ZM12 12C10.34 12 9 13.34 9 15C9 16.66 10.34 18 12 18C13.66 18 15 16.66 15 15C15 13.34 13.66 12 12 12ZM7 7H15V9H7V7Z&quot; fill=&quot;white&quot;/>
+                    </svg>
+                    Save Workflow
+                </button>
+                <button class=&quot;btn btn-outline&quot; id=&quot;preview-workflow&quot;>
+                    <svg width=&quot;20&quot; height=&quot;20&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;>
+                        <path d=&quot;M12 4.5C7 4.5 2.73 7.61 1 12C2.73 16.39 7 19.5 12 19.5C17 19.5 21.27 16.39 23 12C21.27 7.61 17 4.5 12 4.5ZM12 17C9.24 17 7 14.76 7 12C7 9.24 9.24 7 12 7C14.76 7 17 9.24 17 12C17 14.76 14.76 17 12 17ZM12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9Z&quot; fill=&quot;#E0E0E0&quot;/>
+                    </svg>
+                    Preview
+                </button>
+                <button class=&quot;btn btn-outline&quot; id=&quot;clear-workflow&quot;>
+                    <svg width=&quot;20&quot; height=&quot;20&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;>
+                        <path d=&quot;M6 19C6 20.1 6.9 21 8 21H16C17.1 21 18 20.1 18 19V7H6V19ZM8 9H16V19H8V9ZM15.5 4L14.5 3H9.5L8.5 4H5V6H19V4H15.5Z&quot; fill=&quot;#E0E0E0&quot;/>
+                    </svg>
+                    Clear
+                </button>
+            </div>
+        </div>
+
+        <div id=&quot;implementation&quot; class=&quot;tab-content&quot;>
+            <h2 class=&quot;section-title&quot;>Implementation Checklist</h2>
+            
+            <div class=&quot;card&quot;>
+                <ul class=&quot;checklist&quot;>
+                    <li class=&quot;checklist-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;check1&quot;>
+                        <div class=&quot;checklist-item-content&quot;>
+                            <div class=&quot;checklist-item-title&quot;>Document Your Service Blueprint</div>
+                            <div class=&quot;checklist-item-description&quot;>Create detailed documentation of each service ritual and referral mechanic, including exact scripts and timing.</div>
+                        </div>
+                    </li>
+                    
+                    <li class=&quot;checklist-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;check2&quot;>
+                        <div class=&quot;checklist-item-content&quot;>
+                            <div class=&quot;checklist-item-title&quot;>Assign Ownership</div>
+                            <div class=&quot;checklist-item-description&quot;>Determine which team members are responsible for each component of your referral system.</div>
+                        </div>
+                    </li>
+                    
+                    <li class=&quot;checklist-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;check3&quot;>
+                        <div class=&quot;checklist-item-content&quot;>
+                            <div class=&quot;checklist-item-title&quot;>Staff Training Sessions</div>
+                            <div class=&quot;checklist-item-description&quot;>Schedule and conduct training with role-play scenarios to ensure consistent delivery.</div>
+                        </div>
+                    </li>
+                    
+                    <li class=&quot;checklist-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;check4&quot;>
+                        <div class=&quot;checklist-item-content&quot;>
+                            <div class=&quot;checklist-item-title&quot;>Set Up Tech Integration</div>
+                            <div class=&quot;checklist-item-description&quot;>Connect your POS system with CRM tools to automate follow-ups and track referrals.</div>
+                        </div>
+                    </li>
+                    
+                    <li class=&quot;checklist-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;check5&quot;>
+                        <div class=&quot;checklist-item-content&quot;>
+                            <div class=&quot;checklist-item-title&quot;>Create Feedback Loop</div>
+                            <div class=&quot;checklist-item-description&quot;>Implement a system to capture guest feedback and NPS scores to identify potential advocates.</div>
+                        </div>
+                    </li>
+                    
+                    <li class=&quot;checklist-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;check6&quot;>
+                        <div class=&quot;checklist-item-content&quot;>
+                            <div class=&quot;checklist-item-title&quot;>Design Referral Materials</div>
+                            <div class=&quot;checklist-item-description&quot;>Create physical cards, QR codes, or digital assets that facilitate the referral process.</div>
+                        </div>
+                    </li>
+                    
+                    <li class=&quot;checklist-item&quot;>
+                        <input type=&quot;checkbox&quot; id=&quot;check7&quot;>
+                        <div class=&quot;checklist-item-content&quot;>
+                            <div class=&quot;checklist-item-title&quot;>Schedule Regular Reviews</div>
+                            <div class=&quot;checklist-item-description&quot;>Set calendar reminders to analyze referral performance and refine your system.</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div id=&quot;ai-enhancements&quot; class=&quot;tab-content&quot;>
+            <h2 class=&quot;section-title&quot;>AI-Powered Enhancements</h2>
+            
+            <div class=&quot;card&quot;>
+                <h3 class=&quot;card-title&quot;>
+                    <svg width=&quot;24&quot; height=&quot;24&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot;>
+                        <path d=&quot;M21 10.12H14.22L16.96 7.3C14.23 4.6 9.81 4.5 7.08 7.2C4.35 9.91 4.35 14.28 7.08 16.99C9.81 19.7 14.23 19.7 16.96 16.99C18.32 15.65 19 14.08 19 12.1H21C21 14.08 20.12 16.65 18.36 18.39C14.85 21.87 9.15 21.87 5.64 18.39C2.14 14.92 2.11 9.28 5.62 5.81C9.13 2.34 14.76 2.34 18.27 5.81L21 3V10.12ZM12.5 8V12.25L16 14.33L15.28 15.54L11 13V8H12.5Z&quot; fill=&quot;#6C63FF&quot;/>
+                    </svg>
+                    Integrate AI to Amplify Your Referral System
+                </h3>
+
+                <ul>
+                    <li><strong>Chatbot Check-Ins:</strong> Automate post-visit SMS/WhatsApp surveys and send referral links based on positive feedback.</li>
+                    <li><strong>Personalization Engine:</strong> AI analyzes past visits to suggest tailored offers—e.g., &quot;Your favorite dish is back on menu.&quot;</li>
+                    <li><strong>Sentiment Analysis:</strong> AI scans reviews and social posts to surface praise for rituals and flag any service concerns.</li>
+                    <li><strong>Automated Follow-Ups:</strong> Trigger email or SMS reminders for guests who clicked a referral link but haven't visited yet.</li>
+                </ul>
+
+                <h3 class=&quot;section-title&quot;>Recommended AI Tools</h3>
+                <div class=&quot;component-list&quot;>
+                    <div class=&quot;component&quot;>
+                        <h3 class=&quot;component-title&quot;>ChatGPT API Integration</h3>
+                        <p class=&quot;component-description&quot;>Create personalized follow-up messages and craft custom responses to guest feedback at scale.</p>
+                    </div>
+                    
+                    <div class=&quot;component&quot;>
+                        <h3 class=&quot;component-title&quot;>Twilio + GPT</h3>
+                        <p class=&quot;component-description&quot;>Implement AI-powered SMS interactions for post-visit surveys and referral link distribution.</p>
+                    </div>
+                    
+                    <div class=&quot;component&quot;>
+                        <h3 class=&quot;component-title&quot;>MonkeyLearn</h3>
+                        <p class=&quot;component-description&quot;>Sentiment analysis tool to monitor social mentions and online reviews of your venue.</p>
+                    </div>
+                    
+                    <div class=&quot;component&quot;>
+                        <h3 class=&quot;component-title&quot;>Zapier AI Actions</h3>
+                        <p class=&quot;component-description&quot;>Connect your CRM, POS and marketing tools with AI-powered automation workflows.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Tab functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                // Add active class to current tab and content
+                tab.classList.add('active');
+                document.getElementById(target).classList.add('active');
+            });
+        });
+
+        // Drag and drop functionality
+        let components = document.querySelectorAll('.component');
+        const workflowCanvas = document.getElementById('workflow-canvas');
+        let draggedItem = null;
+
+        components.forEach(component => {
+            component.addEventListener('dragstart', function(e) {
+                draggedItem = this;
+                setTimeout(() => this.classList.add('dragging'), 0);
+                
+                // Store the component type and title
+                e.dataTransfer.setData('text/plain', JSON.stringify({
+                    type: this.getAttribute('data-type'),
+                    title: this.querySelector('.component-title').innerText,
+                    description: this.querySelector('.component-description').innerText
+                }));
+            });
+
+            component.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                draggedItem = null;
+            });
+        });
+
+        workflowCanvas.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('drag-over');
+        });
+
+        workflowCanvas.addEventListener('dragleave', function() {
+            this.classList.remove('drag-over');
+        });
+
+        workflowCanvas.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            
+            // Remove the placeholder if it exists
+            const placeholder = this.querySelector('.placeholder');
+            if (placeholder) {
+                placeholder.remove();
+            }
+            
+            // Add the dropped item to the workflow
+            if (draggedItem) {
+                const componentData = JSON.parse(e.dataTransfer.getData('text/plain'));
+                
+                // Create a new workflow item
+                const workflowItem = document.createElement('div');
+                workflowItem.className = 'workflow-item';
+                
+                // Add content based on the dragged component
+                workflowItem.innerHTML = `
+                    <div>
+                        <div class=&quot;component-title&quot;>${componentData.title}</div>
+                        <div class=&quot;component-description&quot;>${componentData.description}</div>
+                    </div>
+                    <button class=&quot;btn btn-outline remove-item&quot;>×</button>
+                `;
+                
+                // If it's not the first item, add a connector
+                if (this.children.length > 0) {
+                    const connector = document.createElement('div');
+                    connector.className = 'workflow-connector';
+                    connector.innerHTML = '<div class=&quot;connector-line&quot;></div>';
+                    this.appendChild(connector);
+                }
+                
+                this.appendChild(workflowItem);
+                
+                // Add event listener to remove button
+                workflowItem.querySelector('.remove-item').addEventListener('click', function() {
+                    const parent = this.parentElement;
+                    const connector = parent.previousElementSibling;
+                    if (connector &amp;&amp; connector.classList.contains('workflow-connector')) {
+                        connector.remove();
+                    } else if (parent.nextElementSibling &amp;&amp; parent.nextElementSibling.classList.contains('workflow-connector')) {
+                        parent.nextElementSibling.remove();
+                    }
+                    
+                    parent.remove();
+                    
+                    // If canvas is empty, show placeholder
+                    if (workflowCanvas.children.length === 0) {
+                        const newPlaceholder = document.createElement('div');
+                        newPlaceholder.className = 'placeholder';
+                        newPlaceholder.textContent = 'Drag and drop components here to build your referral loop';
+                        workflowCanvas.appendChild(newPlaceholder);
+                    }
+                });
+            }
+        });
+
+        // Button functionality
+        document.getElementById('clear-workflow').addEventListener('click', function() {
+            while (workflowCanvas.firstChild) {
+                workflowCanvas.removeChild(workflowCanvas.firstChild);
+            }
+            
+            const newPlaceholder = document.createElement('div');
+            newPlaceholder.className = 'placeholder';
+            newPlaceholder.textContent = 'Drag and drop components here to build your referral loop';
+            workflowCanvas.appendChild(newPlaceholder);
+        });
+
+        document.getElementById('save-workflow').addEventListener('click', function() {
+            const items = workflowCanvas.querySelectorAll('.workflow-item');
+            if (items.length === 0) {
+                alert('Please add components to your workflow before saving.');
+                return;
+            }
+            
+            alert('Your referral loop has been saved successfully!');
+        });
+
+        document.getElementById('preview-workflow').addEventListener('click', function() {
+            const items = workflowCanvas.querySelectorAll('.workflow-item');
+            if (items.length === 0) {
+                alert('Please add components to your workflow to preview.');
+                return;
+            }
+            
+            let previewText = 'Your Referral Loop:\n\n';
+            
+            items.forEach((item, index) => {
+                const title = item.querySelector('.component-title').textContent;
+                previewText += `${index + 1}. ${title}\n`;
+            });
+            
+            alert(previewText);
+        });
+
+        // Checklist functionality
+        const checklistItems = document.querySelectorAll('.checklist-item input[type=&quot;checkbox&quot;]');
+        
+        checklistItems.forEach(item => {
+            item.addEventListener('change', function() {
+                const listItem = this.closest('.checklist-item');
+                if (this.checked) {
+                    listItem.style.opacity = '0.6';
+                } else {
+                    listItem.style.opacity = '1';
+                }
+            });
+        });
+    </script>
+
+        <!-- Script for responsive iframe height -->
+        <script>
+          // Adjust iframe height when the content changes
+          function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            const interactionCode = 'math_eq_1ggyzkf9';
+            
+            // Send message to parent window
+            window.parent.postMessage(
+              {
+                interactionCode: interactionCode,
+                type: 'SET_INSTRUCTION_HEIGHT',
+                value: height,
+              },
+              '*'
+            );
+          }
+          
+          // Run on page load
+          window.addEventListener('load', adjustIframeHeight);
+          
+          // Run on window resize
+          window.addEventListener('resize', adjustIframeHeight);
+          
+          // Also run periodically to catch any dynamic content changes
+          setInterval(adjustIframeHeight, 1000);
+        </script>
+      </body>
+</html>" data-interaction-code="math_eq_1ggyzkf9" style="width: 100%; height: 1259px; border: none;"></iframe>
